@@ -1,0 +1,31 @@
+UFO -- LuaJIT FFI Bindings for various "C" libraries
+
+UFO contains LuaJIT FFI bindings for the following libraries:
+  - OpenGL, glu
+  - OpenCL
+  - glfw
+  - curses
+  - AntTweakBar (1.14)
+  
+This repository contains various FFI library bindings for LuaJIT:
+	cl.lua (OpenCL)
+	gl.lua (OpenGL)
+	glu.lua (GLU)
+	glfw.lua (GLFW, http://www.glfw.org)
+	
+Precompiled executables and dynamic libraries were made available:
+	luajit.exe - 32-bit Windows executable
+	glfw.dll   - 32-bit Windows dynamic library
+	luajit     - 32-bit and 64-bit (fat) Mac OS X
+	glfw.dylib - 32-bit and 64-bit (fat) Mac OS X
+
+You can try the examples from the command-line:
+	luajit cl-demo.lua
+	luajit cl-info.lua
+	luajit glfw-triangle.lua
+	luajit glfw-boing.lua
+	luajit noise.lua
+
+Dimiter "malkia" Stanev
+malkia@gmail.com
+  
