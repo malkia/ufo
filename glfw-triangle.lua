@@ -1,3 +1,5 @@
+#!/usr/bin/env luajit
+
 local ffi = require( "ffi" )
 local cl = require( "ffi/OpenCL" )
 local gl = require( "ffi/OpenGL" )
