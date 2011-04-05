@@ -28,6 +28,18 @@
 --------------------------------------------------------------------------
 
 local ffi = require( "ffi" )
+
+local libs = {
+   OSX     = { x86 = "./glfw.dylib", x64 = "./glfw.dylib" },
+   Windows = { x86 = "./glfw.dll",   x64 = "./glfw64.dll" },
+   Linux   = { x86 = "./glfw.so",    x64 = "./glfw.so" },
+   BSD     = { x86 = "./glfw.so",    x64 = "./glfw.so" },
+   POSIX   = { x86 = "./glfw.so",    x64 = "./glfw.so" },
+   Other   = { x86 = "./glfw.so",    x64 = "./glfw.so" },
+}
+
+local lib = ffi.load( libs[ ffi.os ][ ffi.arch ] )
+
 ffi.cdef[[
 enum {
    GLFW_VERSION_MAJOR         =  3,
@@ -202,63 +214,62 @@ enum {
    GLFW_JOYSTICK_15           = 14,
    GLFW_JOYSTICK_16           = 15,
    GLFW_JOYSTICK_LAST         = GLFW_JOYSTICK_16,
-
    GLFW_WINDOWED              = 0x00010001,
    GLFW_FULLSCREEN            = 0x00010002,
    GLFW_ACTIVE                = 0x00020001,
-    GLFW_ICONIFIED             = 0x00020002,
-    GLFW_ACCELERATED           = 0x00020003,
-    GLFW_RED_BITS              = 0x00020004,
-    GLFW_GREEN_BITS            = 0x00020005,
-    GLFW_BLUE_BITS             = 0x00020006,
-    GLFW_ALPHA_BITS            = 0x00020007,
-    GLFW_DEPTH_BITS            = 0x00020008,
-    GLFW_STENCIL_BITS          = 0x00020009,
-    GLFW_REFRESH_RATE          = 0x0002000A,
-    GLFW_ACCUM_RED_BITS        = 0x0002000B,
-    GLFW_ACCUM_GREEN_BITS      = 0x0002000C,
-    GLFW_ACCUM_BLUE_BITS       = 0x0002000D,
-    GLFW_ACCUM_ALPHA_BITS      = 0x0002000E,
-    GLFW_AUX_BUFFERS           = 0x0002000F,
-    GLFW_STEREO                = 0x00020010,
-    GLFW_WINDOW_NO_RESIZE      = 0x00020011,
-    GLFW_FSAA_SAMPLES          = 0x00020012,
-    GLFW_OPENGL_VERSION_MAJOR  = 0x00020013,
-    GLFW_OPENGL_VERSION_MINOR  = 0x00020014,
-    GLFW_OPENGL_FORWARD_COMPAT = 0x00020015,
-    GLFW_OPENGL_DEBUG_CONTEXT  = 0x00020016,
-    GLFW_OPENGL_PROFILE        = 0x00020017,
-    GLFW_OPENGL_CORE_PROFILE   = 0x00000001,
-    GLFW_OPENGL_COMPAT_PROFILE = 0x00000002,
-    GLFW_OPENGL_ES2_PROFILE    = 0x00000004,
-    GLFW_MOUSE_CURSOR          = 0x00030001,
-    GLFW_STICKY_KEYS           = 0x00030002,
-    GLFW_STICKY_MOUSE_BUTTONS  = 0x00030003,
-    GLFW_SYSTEM_KEYS           = 0x00030004,
-    GLFW_KEY_REPEAT            = 0x00030005,
-    GLFW_PRESENT               = 0x00050001,
-    GLFW_AXES                  = 0x00050002,
-    GLFW_BUTTONS               = 0x00050003,
-    GLFW_NO_ERROR              = 0,
-    GLFW_NOT_INITIALIZED       = 0x00070001,
-    GLFW_NO_CURRENT_WINDOW     = 0x00070002,
-    GLFW_INVALID_ENUM          = 0x00070003,
-    GLFW_INVALID_VALUE         = 0x00070004,
-    GLFW_OUT_OF_MEMORY         = 0x00070005,
-    GLFW_OPENGL_UNAVAILABLE    = 0x00070006,
-    GLFW_VERSION_UNAVAILABLE   = 0x00070007,
-    GLFW_PLATFORM_ERROR        = 0x00070008,
-    GLFW_GAMMA_RAMP_SIZE       = 256
+   GLFW_ICONIFIED             = 0x00020002,
+   GLFW_ACCELERATED           = 0x00020003,
+   GLFW_RED_BITS              = 0x00020004,
+   GLFW_GREEN_BITS            = 0x00020005,
+   GLFW_BLUE_BITS             = 0x00020006,
+   GLFW_ALPHA_BITS            = 0x00020007,
+   GLFW_DEPTH_BITS            = 0x00020008,
+   GLFW_STENCIL_BITS          = 0x00020009,
+   GLFW_REFRESH_RATE          = 0x0002000A,
+   GLFW_ACCUM_RED_BITS        = 0x0002000B,
+   GLFW_ACCUM_GREEN_BITS      = 0x0002000C,
+   GLFW_ACCUM_BLUE_BITS       = 0x0002000D,
+   GLFW_ACCUM_ALPHA_BITS      = 0x0002000E,
+   GLFW_AUX_BUFFERS           = 0x0002000F,
+   GLFW_STEREO                = 0x00020010,
+   GLFW_WINDOW_NO_RESIZE      = 0x00020011,
+   GLFW_FSAA_SAMPLES          = 0x00020012,
+   GLFW_OPENGL_VERSION_MAJOR  = 0x00020013,
+   GLFW_OPENGL_VERSION_MINOR  = 0x00020014,
+   GLFW_OPENGL_FORWARD_COMPAT = 0x00020015,
+   GLFW_OPENGL_DEBUG_CONTEXT  = 0x00020016,
+   GLFW_OPENGL_PROFILE        = 0x00020017,
+   GLFW_OPENGL_CORE_PROFILE   = 0x00000001,
+   GLFW_OPENGL_COMPAT_PROFILE = 0x00000002,
+   GLFW_OPENGL_ES2_PROFILE    = 0x00000004,
+   GLFW_MOUSE_CURSOR          = 0x00030001,
+   GLFW_STICKY_KEYS           = 0x00030002,
+   GLFW_STICKY_MOUSE_BUTTONS  = 0x00030003,
+   GLFW_SYSTEM_KEYS           = 0x00030004,
+   GLFW_KEY_REPEAT            = 0x00030005,
+   GLFW_PRESENT               = 0x00050001,
+   GLFW_AXES                  = 0x00050002,
+   GLFW_BUTTONS               = 0x00050003,
+   GLFW_NO_ERROR              = 0,
+   GLFW_NOT_INITIALIZED       = 0x00070001,
+   GLFW_NO_CURRENT_WINDOW     = 0x00070002,
+   GLFW_INVALID_ENUM          = 0x00070003,
+   GLFW_INVALID_VALUE         = 0x00070004,
+   GLFW_OUT_OF_MEMORY         = 0x00070005,
+   GLFW_OPENGL_UNAVAILABLE    = 0x00070006,
+   GLFW_VERSION_UNAVAILABLE   = 0x00070007,
+   GLFW_PLATFORM_ERROR        = 0x00070008,
+   GLFW_GAMMA_RAMP_SIZE       = 256
 };
 
 typedef struct _GLFWwindow* GLFWwindow;
 
 typedef struct {
-            int width;
-            int height;
-            int redBits;
-            int blueBits;
-            int greenBits;
+   int width;
+   int height;
+   int redBits;
+   int blueBits;
+   int greenBits;
 } GLFWvidmode;
 
 typedef struct {
@@ -315,14 +326,4 @@ void        glfwEnable(               GLFWwindow window, int token );
 void        glfwDisable(              GLFWwindow window, int token );
 ]]
 
-local library = {
-   ["OSX"]     = "./glfw.dylib",
-   ["Windows"] = "./glfw.dll",
-   ["Linux"]   = "./glfw.so",
-   ["BSD"]     = "./glfw.so",
-   ["POSIX"]   = "./glfw.so",
-   ["Other"]   = "./glfw.so",
-}
-
-return ffi.load( library[ ffi.os ] )
-
+return lib

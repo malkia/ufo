@@ -1,10 +1,9 @@
 local ffi = require( "ffi" )
 local libs = {
-   Windows = { x64 = "AntTweakBar64.dll", x86 = "AntTweakBar.dll" },
-   OSX     = { x64 = "AntTweakBar.dylib", x86 = "AntTweakBar.dylib" },
+   Windows = { x64 = "./AntTweakBar64.dll", x86 = "./AntTweakBar.dll" },
+   OSX     = { x64 = "./AntTweakBar.dylib", x86 = "./AntTweakBar.dylib" },
 }
-print( ffi.os, ffi.arch )
-print( libs[ffi.os] )
+
 local lib = ffi.load( libs[ ffi.os ][ ffi.arch ] )
 
 ffi.cdef [[
@@ -174,11 +173,11 @@ ffi.cdef [[
       const char* TwGetLastError(              );
       void        TwHandleErrors(              TwErrorHandler errorHandler);
       int         TwEventSDL(                  const void *sdlEvent, unsigned char sdlMajorVersion, unsigned char sdlMinorVersion);
-      int         TwEventMouseButtonGLFWcdecl( int glfwButton, int glfwAction );
-      int         TwEventKeyGLFWcdecl(         int glfwKey,    int glfwAction );
-      int         TwEventCharGLFWcdecl(        int glfwChar,   int glfwAction );
-      int         TwEventMousePosGLFWcdecl(    int mouseX,     int mouseY     );
-      int         TwEventMouseWheelGLFWcdecl(  int wheelPos                   );
+      int         TwEventMouseButtonGLFW(      int glfwButton, int glfwAction );
+      int         TwEventKeyGLFW(              int glfwKey,    int glfwAction );
+      int         TwEventCharGLFW(             int glfwChar,   int glfwAction );
+      int         TwEventMousePosGLFW(         int mouseX,     int mouseY     );
+      int         TwEventMouseWheelGLFW(       int wheelPos                   );
       int         TwEventMouseButtonGLUT(      int glutButton, int glutState, int mouseX, int mouseY);
       int         TwEventMouseMotionGLUT(      int mouseX,     int mouseY);
       int         TwEventKeyboardGLUT(         unsigned char glutKey, int mouseX, int mouseY );

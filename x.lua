@@ -1,5 +1,6 @@
 local ffi, bit = require( "ffi" ), require( "bit" )
 local gl, glfw = require( "OpenGL" ), require( "glfw" )
+local tw = require( "AntTweakBar" )
 
 local font = require( "x-font" )
 local font = ffi.new( "uint8_t[?]", #font, font )
@@ -144,19 +145,42 @@ local function main()
    glfw.glfwOpenWindowHint(glfw.GLFW_WINDOW_NO_RESIZE, 1)
    local window = glfw.glfwOpenWindow( width, height, glfw.GLFW_WINDOWED, "X", nil )
 
+   tw.TwInit( tw.TW_OPENGL, nil )
+
 --   local shader = glCreateShader( gl.GL_VERTEX_SHADER, vertexShaderSource )
 
    assert( window )
    glfw.glfwSetWindowPos(window, window_x, window_y)
---   glfw.glfwEnable(window, glfw.GLFW_STICKY_KEYS)
-   glfw.glfwSwapInterval(0);
+   glfw.glfwEnable(window, glfw.GLFW_STICKY_KEYS)
+   glfw.glfwEnable(window,glfw.GLFW_STICKY_MOUSE_BUTTONS)
+   glfw.glfwSwapInterval(1);
    local ct = glfw.glfwGetTime()
    local pt = glfw.glfwGetTime()
+
+   local bar = tw.TwNewBar( "Blah" )
+
+   local int1, int2 = ffi.new( "int[1]" ), ffi.new( "int[1]" )
+
    while glfw.glfwIsWindow(window) 
    and   glfw.glfwGetKey(window, glfw.GLFW_KEY_ESCAPE) ~= glfw.GLFW_PRESS 
    do
       pt, ct = ct, glfw.glfwGetTime()
       frame = frame + 1
+
+      glfw.glfwGetWindowSize(window, int1, int2)
+      width, height = int1[0], int2[0]
+      
+      local mb1 = glfw.glfwGetMouseButton(window, glfw.GLFW_MOUSE_BUTTON_LEFT)
+      local mb2 = glfw.glfwGetMouseButton(window, glfw.GLFW_MOUSE_BUTTON_MIDDLE)
+      local mb3 = glfw.glfwGetMouseButton(window, glfw.GLFW_MOUSE_BUTTON_RIGHT)
+      glfw.glfwGetMousePos(window, int1, int2)
+      mx, my = int1[0], int2[0]
+
+      tw.TwMouseButton(mb1, tw.TW_MOUSE_LEFT)
+      tw.TwMouseButton(mb2, tw.TW_MOUSE_MIDDLE)
+      tw.TwMouseButton(mb3, tw.TW_MOUSE_RIGHT)
+      tw.TwMouseMotion(mx, my)
+      tw.TwWindowSize(width, height)
       
       gl.glClear(gl.GL_COLOR_BUFFER_BIT);
 
@@ -175,6 +199,8 @@ local function main()
       gl.glDisableClientState(gl.GL_VERTEX_ARRAY);
       vbo_index = 0
       
+      tw.TwDraw()
+
       glfw.glfwSwapBuffers();
       glfw.glfwPollEvents();
    end
