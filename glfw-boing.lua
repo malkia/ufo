@@ -1,7 +1,7 @@
 local ffi  = require( "ffi" )
-local glfw = require( "glfw" )
-local gl   = require( "OpenGL" )
-local glu  = require( "glu" )
+local glfw = require( "ffi/glfw" )
+local gl   = require( "ffi/OpenGL" )
+local glu  = require( "ffi/glu" )
 local bit  = require( "bit" )
 local bor  = bit.bor
 

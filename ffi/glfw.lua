@@ -1,44 +1,17 @@
---------------------------------------------------------------------------
--- GLFW - An OpenGL library
--- API version: 3.0
--- WWW:         http://www.glfw.org/
---------------------------------------------------------------------------
--- Copyright (c) 2002-2006 Marcus Geelnard
--- Copyright (c) 2006-2010 Camilla Berglund <elmindreda@elmindreda.org>
--- Copyright (c) 2010-2011 Dimiter "malkia" Stanev <malkia@gmail.com>
---
--- This software is provided 'as-is', without any express or implied
--- warranty. In no event will the authors be held liable for any damages
--- arising from the use of this software.
---
--- Permission is granted to anyone to use this software for any purpose,
--- including commercial applications, and to alter it and redistribute it
--- freely, subject to the following restrictions:
---
--- 1. The origin of this software must not be misrepresented; you must not
---    claim that you wrote the original software. If you use this software
---    in a product, an acknowledgment in the product documentation would
---    be appreciated but is not required.
---
--- 2. Altered source versions must be plainly marked as such, and must not
---    be misrepresented as being the original software.
---
--- 3. This notice may not be removed or altered from any source
---    distribution.
---------------------------------------------------------------------------
+local ffi  = require( "ffi" )
 
-local ffi = require( "ffi" )
-
-local libs = {
-   OSX     = { x86 = "./glfw.dylib", x64 = "./glfw.dylib" },
-   Windows = { x86 = "./glfw.dll",   x64 = "./glfw64.dll" },
-   Linux   = { x86 = "./glfw.so",    x64 = "./glfw.so" },
-   BSD     = { x86 = "./glfw.so",    x64 = "./glfw.so" },
-   POSIX   = { x86 = "./glfw.so",    x64 = "./glfw.so" },
-   Other   = { x86 = "./glfw.so",    x64 = "./glfw.so" },
+local libs = ffi_glfw_libs or {
+   OSX     = { x86 = "bin/glfw.dylib", x64 = "bin/glfw.dylib" },
+   Windows = { x86 = "bin/glfw32.dll", x64 = "bin/glfw64.dll" },
+   Linux   = { x86 = "bin/glfw32.so",  x64 = "bin/glfw64.so"  },
+   BSD     = { x86 = "bin/glfw32.so",  x64 = "bin/glfw64.so"  },
+   POSIX   = { x86 = "bin/glfw32.so",  x64 = "bin/glfw64.so"  },
+   Other   = { x86 = "bin/glfw32.so",  x64 = "bin/glfw64.so"  },
 }
 
-local lib = ffi.load( libs[ ffi.os ][ ffi.arch ] )
+local lib  = ffi_glfw_lib or libs[ ffi.os ][ ffi.arch ]
+
+local glfw = ffi.load( lib )
 
 ffi.cdef[[
 enum {
@@ -326,4 +299,4 @@ void        glfwEnable(               GLFWwindow window, int token );
 void        glfwDisable(              GLFWwindow window, int token );
 ]]
 
-return lib
+return glfw

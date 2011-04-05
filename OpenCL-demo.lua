@@ -1,7 +1,7 @@
 #!/usr/bin/env luajit
 
 local ffi = require( "ffi" )
-local cl  = require( "OpenCL" )
+local cl  = require( "ffi/OpenCL" )
 local cl_error = 0
 local cl_error_buf = ffi.new( "int[1]" )
 

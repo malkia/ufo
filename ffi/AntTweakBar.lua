@@ -1,10 +1,17 @@
-local ffi = require( "ffi" )
-local libs = {
-   Windows = { x64 = "./AntTweakBar64.dll", x86 = "./AntTweakBar.dll" },
-   OSX     = { x64 = "./AntTweakBar.dylib", x86 = "./AntTweakBar.dylib" },
+local ffi  = require( "ffi" )
+
+local libs = ffi_AntTweakBar_libs or {
+   OSX     = { x86 = "bin/AntTweakBar.dylib", x64 = "bin/AntTweakBar.dylib" },
+   Windows = { x86 = "bin/AntTweakBar32.dll", x64 = "bin/AntTweakBar64.dll" },
+   Linux   = { x86 = "bin/AntTweakBar32.so",  x64 = "bin/AntTweakBar64.so"  },
+   BSD     = { x86 = "bin/AntTweakBar32.so",  x64 = "bin/AntTweakBar64.so"  },
+   POSIX   = { x86 = "bin/AntTweakBar32.so",  x64 = "bin/AntTweakBar64.so"  },
+   Other   = { x86 = "bin/AntTweakBar32.so",  x64 = "bin/AntTweakBar64.so"  }, 
 }
 
-local lib = ffi.load( libs[ ffi.os ][ ffi.arch ] )
+local lib  = ffi_AntTweakBar_lib or libs[ ffi.os ][ ffi.arch ]
+
+local tw   = ffi.load( lib )
 
 ffi.cdef [[
       enum { TW_VERSION = 114 }
@@ -192,4 +199,4 @@ else
    ffi.cdef( "int TwEventWin(void *wnd, unsigned int msg, unsigned int wParam, int lParam);" )
 end
 
-return lib
+return tw

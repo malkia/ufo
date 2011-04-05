@@ -1,8 +1,8 @@
 local ffi = require( "ffi" )
-local cl = require( "OpenCL" )
-local gl = require( "OpenGL" )
-local glu = require( "glu" )
-local glfw = require( "glfw" )
+local cl = require( "ffi/OpenCL" )
+local gl = require( "ffi/OpenGL" )
+local glu = require( "ffi/glu" )
+local glfw = require( "ffi/glfw" )
 
 local function main()
    assert( glfw.glfwInit() )

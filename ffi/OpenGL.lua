@@ -1,4 +1,17 @@
-local ffi = require( "ffi" )
+local ffi  = require( "ffi" )
+
+local libs = ffi_OpenGL_libs or {
+   OSX     = { x86 = "OpenGL.framework/OpenGL", x64 = "OpenGL.framework/OpenGL" },
+   Windows = { x86 = "OPENGL32.DLL",            x64 = "OPENGL32.DLL" },
+   Linux   = { x86 = "libGL.so",                x64 = "libGL.so" },
+   BSD     = { x86 = "libGL.so",                x64 = "libGL.so" },
+   POSIX   = { x86 = "libGL.so",                x64 = "libGL.so" },
+   Other   = { x86 = "libGL.so",                x64 = "libGL.so" },
+}
+
+local lib  = ffi_OpenGL_lib or libs[ ffi.os ][ ffi.arch ]
+
+local gl   = ffi.load( lib )
 
 ffi.cdef[[
 enum {
@@ -1973,12 +1986,5 @@ void glUniformMatrix3x4fv (GLint location, GLsizei count, GLboolean transpose, c
 void glUniformMatrix4x3fv (GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
 ]]
 
-local library = {
-   ["OSX"]     = "OpenGL.framework/OpenGL",
-   ["Windows"] = "OPENGL32.DLL",
-   ["Linux"]   = "libGL.so",
-   ["BSD"]     = "libGL.so",
-   ["POSIX"]   = "libGL.so",
-   ["Other"]   = "libGL.so",
-}
-return ffi.load( library[ ffi.os ] )
+return gl
+

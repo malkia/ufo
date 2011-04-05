@@ -1,5 +1,17 @@
-#!/usr/bin/env luajit 
-local ffi = require( "ffi" )
+local ffi  = require( "ffi" )
+
+local libs = ffi_OpenCL_libs or {
+   OSX     = { x86 = "OpenCL.framework/OpenCL", x64 = "OpenCL.framework/OpenCL" },
+   Windows = { x86 = "OPENCL.DLL",              x64 = "OPENCL.DLL"              },
+   Linux   = { x86 = "libOpenCL.so",            x64 = "libOpenCL.so"            },
+   BSD     = { x86 = "libOpenCL.so",            x64 = "libOpenCL.so"            },
+   POSIX   = { x86 = "libOpenCL.so",            x64 = "libOpenCL.so"            },
+   Other   = { x86 = "libOpenCL.so",            x64 = "libOpenCL.so"            },
+}
+
+local lib  = ffi_OpenCL_lib or libs[ ffi.os ][ ffi.arch ]
+
+local cl   = ffi.load( lib )
 
 ffi.cdef[[
 enum {
@@ -601,17 +613,6 @@ cl_int   clEnqueueReleaseGLObjects(  cl_command_queue, cl_uint, const cl_mem *, 
 cl_int   clGetGLContextInfoKHR(      const cl_context_properties*, cl_gl_context_info, size_t, void *, size_t *);
 cl_event clCreateEventFromGLsyncKHR( cl_context, cl_GLsync, cl_int * );
 ]]
-
-local library = {
-   ["OSX"]     = "OpenCL.framework/OpenCL",
-   ["Windows"] = "OPENCL.DLL",
-   ["Linux"]   = "libOpenCL.so",
-   ["BSD"]     = "libOpenCL.so",
-   ["POSIX"]   = "libOpenCL.so",
-   ["Other"]   = "libOpenCL.so",
-}
-
-local cl = ffi.load( library[ ffi.os ] )
 
 function clGetPlatforms()
    local plist = {}

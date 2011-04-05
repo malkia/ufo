@@ -1,8 +1,8 @@
 local ffi, bit = require( "ffi" ), require( "bit" )
-local gl, glfw = require( "OpenGL" ), require( "glfw" )
-local tw = require( "AntTweakBar" )
+local gl, glfw = require( "ffi/OpenGL" ), require( "ffi/glfw" )
+local tw = require( "ffi/AntTweakBar" )
 
-local font = require( "x-font" )
+local font = require( "font1" )
 local font = ffi.new( "uint8_t[?]", #font, font )
 
 local random = math.random
@@ -126,7 +126,7 @@ local function read_file(n)
    return f:read("*all")
 end
 
-local text = read_file("x-font.lua")
+local text = read_file("font1.lua")
 
 local fullscreen = false
 

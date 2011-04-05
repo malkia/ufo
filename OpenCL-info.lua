@@ -1,7 +1,7 @@
 #!/usr/bin/env luajit 
 
 local ffi = require( "ffi" )
-local cl  = require( "OpenCL"  )
+local cl  = require( "ffi/OpenCL"  )
 
 local function dump( value )
   if type(value) ~= "table" then
