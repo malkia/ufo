@@ -25,8 +25,8 @@ local ANIMATION_SPEED  = 50 -- Animation speed (50.0 mimics the original GLUT de
 local MAX_DELTA_T      = 0.02 -- Maximum allowed delta time per physics iteration 
 local DRAW_BALL        = 0
 local DRAW_BALL_SHADOW = 1
-local deg_rot_y        = 0;
-local deg_rot_y_inc    = 2;
+local deg_rot_y        = 0
+local deg_rot_y_inc    = 2
 local ball_x           = -RADIUS
 local ball_y           = -RADIUS
 local ball_x_inc       = 1
@@ -91,12 +91,12 @@ end
 local function BounceBall( dt )
 	if ball_x > BOUNCE_WIDTH/2 + WALL_R_OFFSET then
 		ball_x_inc    = -0.5 - 0.75 * random()
-		deg_rot_y_inc = -deg_rot_y_inc;
+		deg_rot_y_inc = -deg_rot_y_inc
 	end
 	
 	if ball_x < -(BOUNCE_HEIGHT/2 + WALL_L_OFFSET) then
 		ball_x_inc    =  0.5 + 0.75 * random()
-		deg_rot_y_inc = -deg_rot_y_inc;
+		deg_rot_y_inc = -deg_rot_y_inc
 	end
 
 	if ball_y > BOUNCE_HEIGHT/2 then
@@ -107,8 +107,8 @@ local function BounceBall( dt )
 		ball_y_inc =  0.75 + random()
 	end
 
-	ball_x = ball_x + ball_x_inc * dt * ANIMATION_SPEED;
-	ball_y = ball_y + ball_y_inc * dt * ANIMATION_SPEED;
+	ball_x = ball_x + ball_x_inc * dt * ANIMATION_SPEED
+	ball_y = ball_y + ball_y_inc * dt * ANIMATION_SPEED
 
 	if ball_y_inc < 0 then
 		sign = -1.0
@@ -133,12 +133,12 @@ local colorToggle = false
 local function DrawBoingBallBand( long_lo, long_hi )
 	for lat_deg = 0, 360 - STEP_LATITUDE, STEP_LATITUDE do
 		if colorToggle then
-			gl.glColor3f( 0.8, 0.1, 0.1 );
+			gl.glColor3f( 0.8, 0.1, 0.1 )
 		else
-			gl.glColor3f( 0.95, 0.95, 0.95 );
+			gl.glColor3f( 0.95, 0.95, 0.95 )
 		end
 		
-		colorToggle = not colorToggle;
+		colorToggle = not colorToggle
 
 		if drawBallHow == DRAW_BALL_SHADOW then
 			gl.glColor3f( 0.35, 0.35, 0.35 )
@@ -149,8 +149,8 @@ local function DrawBoingBallBand( long_lo, long_hi )
 		vert_se = {}
 		vert_sw = {}
 		
-		vert_nw.y = cos_deg(long_hi) * RADIUS;
-		vert_se.y = cos_deg(long_lo) * RADIUS;
+		vert_nw.y = cos_deg(long_hi) * RADIUS
+		vert_se.y = cos_deg(long_lo) * RADIUS
 		vert_ne.y = vert_nw.y
 		vert_sw.y = vert_se.y
 		vert_ne.x = cos_deg( lat_deg                 ) * (RADIUS * sin_deg( long_lo + STEP_LONGITUDE ))
@@ -162,7 +162,7 @@ local function DrawBoingBallBand( long_lo, long_hi )
 		vert_nw.z = sin_deg( lat_deg + STEP_LATITUDE ) * (RADIUS * sin_deg( long_lo + STEP_LONGITUDE ))
 		vert_sw.z = sin_deg( lat_deg + STEP_LATITUDE ) * (RADIUS * sin_deg( long_lo                  ))
 
-		gl.glBegin( gl.GL_POLYGON );
+		gl.glBegin( gl.GL_POLYGON )
 		vert_norm = CrossProduct( vert_ne, vert_nw, vert_sw )
 		gl.glNormal3f( vert_norm.x, vert_norm.y, vert_norm.z )
 		gl.glVertex3f( vert_ne.x, vert_ne.y, vert_ne.z )
@@ -170,7 +170,7 @@ local function DrawBoingBallBand( long_lo, long_hi )
 		gl.glVertex3f( vert_sw.x, vert_sw.y, vert_sw.z )
 		gl.glVertex3f( vert_se.x, vert_se.y, vert_se.z )
 
-		gl.glEnd();
+		gl.glEnd()
 
 		if BOING_DEBUG then
 			print( "----------------------------------------------------------- \n" )
@@ -183,15 +183,15 @@ local function DrawBoingBallBand( long_lo, long_hi )
 
 	end
 
-	colorToggle = not colorToggle;
+	colorToggle = not colorToggle
 end
 
 local function DrawBoingBall( )
-	gl.glPushMatrix();
-	gl.glMatrixMode( gl.GL_MODELVIEW );
-	gl.glTranslatef( 0, 0, DIST_BALL );
+	gl.glPushMatrix()
+	gl.glMatrixMode( gl.GL_MODELVIEW )
+	gl.glTranslatef( 0, 0, DIST_BALL )
 
-	local dt_total = dt;
+	local dt_total = dt
 	while dt_total > 0  do
 		local dt2 = dt_total
 		if dt2 > MAX_DELTA_T then
@@ -202,23 +202,23 @@ local function DrawBoingBall( )
 		deg_rot_y = TruncateDeg( deg_rot_y + deg_rot_y_inc*dt2*ANIMATION_SPEED )
 	end
 
-	gl.glTranslatef( ball_x, ball_y, 0.0 );
+	gl.glTranslatef( ball_x, ball_y, 0.0 )
 
 	if drawBallHow == DRAW_BALL_SHADOW then
 		gl.glTranslatef( SHADOW_OFFSET_X, SHADOW_OFFSET_Y, SHADOW_OFFSET_Z )
 	end
 
 	gl.glRotatef( -20, 0, 0, 1 )
-	gl.glRotatef( deg_rot_y, 0, 1, 0 );
-	gl.glCullFace( gl.GL_FRONT );
-	gl.glEnable( gl.GL_CULL_FACE );
-	gl.glEnable( gl.GL_NORMALIZE );
+	gl.glRotatef( deg_rot_y, 0, 1, 0 )
+	gl.glCullFace( gl.GL_FRONT )
+	gl.glEnable( gl.GL_CULL_FACE )
+	gl.glEnable( gl.GL_NORMALIZE )
 
 	for lon_deg = 0, 180, STEP_LONGITUDE do
 		DrawBoingBallBand( lon_deg, lon_deg + STEP_LONGITUDE )
 	end
 	
-	gl.glPopMatrix();
+	gl.glPopMatrix()
 end
 
 local function DrawGrid()
@@ -228,13 +228,13 @@ local function DrawGrid()
 	local sizeCell  = GRID_SIZE / rowTotal
 	local z_offset  = -40
    
-	gl.glPushMatrix();
-	gl.glDisable( gl.GL_CULL_FACE );
-	gl.glTranslatef( 0, 0, DIST_BALL );
+	gl.glPushMatrix()
+	gl.glDisable( gl.GL_CULL_FACE )
+	gl.glTranslatef( 0, 0, DIST_BALL )
 	for col = 0, colTotal do
 		local xl = -GRID_SIZE / 2 + col * sizeCell
 		local xr = xl + widthLine
-		local yt =  GRID_SIZE / 2;
+		local yt =  GRID_SIZE / 2
 		local yb = -GRID_SIZE / 2 - widthLine
 		gl.glBegin( gl.GL_POLYGON )
 		gl.glColor3f( 0.6, 0.1, 0.6 )
@@ -255,9 +255,9 @@ local function DrawGrid()
 		gl.glVertex3f( xl, yt, z_offset )
 		gl.glVertex3f( xl, yb, z_offset )
 		gl.glVertex3f( xr, yb, z_offset )
-		gl.glEnd();
+		gl.glEnd()
 	end
-	gl.glPopMatrix();
+	gl.glPopMatrix()
 end
 
 
@@ -299,26 +299,26 @@ local function main()
 	local window = glfw.glfwOpenWindow( 400, 400, glfw.GLFW_WINDOWED, "Boing (classic Amiga demo)", nil )
 	assert( window )
 
-	glfw.glfwEnable( window, glfw.GLFW_STICKY_KEYS );
-	glfw.glfwSwapInterval( 1 );
-	glfw.glfwSetTime( 0 );
+	glfw.glfwEnable( window, glfw.GLFW_STICKY_KEYS )
+	glfw.glfwSwapInterval( 1 )
+	glfw.glfwSetTime( 0 )
 
-	init();
+	init()
 
 	while glfw.glfwIsWindow(window) and glfw.glfwGetKey( window, glfw.GLFW_KEY_ESCAPE ) ~= glfw.GLFW_PRESS do
 		local width, height = ffi.new( "int[1]" ), ffi.new( "int[1]" )
-		glfw.glfwGetWindowSize(window, width, height);
+		glfw.glfwGetWindowSize(window, width, height)
 		width, height = width[0], height[0]	
 		reshape( window, width, height )
 		
-		t = glfw.glfwGetTime();
-		dt = t - t_old;
-		t_old = t;
+		t = glfw.glfwGetTime()
+		dt = t - t_old
+		t_old = t
 
-		display();
+		display()
 
-		glfw.glfwSwapBuffers();
-		glfw.glfwPollEvents();
+		glfw.glfwSwapBuffers()
+		glfw.glfwPollEvents()
 	end
 	glfw.glfwTerminate()
 end

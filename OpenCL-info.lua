@@ -14,7 +14,7 @@ local function dump( value )
     c = ", "
   end
   s = s .. " }"
-  return s;
+  return s
 end
 
 local function test_it()

@@ -15,7 +15,7 @@ local function dump( value )
     s = s .. c .. dump(k) .. " = " .. dump(v)
     c = ", "
   end
-  return s .. " }";
+  return s .. " }"
 end
 
 local function main()
@@ -88,11 +88,11 @@ local function main()
 	 end
       end
       
-      gl.glClear(gl.GL_COLOR_BUFFER_BIT);
-      gl.glMatrixMode(gl.GL_PROJECTION);
-      gl.glLoadIdentity();
-      gl.glMatrixMode( gl.GL_MODELVIEW );
-      gl.glLoadIdentity();
+      gl.glClear(gl.GL_COLOR_BUFFER_BIT)
+      gl.glMatrixMode(gl.GL_PROJECTION)
+      gl.glLoadIdentity()
+      gl.glMatrixMode( gl.GL_MODELVIEW )
+      gl.glLoadIdentity()
  
       glfw.glfwGetMousePos(window, int1, int2)
       mouse.x, mouse.y = int1[0], int2[0]
@@ -120,12 +120,12 @@ local function main()
 	 tw.TwDraw()
       end
 
-      glfw.glfwSwapBuffers();
-      glfw.glfwPollEvents();
+      glfw.glfwSwapBuffers()
+      glfw.glfwPollEvents()
    end
 
    tw.TwTerminate()
-   glfw.glfwTerminate();
+   glfw.glfwTerminate()
 end
 
 main()

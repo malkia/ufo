@@ -25,12 +25,12 @@ local function DrawModel( wireframe )
       OFF( gl.GL_CULL_FACE )
       OFF( gl.GL_LIGHTING )
       gl.glPolygonMode( gl.GL_FRONT_AND_BACK, gl.GL_LINE) 
-      num_pass = 1;
+      num_pass = 1
    else
       ON( gl.GL_CULL_FACE )
       ON( gl.GL_LIGHTING )
       gl.glPolygonMode( gl.GL_FRONT_AND_BACK, gl.GL_FILL )
-      num_pass = 2;
+      num_pass = 2
    end
 
    local N, V = gl.glNormal3f, gl.glVertex3f
@@ -38,15 +38,15 @@ local function DrawModel( wireframe )
    gl.glCullFace( gl.GL_FRONT )
    for pass=1, num_pass do
       
-      gl.glBegin(gl.GL_QUADS);
-      N( 0, 0,-1); V(0,0,0); V(0,1,0); V(1,1,0); V(1,0,0); -- front face
-      N( 0, 0, 1); V(0,0,1); V(1,0,1); V(1,1,1); V(0,1,1); -- back face
-      N(-1, 0, 0); V(0,0,0); V(0,0,1); V(0,1,1); V(0,1,0); -- left face
-      N( 1, 0, 0); V(1,0,0); V(1,1,0); V(1,1,1); V(1,0,1); -- right face
-      N( 0,-1, 0); V(0,0,0); V(1,0,0); V(1,0,1); V(0,0,1); -- bottom face
-      N( 0, 1, 0); V(0,1,0); V(0,1,1); V(1,1,1); V(1,1,0); -- top face
-      gl.glEnd();
-
+      gl.glBegin(gl.GL_QUADS)
+      N( 0, 0,-1) V(0,0,0) V(0,1,0) V(1,1,0) V(1,0,0) -- front face
+      N( 0, 0, 1) V(0,0,1) V(1,0,1) V(1,1,1) V(0,1,1) -- back face
+      N(-1, 0, 0) V(0,0,0) V(0,0,1) V(0,1,1) V(0,1,0) -- left face
+      N( 1, 0, 0) V(1,0,0) V(1,1,0) V(1,1,1) V(1,0,1) -- right face
+      N( 0,-1, 0) V(0,0,0) V(1,0,0) V(1,0,1) V(0,0,1) -- bottom face
+      N( 0, 1, 0) V(0,1,0) V(0,1,1) V(1,1,1) V(1,1,0) -- top face
+      gl.glEnd()
+      
       gl.glCullFace( gl.GL_BACK )
    end
 end
@@ -97,16 +97,16 @@ local function main()
       glfw.glfwGetWindowSize(window, int1, int2)
       if width ~= int1[0] or height ~= int2[0] then
          width, height = int1[0], int2[0]
-	 gl.glViewport(0, 0, width, height);
-	 gl.glMatrixMode(gl.GL_PROJECTION);
-	 gl.glLoadIdentity();        
+	 gl.glViewport(0, 0, width, height)
+	 gl.glMatrixMode(gl.GL_PROJECTION)
+	 gl.glLoadIdentity()        
 	 glu.gluPerspective(40, width/height, 1, 10)
 	 glu.gluLookAt(-1,0,3, 0,0,0, 0,1,0)
-	 tw.TwWindowSize(width, height);         
+	 tw.TwWindowSize(width, height)         
       end
 
       gl.glClearColor(var_bg_color[0], var_bg_color[1], var_bg_color[2], 1)
-      gl.glClear(gl.GL_COLOR_BUFFER_BIT + gl.GL_DEPTH_BUFFER_BIT);
+      gl.glClear(gl.GL_COLOR_BUFFER_BIT + gl.GL_DEPTH_BUFFER_BIT)
 
       local dt = os.clock() - var_time[0]
       var_time[0] = var_time[0] + dt
@@ -145,12 +145,12 @@ local function main()
 	 tw.TwDraw()
       end
 
-      glfw.glfwSwapBuffers();
-      glfw.glfwPollEvents();
+      glfw.glfwSwapBuffers()
+      glfw.glfwPollEvents()
    end
 
    tw.TwTerminate()
-   glfw.glfwTerminate();
+   glfw.glfwTerminate()
 end
 
 main()

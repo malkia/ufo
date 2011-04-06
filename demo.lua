@@ -44,11 +44,11 @@ local function main()
       glfw.glfwGetWindowSize(window, int1, int2)
       width, height = int1[0], int2[0]
       
-      gl.glClear(gl.GL_COLOR_BUFFER_BIT);
-      gl.glMatrixMode(gl.GL_PROJECTION);
-      gl.glLoadIdentity();
-      gl.glMatrixMode( gl.GL_MODELVIEW );
-      gl.glLoadIdentity();
+      gl.glClear(gl.GL_COLOR_BUFFER_BIT)
+      gl.glMatrixMode(gl.GL_PROJECTION)
+      gl.glLoadIdentity()
+      gl.glMatrixMode( gl.GL_MODELVIEW )
+      gl.glLoadIdentity()
  
       glfw.glfwGetMousePos(window, int1, int2)
       mouse.x, mouse.y = int1[0], int2[0]
@@ -79,11 +79,11 @@ local function main()
 	 tw.TwDraw()
       end
 
-      glfw.glfwSwapBuffers();
-      glfw.glfwPollEvents();
+      glfw.glfwSwapBuffers()
+      glfw.glfwPollEvents()
    end
 
-   glfw.glfwTerminate();
+   glfw.glfwTerminate()
 end
 
 main()
