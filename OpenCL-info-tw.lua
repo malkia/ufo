@@ -10,38 +10,28 @@ local function dump( value )
   if type(value) ~= "table" then
      return tostring(value)
   end
-  local s = "{ "
-  local c = ""
+  local s, c = "{ ", ""
   for k,v in pairs(value) do
     s = s .. c .. dump(k) .. " = " .. dump(v)
     c = ", "
   end
-  s = s .. " }"
-  return s;
+  return s .. " }";
 end
 
 local function main()
-end
-
-local function main()
-   local desktop_width  = 0
-   local desktop_height = 0
-
    assert( glfw.glfwInit(), "Failed to initialize GLFW" )
 
    local desktop_mode = ffi.new( "GLFWvidmode[1]" )
    glfw.glfwGetDesktopMode( desktop_mode )
-   desktop_width, desktop_height = desktop_mode[0].width, desktop_mode[0].height
+   local desktop_width, desktop_height = desktop_mode[0].width, desktop_mode[0].height
    local width, height = desktop_width * 0.8, desktop_height * 0.8
-   local window_x, window_y = ( desktop_width - width ) / 2, ( desktop_height - height ) / 2
 
-   local window = glfw.glfwOpenWindow( width, height, glfw.GLFW_WINDOWED, "LuaJIT FFI demo - OpenGL, glu, glfw and AntTweakBar", nil )
+   local window = glfw.glfwOpenWindow( width, height, glfw.GLFW_WINDOWED,
+				       "LuaJIT FFI demo - OpenGL, glu, glfw and AntTweakBar", nil )
    assert( window, "Failed to open GLFW window")
-   glfw.glfwSetWindowPos( window, window_x, window_y )
+   glfw.glfwSetWindowPos( window, (desktop_width - width)/2, (desktop_height - height)/2 )
    glfw.glfwSwapInterval( 1 ) -- 60fps
-   
-   tw.TwInit( tw.TW_OPENGL, nil )
-
+ 
    local mouse = { 
       x = 0, y = 0, wheel = 0,
       buttons = { {}, {}, {} },
@@ -51,11 +41,13 @@ local function main()
    local bars = {}
    local strings = {}
    
+   tw.TwInit( tw.TW_OPENGL, nil )
    for platform_index, platform in pairs( clGetPlatforms() ) 
    do
       for device_index, device in pairs( clGetDevices( platform.id ) )
       do
-	 local title = "Platform "..tostring(platform_index)..", Device "..tostring(device_index) .. ": ".. device.name
+	 local title = "Platform " .. tostring(platform_index)..
+	               ", Device " .. tostring(device_index) .. ": ".. device.name
          local bar = tw.TwNewBar( title )
 	 local keys = {}
 	 for key, _ in pairs( device ) do
@@ -82,11 +74,12 @@ local function main()
       glfw.glfwGetWindowSize(window, int1, int2)
       if width ~= int1[0] or height ~= int2[0] then
          width, height = int1[0], int2[0]
+	 tw.TwWindowSize( width, height )
 	 for i=1,#bars do
 	   local bar = bars[i]
 	   local bar_x, bar_y = (i - 1) * (width - 64) / #bars + 32, 16
 	   local bar_pos = ffi.new( "int32_t[2]", bar_x, bar_y )
-           local bar_width, bar_height = (width - 64) / #bars, height - 32
+           local bar_width, bar_height = (width - 64) / #bars - 6, height - 32
            local bar_size = ffi.new( "int32_t[2]", bar_width, bar_height )
 	   tw.TwSetParam(bar, nil, "position", tw.TW_PARAM_INT32, 2, bar_pos )
 	   tw.TwSetParam(bar, nil, "size",     tw.TW_PARAM_INT32, 2, bar_size )
@@ -106,26 +99,24 @@ local function main()
 
       do -- AntTweakBar
 	 for i=1, #mouse.buttons do
-	    local should_signal = nil
+	    local should_update = nil
 	    local b = mouse.buttons[i]
-	    b.repeat_after = b.repeat_after or 0.25
 	    b.new_state = glfw.glfwGetMouseButton( window, glfw.GLFW_MOUSE_BUTTON_LEFT + i - 1 )
 	    if b.old_state ~= b.new_state then
 	       b.old_state = b.new_state
 	       b.last_time = os.clock()
-	       should_signal = true
+	       should_update = true
 	    elseif b.new_state == glfw.GLFW_PRESS then
-	       should_signal = (os.clock() - b.last_time > b.repeat_after)
+	       should_update = (os.clock() - b.last_time > 0.25)
 	    end
-	    if should_signal then
+	    if should_update then
 	       tw.TwMouseButton( b.new_state, tw.TW_MOUSE_LEFT + i - 1 )
 	    end
 	 end
 	 glfw.glfwGetScrollOffset( window, int1, int2 )
 	 mouse.wheel = mouse.wheel + int2[0]
-	 tw.TwMouseWheel(mouse.wheel)
-	 tw.TwMouseMotion(mouse.x, mouse.y)
-	 tw.TwWindowSize(width, height)
+	 tw.TwMouseWheel( mouse.wheel )
+	 tw.TwMouseMotion( mouse.x, mouse.y )
 	 tw.TwDraw()
       end
 
