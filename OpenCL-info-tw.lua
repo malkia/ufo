@@ -84,9 +84,9 @@ local function main()
          width, height = int1[0], int2[0]
 	 for i=1,#bars do
 	   local bar = bars[i]
-	   local bar_x, bar_y = (i - 1) * width / #bars, 0
+	   local bar_x, bar_y = (i - 1) * (width - 64) / #bars + 32, 0
 	   local bar_pos = ffi.new( "int32_t[2]", bar_x, bar_y )
-           local bar_width, bar_height = width / #bars, height
+           local bar_width, bar_height = (width - 64) / #bars, height
            local bar_size = ffi.new( "int32_t[2]", bar_width, bar_height )
 	   tw.TwSetParam(bar, nil, "position", tw.TW_PARAM_INT32, 2, bar_pos )
 	   tw.TwSetParam(bar, nil, "size",     tw.TW_PARAM_INT32, 2, bar_size )
