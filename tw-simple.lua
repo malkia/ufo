@@ -77,14 +77,17 @@ local function main()
    local var_bg_color   = ffi.new( "float[3]", 0.1, 0.2, 0.4 )
    local var_cube_color = ffi.new( "uint8_t[4]", 255, 0, 0, 128 )
 
+   local RW = tw.TwAddVarRW
+   local RO = tw.TwAddVarRO
+
    local bar = tw.TwNewBar("TweakBar")
-   tw.TwDefine(" GLOBAL help='This example shows how to integrate AntTweakBar with GLFW and OpenGL.' ")
-   tw.TwAddVarRW( bar, "speed", tw.TW_TYPE_DOUBLE, var_speed, " label='Rot speed' min=0 max=2 step=0.01 keyIncr=s keyDecr=S help='Rotation speed (turns/second)' " )
-   tw.TwAddVarRW( bar, "wire", tw.TW_TYPE_BOOL32, var_wire, " label='Wireframe mode' key=w help='Toggle wireframe display mode.' " )
-   tw.TwAddVarRO( bar, "time", tw.TW_TYPE_DOUBLE, var_time, " label='Time' precision=1 help='Time (in seconds).' ")
-   tw.TwAddVarRO( bar, "turn", tw.TW_TYPE_DOUBLE, var_turn, " label='Turn' precision=1 help='Turn' ")
-   tw.TwAddVarRW( bar, "bgColor", tw.TW_TYPE_COLOR3F, var_bg_color, " label='Background color' ")
-   tw.TwAddVarRW( bar, "cubeColor", tw.TW_TYPE_COLOR32, var_cube_color, " label='Cube color' alpha help='Color and transparency of the cube.' ")
+   tw.TwDefine("GLOBAL help='This example shows how to integrate AntTweakBar with GLFW and OpenGL.'")
+   RW( bar, "speed",     tw.TW_TYPE_DOUBLE,  var_speed,      "label='Rot speed' min=0 max=2 step=0.01 keyIncr=s keyDecr=S help='Rotation speed (turns/second)'" )
+   RW( bar, "wire",      tw.TW_TYPE_BOOL32,  var_wire,       "label='Wireframe mode' key=w help='Toggle wireframe display mode.'" )
+   RO( bar, "time",      tw.TW_TYPE_DOUBLE,  var_time,       "label='Time' precision=1 help='Time (in seconds).'")
+   RO( bar, "turn",      tw.TW_TYPE_DOUBLE,  var_turn,       "label='Turn' precision=1 help='Turn'")
+   RW( bar, "bgColor",   tw.TW_TYPE_COLOR3F, var_bg_color,   "label='Background color'")
+   RW( bar, "cubeColor", tw.TW_TYPE_COLOR32, var_cube_color, "label='Cube color' alpha help='Color and transparency of the cube.'")
 
    width, height = nil, nil
    local int1, int2 = ffi.new( "int[1]" ), ffi.new( "int[1]" )
