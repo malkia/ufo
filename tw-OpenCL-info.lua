@@ -56,8 +56,8 @@ local function main()
 	 table.sort( keys )
 	 for _, key in pairs( keys ) do
 	    local s = dump( device[ key] )
-	    local len = #s
-	    local s = ffi.new( "char[?]", len + 1, s )
+	    local len = #s + 1 -- 0 character included
+	    local s = ffi.new( "char[?]", len, s )
 	    tw.TwAddVarRO( bar, key, tw.TW_TYPE_CSSTRING_LEN0 + len, s, nil )
 	    strings[ #strings + 1 ] = s
 	 end
