@@ -705,7 +705,7 @@ enum {
  GL_PRIMARY_COLOR                  = 0x8577,
  GL_PREVIOUS                       = 0x8578,
  GL_SUBTRACT                       = 0x84E7,
- GL_SRC0_RGB                       = 0x8580,
+ GL_SR0_RGB                       = 0x8580,
  GL_SRC1_RGB                       = 0x8581,
  GL_SRC2_RGB                       = 0x8582,
  GL_SRC3_RGB                       = 0x8583,
