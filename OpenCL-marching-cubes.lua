@@ -145,35 +145,44 @@ local kernel = [[
       }
 ]]
 
-local ON  = gl.glEnable
-local OFF = gl.glDisable
+local width          = 640
+local height         = 480
 
-local ambient_light  = ffi.new( "float[4]", 0.5, 0.5, 0.5, 1.0 )
-local diffuse_light  = ffi.new( "float[4]", 0.3, 0.3, 0.3, 1.0 )
-local specular_light = ffi.new( "float[4]", 0.1, 0.1, 0.1, 1.0 )
-local position       = ffi.new( "float[4]", 1.0, 2.0, 1.0, 1.0 )
+local max_x          = 65
+local max_y          = 65
+local max_z          = 65
 
-local width  = 640
-local height = 480
+local ON             = gl.glEnable
+local OFF            = gl.glDisable
 
-local max_x, max_y, max_z = 65, 65, 65
+local ambient_light  = ffi.new( "float[4]", 0.5, 0.5, 0.5, 1 )
+local diffuse_light  = ffi.new( "float[4]", 0.3, 0.3, 0.3, 1 )
+local specular_light = ffi.new( "float[4]", 0.1, 0.1, 0.1, 1 )
+local position       = ffi.new( "float[4]", 1.0, 2.0, 1.0, 1 )
 
-local edge_coords  = ffi.new( "float[?]",       9 *  max_x    *  max_y    *  max_z    )
-local edge_normals = ffi.new( "float[?]",       9 *  max_x    *  max_y    *  max_z    )
-local color_data   = ffi.new( "float[?]",   4 * 3 *  max_x    *  max_y    *  max_z    )
-local element_data = ffi.new( "int32_t[?]", 5 * 3 * (max_x-1) * (max_y-1) * (max_z-1) )
+local n_voxels       =  max_x    *  max_y    *  max_z
+local n_elements     = (max_x-1) * (max_y-1) * (max_z-1)
+local n_edge_coords  = n_voxels * 9 
+local n_edge_coords  = n_voxels * 9
+local n_color_data   = n_voxels * 4 * 3
+local n_element_data = n_elements * 5 * 3
 
-local bufs         = ffi.new( "GLint[4]" )
+local edge_coords    = ffi.new( "float[?]",   n_edge_coords  )
+local edge_normals   = ffi.new( "float[?]",   n_edge_normals )
+local color_data     = ffi.new( "float[?]",   n_color_data   )
+local element_data   = ffi.new( "int32_t[?]", n_element_data )
+local bufs           = ffi.new( "GLuint[4]" )
 
-local n_elems      = 10
-local n_fames      = 0
+local n_objects      = 10
+local n_frames       = 0
 
 local function init()
-   ON( gl.GL_DEPTH_TEST )
+   ON( gl.GL_DEPTH_TEST     )
    ON( gl.GL_COLOR_MATERIAL )
-   ON( gl.GL_BLEND )
-   ON( gl.GL_LIGHTING )
-   ON( gl.GL_LIGHT0 )
+   ON( gl.GL_BLEND          )
+   ON( gl.GL_LIGHTING       )
+   ON( gl.GL_LIGHT0         )
+
    gl.glClearColor(    0, 0, 0, 0 )
    gl.glShadeModel(    gl.GL_SMOOTH )
    gl.glDepthFunc(     gl.GL_LEQUAL )
@@ -185,12 +194,11 @@ local function init()
    gl.glLightfv(       gl.GL_LIGHT0,          gl.GL_POSITION, position )
    gl.glMatrixMode(    gl.GL_PROJECTION )
    gl.glLoadIdentity()
-   gl.glOrtho(         -2, 2, -2, 2, -15, 15 )
-   gl.glViewport(       0, 0, width, height )
+   gl.glOrtho(        -2, 2, -2, 2, -15, 15 )
+   gl.glViewport(      0, 0, width, height )
    
-   local color_data_length = 4 * 3 * max_x * max_y * max_z
-   for i=0, color_data_length - 1, 4 do
-      local temp = i / (color_data_length - 1)
+   for i=0, n_color_data - 1, 4 do
+      local temp = i / (n_color_data - 1)
       color_data[ i + 1 ] = 3 * temp
       color_data[ i + 2 ] = 0.97
       color_data[ i + 3 ] = 1
@@ -251,52 +259,49 @@ local function init()
    local cgl_normals   = cl.clCreateFromGLBuffer( context, cl.CL_MEM_WRITE_ONLY, bufs[2], nil )
    local cgl_indices   = cl.clCreateFromGLBuffer( context, cl.CL_MEM_WRITE_ONLY, bufs[3], nil )
 
-            //OpenCLTemplate variables inheritance
-            CLCalc.InitCL(Ctx.Handle, CQ.Handle);
+   CLCalc.InitCL(Ctx.Handle, CQ.Handle);
+   
+   varTempo = new CLCalc.Program.Variable(Tempo);
+   varEdgePos = new CLCalc.Program.Variable(CLGLPositions.Handle, EdgeCoords.Length, sizeof(float));
+   varEdgeNormals = new CLCalc.Program.Variable(CLGLNormals.Handle, EdgeNormals.Length, sizeof(float));
+   varColorIndex = new CLCalc.Program.Variable(CLGLColors.Handle, ColorData.Length, sizeof(float));
+   varElemIndex = new CLCalc.Program.Variable(CLGLElemIndex.Handle, ElementData.Length, sizeof(int));
+   
 
-            varTempo = new CLCalc.Program.Variable(Tempo);
-            varEdgePos = new CLCalc.Program.Variable(CLGLPositions.Handle, EdgeCoords.Length, sizeof(float));
-            varEdgeNormals = new CLCalc.Program.Variable(CLGLNormals.Handle, EdgeNormals.Length, sizeof(float));
-            varColorIndex = new CLCalc.Program.Variable(CLGLColors.Handle, ColorData.Length, sizeof(float));
-            varElemIndex = new CLCalc.Program.Variable(CLGLElemIndex.Handle, ElementData.Length, sizeof(int));
+   local vals = ffi.new( "float[?]", n_voxels )
+   for x = 0, max_x - 1 do
+      local xv = 2 * x / (max_x - 1) - 1
+      for y = 0, max_y - 1 do
+	 local yv = 2 * y / (max_y - 1) - 1
+	 for z = 0, max_z - 1 do
+	    local zv = 2 * z / (max_z - 1) - 1
+	    local r = xv * xv + yv * yv + zv * zv
+	    local v = 0.1 / r
+	    r = (xv - 0.8) * (xv - 0.8) + yv * yv + zv * zv
+	    v = v + 0.1 / r
+	    r = (yv + 0.8) * (yv + 0.8) + xv * xv + zv * zv
+	    v = v + 0.1 / r
+	    vals[ x * max_y * max_z + y * max_z + z ] = v
+	 end
+      end
+   end
 
-            float[, ,] vals = new float[maxX, maxY, maxZ];
-            for (int x = 0; x < maxX; x++)
-            {
-                float xVal = 2.0f * ((float)x / (float)(maxX - 1) - 0.5f);
-                for (int y = 0; y < maxY; y++)
-                {
-                    float yVal = 2.0f * ((float)y / (float)(maxY - 1) - 0.5f);
-                    for (int z = 0; z < maxZ; z++)
-                    {
-                        float zVal = 2.0f * ((float)z / (float)(maxZ - 1) - 0.5f);
-                        float r = xVal * xVal + yVal * yVal + zVal * zVal;
+   if use_interop then
+   else
+   end
 
-                        vals[x, y, z] = 0.1f / r;
-
-                        r = (xVal - 0.8f) * (xVal - 0.8f) + yVal * yVal + zVal * zVal;
-                        vals[x, y, z] += 0.1f / r;
-
-                        r = (yVal + 0.8f) * (yVal + 0.8f) + xVal * xVal + zVal * zVal;
-                        vals[x, y, z] += 0.1f / r;
-                    }
-                }
-
-            }
-
-            //Use OpenGL/OpenCL interop?
-            if (USEINTEROP) MC = new OpenCLTemplate.Isosurface.MarchingCubes(vals, varEdgePos, varEdgeNormals, varElemIndex);
-            else MC = new OpenCLTemplate.Isosurface.MarchingCubes(vals);
-
-            MC.InitValues = new float[] { -2.0f, -2.0f, -2.0f };
-            MC.Increments = new float[] { 4.0f / (float)(maxX-1), 4.0f / (float)(maxY-1), 4.0f / (float)(maxZ-1) };
-            
---          MC.ComputeNormals = false;
-            
-            //OpenCL value updater
-            CLCalc.Program.Compile(CLsrc);
-            kernelUpdate = new CLCalc.Program.Kernel("UpdateVals");
-
+   //Use OpenGL/OpenCL interop?
+   if (USEINTEROP) MC = new OpenCLTemplate.Isosurface.MarchingCubes(vals, varEdgePos, varEdgeNormals, varElemIndex);
+else MC = new OpenCLTemplate.Isosurface.MarchingCubes(vals);
+   
+   MC.InitValues = new float[] { -2.0f, -2.0f, -2.0f };
+   MC.Increments = new float[] { 4.0f / (float)(maxX-1), 4.0f / (float)(maxY-1), 4.0f / (float)(maxZ-1) };
+   
+   --          MC.ComputeNormals = false;
+   
+   //OpenCL value updater
+   CLCalc.Program.Compile(CLsrc);
+   kernelUpdate = new CLCalc.Program.Kernel("UpdateVals");
 end
 
 local function draw()
