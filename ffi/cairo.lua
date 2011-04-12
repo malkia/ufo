@@ -13,6 +13,8 @@ CAIRO_MIME_TYPE_PNG  = "image/png"
 CAIRO_MIME_TYPE_JP2  = "image/jp2"
 CAIRO_MIME_TYPE_URI  = "text/x-uri"
 
+-- #define CAIRO_FONT_TYPE_ATSUI CAIRO_FONT_TYPE_QUARTZ
+
 ffi.cdef [[
       typedef int                        cairo_bool_t;
       typedef struct _cairo              cairo_t;
@@ -652,6 +654,121 @@ cairo_status_t         cairo_region_xor(                      cairo_region_t* ds
 cairo_status_t         cairo_region_xor_rectangle(            cairo_region_t* dst, const cairo_rectangle_int_t* rectangle );
 
 void                   cairo_debug_reset_static_data(         void );
+
+typedef struct FT_Face_ *FT_Face;
+typedef struct FcPattern_ *FcPattern;
+
+cairo_font_face_t* cairo_ft_font_face_create_for_ft_face( FT_Face face, int load_flags );
+FT_Face            cairo_ft_scaled_font_lock_face(        cairo_scaled_font_t* scaled_font );
+void               cairo_ft_scaled_font_unlock_face(      cairo_scaled_font_t* scaled_font );
+cairo_font_face_t* cairo_ft_font_face_create_for_pattern( FcPattern *pattern );
+void               cairo_ft_font_options_substitute(      const cairo_font_options_t* options, FcPattern* pattern );
+
+typedef enum _cairo_pdf_version {
+    CAIRO_PDF_VERSION_1_4,
+    CAIRO_PDF_VERSION_1_5
+} cairo_pdf_version_t;
+
+cairo_surface_t* cairo_pdf_surface_create(              const char* filename, double width_in_points, double height_in_points );
+cairo_surface_t* cairo_pdf_surface_create_for_stream(   cairo_write_func_t write_func, void* closure, double width_in_points, double height_in_points );
+void             cairo_pdf_surface_restrict_to_version( cairo_surface_t* surface, cairo_pdf_version_t version );
+void             cairo_pdf_get_versions(                cairo_pdf_version_t const **versions, int* num_versions );
+const char*      cairo_pdf_version_to_string(           cairo_pdf_version_t version );
+void             cairo_pdf_surface_set_size(            cairo_surface_t* surface, double width_in_points, double height_in_points );
+
+cairo_surface_t* cairo_quartz_image_surface_create(    cairo_surface_t* image_surface );
+cairo_surface_t* cairo_quartz_image_surface_get_image( cairo_surface_t* surface );
+
+typedef struct _cairo_script_interpreter cairo_script_interpreter_t;
+
+typedef void             (* csi_destroy_func_t)(        void* closure, void *ptr );
+typedef cairo_surface_t* (* csi_surface_create_func_t)( void* closure, cairo_content_t content, double width, double height, long uid );
+typedef cairo_t*         (* csi_context_create_func_t)( void* closure, cairo_surface_t* surface );
+typedef void             (* csi_show_page_func_t)(      void* closure, cairo_t* cr );
+typedef void             (* csi_copy_page_func_t)(      void* closure, cairo_t* cr );
+
+typedef struct _cairo_script_interpreter_hooks {
+   void *closure;
+   csi_surface_create_func_t surface_create;
+   csi_destroy_func_t surface_destroy;
+   csi_context_create_func_t context_create;
+   csi_destroy_func_t context_destroy;
+   csi_show_page_func_t show_page;
+   csi_copy_page_func_t copy_page;
+} cairo_script_interpreter_hooks_t;
+
+typedef struct FILE_ *FILE;
+
+cairo_script_interpreter_t* cairo_script_interpreter_create(           void );
+void                        cairo_script_interpreter_install_hooks(    cairo_script_interpreter_t*, const cairo_script_interpreter_hooks_t* hooks );
+cairo_status_t              cairo_script_interpreter_run(              cairo_script_interpreter_t*, const char *filename );
+cairo_status_t              cairo_script_interpreter_feed_stream(      cairo_script_interpreter_t*, FILE* stream );
+cairo_status_t              cairo_script_interpreter_feed_string(      cairo_script_interpreter_t*, const char *line, int len );
+unsigned int                cairo_script_interpreter_get_line_number(  cairo_script_interpreter_t*  );
+cairo_script_interpreter_t* cairo_script_interpreter_reference(        cairo_script_interpreter_t*  );
+cairo_status_t              cairo_script_interpreter_finish(           cairo_script_interpreter_t*  );
+cairo_status_t              cairo_script_interpreter_destroy(          cairo_script_interpreter_t*  );
+cairo_status_t              cairo_script_interpreter_translate_stream( FILE* stream, cairo_write_func_t write_func, void *closure );
+
+typedef enum {
+    CAIRO_SCRIPT_MODE_BINARY,
+    CAIRO_SCRIPT_MODE_ASCII
+} cairo_script_mode_t;
+
+cairo_device_t*     cairo_script_create(                    const char *filename );
+cairo_device_t*     cairo_script_create_for_stream(         cairo_write_func_t write_func, void *closure );
+void                cairo_script_write_comment(             cairo_device_t *script, const char *comment, int len);
+void                cairo_script_set_mode(                  cairo_device_t *script, cairo_script_mode_t mode);
+cairo_script_mode_t cairo_script_get_mode(                  cairo_device_t* script  );
+cairo_surface_t*    cairo_script_surface_create(            cairo_device_t* script, cairo_content_t content, double width, double height);
+cairo_surface_t*    cairo_script_surface_create_for_target( cairo_device_t* script, cairo_surface_t* target);
+cairo_status_t      cairo_script_from_recording_surface(    cairo_device_t* script, cairo_surface_t* recording_surface);
+
+cairo_surface_t*    cairo_tee_surface_create( cairo_surface_t *master );
+void                cairo_tee_surface_add(    cairo_surface_t *surface, cairo_surface_t *target );
+void                cairo_tee_surface_remove( cairo_surface_t *surface, cairo_surface_t *target );
+cairo_surface_t*    cairo_tee_surface_index(  cairo_surface_t *surface, int index );
+
+cairo_device_t*     cairo_xml_create(                const char* filename );
+cairo_device_t*     cairo_xml_create_for_stream(     cairo_write_func_t write_func, void* closure );
+cairo_surface_t*    cairo_xml_surface_create(        cairo_device_t* xml, cairo_content_t content, double width, double height );
+cairo_status_t      cairo_xml_for_recording_surface( cairo_device_t* xml, cairo_surface_t *surface );
+
+typedef void* GType;
+
+GType cairo_gobject_context_get_type(            void );
+GType cairo_gobject_device_get_type(             void );
+GType cairo_gobject_pattern_get_type(            void );
+GType cairo_gobject_surface_get_type(            void );
+GType cairo_gobject_rectangle_get_type(          void );
+GType cairo_gobject_scaled_font_get_type(        void );
+GType cairo_gobject_font_face_get_type(          void );
+GType cairo_gobject_font_options_get_type(       void );
+GType cairo_gobject_rectangle_int_get_type(      void );
+GType cairo_gobject_region_get_type(             void );
+GType cairo_gobject_status_get_type(             void );
+GType cairo_gobject_content_get_type(            void );
+GType cairo_gobject_operator_get_type(           void );
+GType cairo_gobject_antialias_get_type(          void );
+GType cairo_gobject_fill_rule_get_type(          void );
+GType cairo_gobject_line_cap_get_type(           void );
+GType cairo_gobject_line_join_get_type(          void );
+GType cairo_gobject_text_cluster_flags_get_type( void );
+GType cairo_gobject_font_slant_get_type(         void );
+GType cairo_gobject_font_weight_get_type(        void );
+GType cairo_gobject_subpixel_order_get_type(     void );
+GType cairo_gobject_hint_style_get_type(         void );
+GType cairo_gobject_hint_metrics_get_type(       void );
+GType cairo_gobject_font_type_get_type(          void );
+GType cairo_gobject_path_data_type_get_type(     void );
+GType cairo_gobject_device_type_get_type(        void );
+GType cairo_gobject_surface_type_get_type(       void );
+GType cairo_gobject_format_get_type(             void );
+GType cairo_gobject_pattern_type_get_type(       void );
+GType cairo_gobject_extend_get_type(             void );
+GType cairo_gobject_filter_get_type(             void );
+GType cairo_gobject_region_overlap_get_type(     void );
+ 
 
 ]]
 
