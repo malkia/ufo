@@ -1,4 +1,3 @@
-print( "[".. ... .. "]" )
 local ffi = require( "ffi" )
 
 local libs = ffi_zmq_libs or {
