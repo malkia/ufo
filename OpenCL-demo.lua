@@ -2,6 +2,7 @@
 
 local ffi = require( "ffi" )
 local cl  = require( "ffi/OpenCL" )
+local clx = require( "ext/OpenCL" )( cl )
 local cl_error = 0
 local cl_error_buf = ffi.new( "int[1]" )
 
@@ -81,11 +82,9 @@ clSetKernelArg            = function(kernel, index, data, type)
 			    end
 
 local function demo1( devidx )
-   local count = 1024
-   
    local devices = {}
-   for platform_index, platform in pairs(clGetPlatforms()) do
-      local platform_devices = clGetDevices(platform.id)
+   for platform_index, platform in pairs(clx.GetPlatforms()) do
+      local platform_devices = clx.GetDevices(platform.id)
       for device_index, device in pairs(platform_devices) do
 	 devices[ #devices + 1 ] = device
       end
@@ -128,6 +127,7 @@ local function demo1( devidx )
    clBuildProgram( program, 0, nil, nil, nil, nil )
    local kernel = clCreateKernel(program, "square")
 
+   local count = 1024
    local data = ffi.new("float[?]", count)
    for i=0,count-1 do data[i] = (i + 10) end
 

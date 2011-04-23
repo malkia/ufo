@@ -2,6 +2,7 @@
 
 local ffi  = require( "ffi" )
 local cl   = require( "ffi/OpenCL" )
+local clx  = require( "ext/OpenCL" )( cl )
 local gl   = require( "ffi/OpenGL" )
 local glfw = require( "ffi/glfw" )
 local tw   = require( "ffi/AntTweakBar" )
@@ -42,9 +43,9 @@ local function main()
    local strings = {}
    
    tw.TwInit( tw.TW_OPENGL, nil )
-   for platform_index, platform in pairs( clGetPlatforms() ) 
+   for platform_index, platform in pairs( clx.GetPlatforms() ) 
    do
-      for device_index, device in pairs( clGetDevices( platform.id ) )
+      for device_index, device in pairs( clx.GetDevices( platform.id ) )
       do
 	 local title = "Platform " .. tostring(platform_index)..
 	               ", Device " .. tostring(device_index) .. ": ".. device.name
@@ -55,10 +56,22 @@ local function main()
 	 end
 	 table.sort( keys )
 	 for _, key in pairs( keys ) do
-	    local s = dump( device[ key] )
-	    local len = #s + 1 -- 0 character included
-	    local s = ffi.new( "char[?]", len, s )
-	    tw.TwAddVarRO( bar, key, tw.TW_TYPE_CSSTRING_LEN0 + len, s, nil )
+	    local s
+	    if type(device[key]) == "table" then
+	       s = table.concat( device[key], "," )
+	       s = ffi.new( "char[?]", #s + 1, s )
+	       -- typename has to be something unique, guid would be more appropriate here for example
+	       local typename = tostring(platform.id) .. "@" .. tostring(device.id) .. "@" .. key
+	       local type = tw.TwDefineEnumFromString( typename, s )
+	       local val = ffi.new( "int[1]" )
+	       strings[ #strings + 1 ] = val
+	       tw.TwAddVarRW( bar, key, type, val, nil )
+	    else
+	       s = dump( device[ key] )
+	       local len = #s + 1 -- 0 character included
+	       s = ffi.new( "char[?]", len, s )
+	       tw.TwAddVarRO( bar, key, tw.TW_TYPE_CSSTRING_LEN0 + len, s, nil )
+	    end
 	    strings[ #strings + 1 ] = s
 	 end
          bars[ #bars + 1 ] = bar

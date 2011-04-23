@@ -2,6 +2,7 @@
 
 local ffi = require( "ffi" )
 local cl  = require( "ffi/OpenCL"  )
+local clx = require( "ext/OpenCL" )( cl )
 
 local function dump( value )
   if type(value) ~= "table" then
@@ -18,12 +19,12 @@ local function dump( value )
 end
 
 local function test_it()
-   for platform_index, platform in pairs( clGetPlatforms() ) 
+   for platform_index, platform in pairs( clx.GetPlatforms() ) 
    do
       for k, v in pairs( platform ) do
 	 print( "Platform "..tostring( platform_index )..": "..tostring( k ).." = "..tostring( v ) )
       end
-      for device_index,device in pairs( clGetDevices( platform.id ) )
+      for device_index,device in pairs( clx.GetDevices( platform.id ) )
       do
 	 local keys = {}
 	 for key, _ in pairs( device ) do
