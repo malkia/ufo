@@ -1,0 +1,5 @@
+This build LuaJIT using the Windows WDK (Windows Developer Kit)
+
+It assumes certain paths, for example that WDK is in d:\wdk, and that luajit is at the same root level of ufo (and named just luajit)
+
+TODO: Make it more independent, and provide compiling using other means - mingw, VCExpress, WSDK, etc.

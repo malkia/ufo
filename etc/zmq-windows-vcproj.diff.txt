@@ -1,0 +1,3 @@
+This diff allows LIBZMQ to be compiled for 32/64 bit and using the MT model (static MSVCR)
+
+The generated lib\libzmq.dll lib\libzmq64.dll are manually copied into ufo\bin\zmq32.dll ufo\bin\zmq64.dll

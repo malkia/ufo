@@ -1,0 +1,8 @@
+# This script allows libzmq to be build universal for 32/64 bit (Intel only)
+
+# example usage, assuming libzmq is in ~/p/libzmq, and ufo in ~/p/ufo
+cd ~/p/libzmq
+. ~/p/ufo/etc/zmq-osx-configure.sh
+
+# The actual generated .dylib file is manually copied to ~/p/ufo/bin
+# This should be automated
