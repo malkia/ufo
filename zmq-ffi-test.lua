@@ -1,8 +1,22 @@
 local ffi = require( "ffi" )
 local zmq = require( "ffi/zmq" )
 
-local content = "12345678ABCDEFGH12345678abcdefgh"
+content = {}
+
+for i=0,65535 do
+  content[#content + 1] = string.char(math.floor(math.random(255)))
+end
+
+
+content = table.concat(content)
+print(#content)
+
 --[[
+local content = "12345678ABCDEFGH12345678abcdefgh"
+<<<<<<< HEAD
+--[[
+=======
+>>>>>>> df751bbc995212251e5ee30c49a76fbde7958175
 content = content .. content
 content = content .. content
 content = content .. content
@@ -13,12 +27,20 @@ content = content .. content
 content = content .. content
 content = content .. content
 content = content .. content
+<<<<<<< HEAD
 --]]
+=======
+content = content .. content
+print(#content)
+--]]
+
+>>>>>>> df751bbc995212251e5ee30c49a76fbde7958175
 local buf  = ffi.new( "char[?]", #content, content )
 local buf1 = ffi.new( "char[?]", #content )
 local buf2 = ffi.new( "char[?]", #content )
 local send, recv = zmq.zmq_send, zmq.zmq_recv
 
+<<<<<<< HEAD
 local size, size1, size2 = ffi.sizeof(buf), ffi.sizeof(buf1), ffi.sizeof(buf2)
 
 local connection = { }
@@ -59,6 +81,20 @@ local function bounce( sb, sc )
    assert( r2 == size1 )
    assert( r3 == size1 )
    assert( r4 == size2 )
+=======
+local len = #content
+
+local function bounce( sb, sc )
+   local r1, r2, r3, r4
+   r1 = send( sc, buf,  len, 0 )
+   r2 = recv( sb, buf1, len, 0 )
+   r3 = send( sb, buf1, len, 0 )
+   r4 = recv( sc, buf2, len, 0 )
+   assert( r1 == len, r1 )
+   assert( r2 == len, r2 )
+   assert( r3 == len, r3 )
+   assert( r4 == len, r4 )
+>>>>>>> df751bbc995212251e5ee30c49a76fbde7958175
 end
 
 local ctx = zmq.zmq_init (1);
@@ -67,13 +103,21 @@ assert (ctx);
 local sb = zmq.zmq_socket (ctx, zmq.ZMQ_PAIR);
 assert (sb);
 
+<<<<<<< HEAD
 local rc = zmq.zmq_bind (sb, "ipc://abcd"); --tcp://127.0.0.1:6666");
+=======
+local rc = zmq.zmq_bind (sb, "inproc://a" );
+>>>>>>> df751bbc995212251e5ee30c49a76fbde7958175
 assert (rc == 0);
 
 local sc = zmq.zmq_socket (ctx, zmq.ZMQ_PAIR);
 assert (sc);
 
+<<<<<<< HEAD
 local rc = zmq.zmq_connect (sc, "ipc://abcd" ); --tcp://127.0.0.1:6666");
+=======
+local rc = zmq.zmq_connect (sc, "inproc://a" );
+>>>>>>> df751bbc995212251e5ee30c49a76fbde7958175
 assert (rc == 0);
 
 local sb = new_connection( sb )
