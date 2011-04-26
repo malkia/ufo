@@ -55,12 +55,19 @@ return function( zmq )
 			       recv =
 				  function( len, flags )
 				     local buf = ffi.new( "char[?]", len )
-				     zmq.zmq_recv( socket, buf, len, flags )
+				     local bytes = zmq.zmq_recv( socket, buf, len, flags )
+				     local r = zmq.zmq_errno()
+				     check( r, "zmq_recv" )
 				     return ffi.string( buf, len )
 				  end,
 			       send =
 				  function( msg, flags )
-				     zmq.zmq_send( socket, msg, #msg, flags )
+				     print( zmq.zmq_errno() )
+				     print( socket, msg, #msg, flags )
+				     local bytes = zmq.zmq_send( socket, msg, #msg, flags )
+				     print( "bytes", bytes )
+				     local r = zmq.zmq_errno()
+				     check( r, "zmq_send" )
 				  end,
 			       setsockopt =
 				  function( option_name, option_value, option_len )

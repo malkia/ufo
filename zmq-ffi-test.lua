@@ -2,26 +2,22 @@ local ffi = require( "ffi" )
 local zmq = require( "ffi/zmq" )
 
 local content = "12345678ABCDEFGH12345678abcdefgh"
+local buf  = ffi.new( "char[32]", content )
 local buf1 = ffi.new( "char[32]" )
 local buf2 = ffi.new( "char[32]" )
+local send, recv = zmq.zmq_send, zmq.zmq_recv
 
 local function bounce( sb, sc )
-   local rc = zmq.zmq_send( sc, content, 32, 0 )
---   assert( rc == 32 )
-
-   rc = zmq.zmq_recv( sb, buf1, 32, 0 )
---   assert( rc == 32 )
-   rc = zmq.zmq_send( sb, buf1, 32, 0 )
---   assert( rc == 32 )
-   
-   rc = zmq.zmq_recv( sc, buf2, 32, 0 )
---   assert( rc == 32 )
-
---   for i=0, 31 do
---      assert( buf1[i] == buf2[i] )
---   end
-
---   print( ffi.string(buf2,32))
+   local r1, r2, r3, r4
+   r1 = send( sc, buf,  32, 0 )
+   r2 = recv( sb, buf1, 32, 0 )
+   r3 = send( sb, buf1, 32, 0 )
+   r4 = recv( sc, buf2, 32, 0 )
+   print( r1, r2, r3, r4 )
+   assert( r1 == 0 )
+   assert( r2 == 0 )
+   assert( r3 == 0 )
+   assert( r4 == 0 )
 end
 
 local ctx = zmq.zmq_init (1);
