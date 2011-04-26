@@ -62,10 +62,8 @@ return function( zmq )
 				  end,
 			       send =
 				  function( msg, flags )
-				     print( zmq.zmq_errno() )
 				     print( socket, msg, #msg, flags )
 				     local bytes = zmq.zmq_send( socket, msg, #msg, flags )
-				     print( "bytes", bytes )
 				     local r = zmq.zmq_errno()
 				     check( r, "zmq_send" )
 				  end,
