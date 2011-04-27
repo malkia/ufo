@@ -1,4 +1,4 @@
-LuaJIT FFI bindings for OpenCL, OpenGL, glu, glfw and AntTweakBar
+LuaJIT FFI bindings for OpenCL, OpenGL, glu, glfw, AntTweakBar and ZeroMQ
 
 You can try the examples from the command-line:
   luajit demo.lua           -- Simple demo showing couple of libraries in action
