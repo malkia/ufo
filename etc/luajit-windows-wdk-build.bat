@@ -43,12 +43,19 @@ pushd
 cd /d %_LUAJITDIR%
 for %%j in (amalg static) do (
   call %~dp0\luajit-windows-msvcbuild-mt-and-shell.bat %%j
-  if "%%j"=="static" call :echo move /y %_LUAJITDIR%\lua51.dll  %_UFODIR%\bin\luajit%_ARCH%.dll
-  if "%%j"=="amalg" call :echo move /y %_LUAJITDIR%\luajit.exe      %_UFODIR%\luajit%_ARCH%.exe
+  if "%%j"=="amalg" (
+    call :echo move /y %_LUAJITDIR%\lua51.dll  %_UFODIR%\bin\luajit%_ARCH%.dll
+    git log -1 >> %_UFODIR%\bin\luajit%_ARCH%.dll
+  )
+  if "%%j"=="static" (
+    call :echo move /y %_LUAJITDIR%\luajit.exe      %_UFODIR%\luajit%_ARCH%.exe
+    git log -1 >> %_UFODIR%\luajit%_ARCH%.exe
+  )
 rem  staticlib echo move /y %_LUAJITDIR%\lua51.lib %_UFODIR%\bin\luajit%_ARCH%.lib
 rem  dynamiclib echo move /y %_LUAJITDIR%\luajit.lib %_UFODIR%\bin\luajit%_ARCH%.lib
 )
 popd
+
 goto :EOF
 
 :INVALID_ARCH
