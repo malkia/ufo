@@ -1,4 +1,4 @@
-rem @echo off
+@echo off
 
 setlocal
 
@@ -42,7 +42,7 @@ set INCLUDE=%CRT_INC_PATH%;%INCLUDE%;
 pushd
 cd /d %_LUAJITDIR%
 for %%j in (amalg static) do (
-  call %~dp0\luajit-windows-msvcbuild-mt-and-shell.bat %%j
+  call %~dp0\luajit-build-windows-mt.bat %%j
   if "%%j"=="amalg" (
     call :echo move /y %_LUAJITDIR%\lua51.dll  %_UFODIR%\bin\luajit%_ARCH%.dll
     git log -1 >> %_UFODIR%\bin\luajit%_ARCH%.dll
