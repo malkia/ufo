@@ -63,18 +63,18 @@ assert (ctx);
 local sb = zmq.zmq_socket (ctx, zmq.ZMQ_PAIR);
 assert (sb);
 
-local rc = zmq.zmq_bind (sb, "inproc://a" );
+local rc = zmq.zmq_bind (sb, "tcp://127.0.0.1:6666" );
 assert (rc == 0);
 
 local sc = zmq.zmq_socket (ctx, zmq.ZMQ_PAIR);
 assert (sc);
 
-local rc = zmq.zmq_connect (sc, "inproc://a" );
+local rc = zmq.zmq_connect (sc, "tcp://127.0.0.1:6666" );
 assert (rc == 0);
 
 local sb = new_connection( sb )
 local sc = new_connection( sc )
-for i=0, 1024*1024-1 do
+for i=0, 1024*60-1 do
 bounce( sb, sc )   
 end 
 local sb = sb.handle

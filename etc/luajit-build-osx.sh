@@ -1,14 +1,14 @@
-LUAJIT=../../luajit
+export LUAJIT=../../luajit
 echo LUAJIT=$LUAJIT
 
 pushd $LUAJIT/src
 
-make "CC=gcc -m32" clean amalg
+make "CC=gcc -m32 -mmacosx-version-min=10.4" clean amalg
 mv luajit       luajit32.x.tmp
 mv libluajit.a  luajit32.a.tmp
 mv libluajit.so luajit32.l.tmp
 
-make "CC=gcc -m64" clean amalg
+make "CC=gcc -m64 -mmacosx-version-min=10.4" clean amalg
 mv luajit       luajit64.x.tmp
 mv libluajit.a  luajit64.a.tmp
 mv libluajit.so luajit64.l.tmp
