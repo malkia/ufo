@@ -269,6 +269,7 @@ ffi.cdef[[
       void        glfwTerminate(                void );
       void        glfwGetVersion(               int* major, int* minor, int* rev );
       const char* glfwGetVersionString(         void );
+      void        glfwCopyGLState(              GLFWwindow src, GLFWwindow dst, unsigned long mask );
 
       int         glfwGetError(                 void );
       const char* glfwErrorString(              int error );
