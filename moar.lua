@@ -1,17 +1,21 @@
 #!/usr/bin/env luajit
 
-local shr, band = bit.rshift, bit.band
+local shr, band, min, max = bit.rshift, bit.band, math.min, math.max
 
 local ffi   = require( "ffi" )
 local gl    = require( "ffi/OpenGL" )
+local glu   = require( "ffi/glu" )
 local glfw  = require( "ffi/glfw" )
 local fonts = require( "lib/fonts" )
+
+--jit.off()
+--require('dbg')
 
 -- Wrap every OpenGL call to test it for error
 local function testGL( v )
    local r = gl.glGetError()
    if r ~= 0 then
-      print( "OpenGL Error: "..tostring(r))
+      error( "OpenGL Error: "..tostring(r) .. " " .. ffi.string(glu.gluErrorString(r)) )
    end
    return v
 end
@@ -39,7 +43,7 @@ end
 local function bind_font( font )
    local tid = ffi.new( "GLuint[1]" )
    testGL( gl.glGenTextures( 1, tid ) )
-   tid = tid[0]
+   local tid = tid[0]
    testGL( gl.glBindTexture( gl.GL_TEXTURE_2D, tid ) )
    withGL{ gl.glPixelStorei, "GL_UNPACK_", SWAP_BYTES="FALSE", LSB_FIRST="FALSE", 
            ROW_LENGTH=0, SKIP_ROWS=0, SKIP_PIXELS=0, ALIGNMENT=1 }
@@ -50,7 +54,7 @@ local function bind_font( font )
    withGL{ function(p,v) gl.glTexParameterf( gl.GL_TEXTURE_2D, p, v ) end, "GL_TEXTURE_",
            WRAP_S="CLAMP", WRAP_T="CLAMP", MAG_FILTER="NEAREST", MIN_FILTER="NEAREST" }
    testGL( gl.glTexEnvi( gl.GL_TEXTURE_ENV, gl.GL_TEXTURE_ENV_MODE, gl.GL_MODULATE ) )
-   return{
+   return {
       tid = tid,
       font = font
    }
@@ -59,6 +63,29 @@ end
 local function unbind_font( font )
    local tid = ffi.new( "GLuint[1]", font.tid )
    testGL( gl.glDeleteTextures(1, tid) )
+end
+
+local function measure_text( font, lines, line, col, pos )
+   local lines = type(lines)=="string" and { lines } or lines
+   local top, bottom = 1, #lines
+   local font = font.font
+   local cw, ch = font.cw, font.ch
+   local x0, y0, c, w = 0, 0, 0, 0
+   for y = top, bottom do
+      local x0, y1, line = x0, y0 + ch, lines[y]
+      for x = 1, #line do
+         local ch = line:byte(x)
+         local x1 = x0 + cw[ch]
+	 c = c + 1
+         x0 = x1
+      end
+      w = max(w, x0)
+      y0 = y1
+   end
+   return {
+      w = w,
+      h = y1,
+   }
 end
 
 local function build_text( font, lines )
@@ -74,7 +101,7 @@ local function build_text( font, lines )
    local uv = ffi.new( "float[?]", chars * 12 )
    local tid, font = font.tid, font.font
    local u0, v0, u1, v1, cw, ch = font.u0, font.v0, font.u1, font.v1, font.cw, font.ch
-   local x0, y0, c = 0, 0, 0
+   local x0, y0, c, w, h = 0, 0, 0, 0, 0
    for y = top, bottom do
       local x0, y1, line = x0, y0 + ch, lines[y]
       for x = 1, #line do
@@ -90,14 +117,18 @@ local function build_text( font, lines )
          c = c + 12
          x0 = x1
       end
+      w = max(w, x0)
       y0 = y1
    end
+   h = max(h, y0)
    
    return {
       tid = tid,
       n_verts = chars * 6,
       uvs = uv,
       verts = v,
+      w = w,
+      h = h,
    }
 end
 
@@ -117,13 +148,21 @@ local function draw_text( dc, x, y, selection )
    if selection then
       local from = selection.from * 6
       local to   = selection.to   * 6
-      testGL( gl.glDrawArrays(          gl.GL_TRIANGLES, 0,    from ) )
-      testGL( gl.glBlendFunc(           gl.GL_ONE_MINUS_SRC_ALPHA, gl.GL_SRC_ALPHA ) )
-      testGL( gl.glDrawArrays(          gl.GL_TRIANGLES, from, to - from ) )
-      testGL( gl.glBlendFunc(           gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA ) )
-      testGL( gl.glDrawArrays(          gl.GL_TRIANGLES, to,   dc.n_verts - to ) )
+      if 0 <= from and from <= to and to <= dc.n_verts then
+	 assert( 0 <= from and from <= to and to <= dc.n_verts,
+		 "from="..tostring(from)..
+		 " to="..tostring(to)..
+	      " n_verts="..tostring(dc.n_verts))
+	 testGL( gl.glDrawArrays(       gl.GL_TRIANGLES, 0,  from ) )
+	 testGL( gl.glBlendFunc(        gl.GL_ONE_MINUS_SRC_ALPHA, gl.GL_SRC_ALPHA ) )
+	 testGL( gl.glDrawArrays(       gl.GL_TRIANGLES, from, to - from ) )
+	 testGL( gl.glBlendFunc(        gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA ) )
+	 testGL( gl.glDrawArrays(       gl.GL_TRIANGLES, to, dc.n_verts - to ) )
+      else
+	 testGL( gl.glDrawArrays(       gl.GL_TRIANGLES, 0, dc.n_verts ) )
+      end
    else
-      testGL( gl.glDrawArrays(          gl.GL_TRIANGLES, 0, dc.n_verts ) )
+      testGL( gl.glDrawArrays(       gl.GL_TRIANGLES, 0, dc.n_verts ) )
    end
    testGL( gl.glPopMatrix() )
    testGL( gl.glPopAttrib() )
@@ -140,6 +179,12 @@ end
 
 local source = read_text_file( ... or (arg and arg[1]) or "moar.lua" )
 
+local state = {
+   lines = {},
+   top = 0,
+   left = 0,
+}
+
 local function main()
    assert( glfw.glfwInit() )
 
@@ -155,31 +200,59 @@ local function main()
    glfw.glfwSwapInterval( 1 ) -- 60fps
 
    local font = bind_font( fonts[4] )
+   local font2 = bind_font( fonts[1] )
 
-   local mx, my = ffi.new( "int[1]" ), ffi.new( "int[1]" )
-   local sw, sh = ffi.new( "int[1]" ), ffi.new( "int[1]" )
-   local px, py = 0, 0
+   local mx, my = ffi.new( "int[1]" ), ffi.new( "int[1]" ) -- mouse x, y 
+   local ww, wh = ffi.new( "int[1]" ), ffi.new( "int[1]" ) -- window width, height
+   local sx, sy = ffi.new( "int[1]" ), ffi.new( "int[1]" ) -- mouse scroll x, y 
+   local px, py, pdx, pdy = 0, 0, 0, 0
    local s1 = 10
    local s2 = 100
+
+   local dc = build_text( font, source )
+   local dc2 = build_text( font2, source )
+
    while glfw.glfwIsWindow(window) and glfw.glfwGetKey(window, glfw.GLFW_KEY_ESCAPE) ~= glfw.GLFW_PRESS do
+      glfw.glfwGetWindowSize(window, ww, wh)
+      local ww, wh = ww[0], wh[0]
+
       glfw.glfwGetMousePos(window, mx, my)
       local mx, my = mx[0], my[0]
 
-      glfw.glfwGetWindowSize(window, sw, sh)
-      local sw, sh = sw[0], sh[0]
+      glfw.glfwGetScrollOffset(window, sx, sy)
+      local sx, sy = sx[0], sy[0]
 
-      testGL( gl.glViewport(0, 0, sw, sh) )
+      testGL( gl.glViewport(0, 0, ww, wh) )
       testGL( gl.glClearColor(0.4, 0.3, 0.2, 0) )
       testGL( gl.glClear(gl.GL_COLOR_BUFFER_BIT) )
 
       testGL( gl.glMatrixMode(gl.GL_PROJECTION) )
       testGL( gl.glLoadIdentity() )
       
-      testGL( gl.glOrtho(0, sw, sh, 0, -1, 1 ) )
+      testGL( gl.glOrtho(0, ww, wh, 0, -1, 1 ) )
 
       gl.glColor4ub( 130, 255, 255, 255 )
-      draw_text( build_text( font, source ), px, py, { from = s1, to = s2 } )
-      py = py - 1
+      draw_text( dc, px, py, { from = s1, to = s2 } )
+      
+      gl.glPushMatrix()
+      gl.glTranslated(ww - 256, 0, 0 )
+      gl.glScaled(256 / dc2.w, wh / dc2.h, 0)
+      draw_text( dc2, 0, 0, { from = s1, to = s2 } )
+      gl.glPopMatrix()
+
+      pdx = pdx * 0.915 + sx
+      if sx * pdx < 0 then
+	 pdx = 0
+      end
+      px  = px + pdx
+      px = min(px, 0)
+
+      pdy = pdy * 0.915 + sy
+      if sy * pdy < 0 then
+	 pdy = 0
+      end
+      py = py + pdy
+      py = min(py, 0)
 
       s1 = s1 + 2.5
       s2 = s2 + 3
@@ -188,6 +261,8 @@ local function main()
       glfw.glfwPollEvents()
    end
    glfw.glfwTerminate()
+
+   print( "Verts: ", dc.n_verts )
 end
 
 main()
