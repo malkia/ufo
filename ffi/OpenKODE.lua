@@ -1,6 +1,13 @@
-local ffi = require( "ffi" )
+local ffi   = require( "ffi" )
+local libs  = ffi_OpenKODE_libs or {
+   OSX      = { x86 = "kd.dylib", x64 = "kd.dylib" },
+   Windows = { x86 = "libXMKD.dll", x64 = "libXMKD.dll" },
+}
+--local lib   = ffi_OpenKODE_lib or ( "bin/" .. ffi.os .. "/" .. ffi.arch .. "/angle/" .. libs[ ffi.os ][ ffi.arch ] )
+local lib   = ffi_OpenKODE_lib or ( "bin/" .. ffi.os .. "/" .. ffi.arch .. "/" .. libs[ ffi.os ][ ffi.arch ] )
+print(lib)
+local kd = ffi.load( (... and "" or "../") .. lib )
 
-local kd = "test"
 
 ffi.cdef[[
       enum {
@@ -76,6 +83,7 @@ ffi.cdef[[
 	 KD_EOPNOTSUPP,
 	 KD_EOVERFLOW,
 	 KD_EPERM, 
+	 KD_EPIPE,
 	 KD_ERANGE,
 	 KD_ETIMEDOUT,
 	 KD_ETRY_AGAIN,
@@ -95,8 +103,8 @@ ffi.cdef[[
 	 KD_EVENT_SOCKET_CONNECT_COMPLETE,
 	 KD_EVENT_SOCKET_INCOMING,
 	 KD_EVENT_NAME_LOOKUP_COMPLETE,
-	 KD_EVENT_STATE,
 	 KD_MISSING_54,
+	 KD_EVENT_STATE,
 	 KD_EVENT_INPUT,
 	 KD_EVENT_INPUT_POINTER,
 	 KD_EVENT_INPUT_STICK,
@@ -583,7 +591,7 @@ ffi.cdef[[
       KDint          kdGetWindowPropertybv(KDWindow *window, KDint pname, KDboolean *param);
       KDint          kdGetWindowPropertyiv(KDWindow *window, KDint pname, KDint32 *param);
       KDint          kdGetWindowPropertycv(KDWindow *window, KDint pname, KDchar *param, KDsize *size);
-      KDint          kdRealizeWindow(KDWindow *window, void* EGLNativeWindow );
+      KDint          kdRealizeWindow(KDWindow *window, void** EGLNativeWindow );
 
       void           kdHandleAssertion(const KDchar *condition, const KDchar *filename, KDint linenumber);
       void           kdLogMessage(const KDchar *string);

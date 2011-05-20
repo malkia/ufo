@@ -1,7 +1,10 @@
 local ffi  = require( "ffi" )
 local libs = ffi_egl_libs or {
    OSX     = { x86 = "egl.dylib", x64 = "egl.dylib" },
+   Windows = { x86 = "libEGL.dll", x64 = "libEGL.dll" },
 }
+--local lib  = ffi_egl_lib or ( "bin/" .. ffi.os .. "/" .. ffi.arch .. "/angle/" .. libs[ ffi.os ][ ffi.arch ] )
+local lib  = ffi_egl_lib or ( "bin/" .. ffi.os .. "/" .. ffi.arch .. "/libGLESv2.dll" )
 local lib  = ffi_egl_lib or ( "bin/" .. ffi.os .. "/" .. ffi.arch .. "/" .. libs[ ffi.os ][ ffi.arch ] )
 local egl  = ffi.load( lib )
 
