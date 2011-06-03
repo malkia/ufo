@@ -47,12 +47,11 @@ local function bind_font( font )
    testGL( gl.glBindTexture( gl.GL_TEXTURE_2D, tid ) )
    withGL{ gl.glPixelStorei, "GL_UNPACK_", SWAP_BYTES="FALSE", LSB_FIRST="FALSE", 
            ROW_LENGTH=0, SKIP_ROWS=0, SKIP_PIXELS=0, ALIGNMENT=1 }
-   withGL{ gl.glPixelTransferf, "GL_", ALPHA_SCALE=1, ALPHA_BIAS=0, 
-           RED_BIAS=1, GREEN_BIAS=1, BLUE_BIAS=1 }
-   testGL( gl.glTexImage2D( gl.GL_TEXTURE_2D, 0, 2, font.tw, font.th, 0, 
+   withGL{ gl.glPixelTransferf, "GL_", ALPHA_SCALE=1, ALPHA_BIAS=0 }
+   testGL( gl.glTexImage2D( gl.GL_TEXTURE_2D, 0, gl.GL_ALPHA, font.tw, font.th, 0, 
                             gl.GL_ALPHA, gl.GL_UNSIGNED_BYTE, font.td ) )
    withGL{ function(p,v) gl.glTexParameterf( gl.GL_TEXTURE_2D, p, v ) end, "GL_TEXTURE_",
-           WRAP_S="CLAMP", WRAP_T="CLAMP", MAG_FILTER="NEAREST", MIN_FILTER="NEAREST" }
+           WRAP_S="REPEAT", WRAP_T="REPEAT", MAG_FILTER="LINEAR", MIN_FILTER="LINEAR" }
    testGL( gl.glTexEnvi( gl.GL_TEXTURE_ENV, gl.GL_TEXTURE_ENV_MODE, gl.GL_MODULATE ) )
    return {
       tid = tid,
@@ -76,7 +75,7 @@ local function measure_text( font, lines, line, col, pos )
       for x = 1, #line do
          local ch = line:byte(x)
          local x1 = x0 + cw[ch]
-	 c = c + 1
+         c = c + 1
          x0 = x1
       end
       w = max(w, x0)
@@ -88,9 +87,17 @@ local function measure_text( font, lines, line, col, pos )
    }
 end
 
-local function build_text( font, lines )
+local function build_text( font, lines, top, bottom )
+   local fixed = false
    local lines = type(lines)=="string" and { lines } or lines
-   local top, bottom = 1, #lines
+   local top = top or 1
+   local bottom = bottom or #lines
+   
+   assert( 1 <= top and top <= bottom and bottom <= #lines,
+	   "top="..tostring(top).." "..
+	   "bottom="..tostring(bottom).." "..
+	"lines="..tostring(#lines)
+	)
 
    local chars = 0
    for y = top, bottom do
@@ -101,13 +108,25 @@ local function build_text( font, lines )
    local uv = ffi.new( "float[?]", chars * 12 )
    local tid, font = font.tid, font.font
    local u0, v0, u1, v1, cw, ch = font.u0, font.v0, font.u1, font.v1, font.cw, font.ch
-   local x0, y0, c, w, h = 0, 0, 0, 0, 0
+   local x0, c, w, h = 0, 0, 0, 0
+   local y0 = (top - 1) * ch
+   local ootw = 1 / font.tw
+   ootw = ootw - ootw / 2
    for y = top, bottom do
       local x0, y1, line = x0, y0 + ch, lines[y]
       for x = 1, #line do
          local ch = line:byte(x)
-         local x1 = x0 + cw[ch]
          local u0, v0, u1, v1 = u0[ch], v0[ch], u1[ch], v1[ch]
+	 local x1 = x0
+	 if fixed then
+	    x1 = x1 + 8
+	    if cw[ch] <= 6 then
+	       u0 = u0 - ootw*2
+	       u1 = u1 + ootw*2
+	    end
+	 else
+	    x1 = x1 + cw[ch]
+	 end
          v[c +  0], v[c +  1], uv[c +  0], uv[c +  1] = x0, y0, u0, v0
          v[c +  2], v[c +  3], uv[c +  2], uv[c +  3] = x1, y0, u1, v0
          v[c +  4], v[c +  5], uv[c +  4], uv[c +  5] = x0, y1, u0, v1
@@ -149,17 +168,17 @@ local function draw_text( dc, x, y, selection )
       local from = selection.from * 6
       local to   = selection.to   * 6
       if 0 <= from and from <= to and to <= dc.n_verts then
-	 assert( 0 <= from and from <= to and to <= dc.n_verts,
-		 "from="..tostring(from)..
-		 " to="..tostring(to)..
-	      " n_verts="..tostring(dc.n_verts))
-	 testGL( gl.glDrawArrays(       gl.GL_TRIANGLES, 0,  from ) )
-	 testGL( gl.glBlendFunc(        gl.GL_ONE_MINUS_SRC_ALPHA, gl.GL_SRC_ALPHA ) )
-	 testGL( gl.glDrawArrays(       gl.GL_TRIANGLES, from, to - from ) )
-	 testGL( gl.glBlendFunc(        gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA ) )
-	 testGL( gl.glDrawArrays(       gl.GL_TRIANGLES, to, dc.n_verts - to ) )
+         assert( 0 <= from and from <= to and to <= dc.n_verts,
+                 "from="..tostring(from)..
+                 " to="..tostring(to)..
+              " n_verts="..tostring(dc.n_verts))
+         testGL( gl.glDrawArrays(       gl.GL_TRIANGLES, 0,  from ) )
+         testGL( gl.glBlendFunc(        gl.GL_ONE_MINUS_SRC_ALPHA, gl.GL_SRC_ALPHA ) )
+         testGL( gl.glDrawArrays(       gl.GL_TRIANGLES, from, to - from ) )
+         testGL( gl.glBlendFunc(        gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA ) )
+         testGL( gl.glDrawArrays(       gl.GL_TRIANGLES, to, dc.n_verts - to ) )
       else
-	 testGL( gl.glDrawArrays(       gl.GL_TRIANGLES, 0, dc.n_verts ) )
+         testGL( gl.glDrawArrays(       gl.GL_TRIANGLES, 0, dc.n_verts ) )
       end
    else
       testGL( gl.glDrawArrays(       gl.GL_TRIANGLES, 0, dc.n_verts ) )
@@ -177,13 +196,19 @@ local function read_text_file(n)
    return lines
 end
 
-local source = read_text_file( ... or (arg and arg[1]) or "moar.lua" )
+local source = read_text_file( ... or (arg and arg[1]) or "ffi/OpenGL.lua" )
 
 local state = {
    lines = {},
    top = 0,
    left = 0,
 }
+
+local glfw_window
+
+local function key_pressed(key)
+   return glfw.glfwGetKey( glfw_window, glfw[ "GLFW_KEY_" .. key:upper() ] ) == glfw.GLFW_PRESS
+end
 
 local function main()
    assert( glfw.glfwInit() )
@@ -195,7 +220,9 @@ local function main()
 
    local window = glfw.glfwOpenWindow( width, height, glfw.GLFW_WINDOWED, "Font Demo", nil )
    assert( window, "Failed to open GLFW window" )
+   glfw_window = window
 
+   glfw.glfwDisable( window, glfw.GLFW_STICKY_KEYS )
    glfw.glfwSetWindowPos( window, (desktop_width - width)/2, (desktop_height - height)/2 )
    glfw.glfwSwapInterval( 1 ) -- 60fps
 
@@ -209,9 +236,6 @@ local function main()
    local s1 = 10
    local s2 = 100
 
-   local dc = build_text( font, source )
-   local dc2 = build_text( font2, source )
-
    while glfw.glfwIsWindow(window) and glfw.glfwGetKey(window, glfw.GLFW_KEY_ESCAPE) ~= glfw.GLFW_PRESS do
       glfw.glfwGetWindowSize(window, ww, wh)
       local ww, wh = ww[0], wh[0]
@@ -222,40 +246,65 @@ local function main()
       glfw.glfwGetScrollOffset(window, sx, sy)
       local sx, sy = sx[0], sy[0]
 
+      if key_pressed( "UP" ) then
+--       py = py + font.font.ch
+--       sy = sy + 1
+         py = py + font.font.ch
+      end
+
+      if key_pressed( "DOWN" ) then
+--       py = py - font.font.ch
+--       sy = sy - 1
+         py = py - font.font.ch
+      end
+
       testGL( gl.glViewport(0, 0, ww, wh) )
-      testGL( gl.glClearColor(0.4, 0.3, 0.2, 0) )
-      testGL( gl.glClear(gl.GL_COLOR_BUFFER_BIT) )
+      testGL( gl.glClearColor(0.4, 0.3, 0.2 + pdy/100.0, 0) )
+--      if math.abs(pdy) < 10.5 then
+	 testGL( gl.glClear(gl.GL_COLOR_BUFFER_BIT) )
+  --    end
 
       testGL( gl.glMatrixMode(gl.GL_PROJECTION) )
       testGL( gl.glLoadIdentity() )
       
       testGL( gl.glOrtho(0, ww, wh, 0, -1, 1 ) )
 
+      local top = max(1,min(#source,math.floor(-py / font.font.ch) + 1))
+      local bottom = max(1,min(#source, top + math.floor( wh / font.font.ch )))
+      dc = build_text( font, source, top, bottom )
+
       gl.glColor4ub( 130, 255, 255, 255 )
       draw_text( dc, px, py, { from = s1, to = s2 } )
-      
-      gl.glPushMatrix()
-      gl.glTranslated(ww - 256, 0, 0 )
-      gl.glScaled(256 / dc2.w, wh / dc2.h, 0)
-      draw_text( dc2, 0, 0, { from = s1, to = s2 } )
-      gl.glPopMatrix()
+
+      if false then
+	 gl.glPushMatrix()
+	 gl.glTranslated(ww - 256, 0, 0 )
+	 gl.glScaled(256 / dc2.w, wh / dc2.h, 0)
+	 draw_text( dc2, 0, 0, { from = s1, to = s2 } )
+	 gl.glPopMatrix()
+      end
 
       pdx = pdx * 0.915 + sx
       if sx * pdx < 0 then
-	 pdx = 0
+         pdx = 0
       end
-      px  = px + pdx
+      px = px + pdx
       px = min(px, 0)
 
       pdy = pdy * 0.915 + sy
       if sy * pdy < 0 then
-	 pdy = 0
+         pdy = 0
       end
       py = py + pdy
       py = min(py, 0)
 
       s1 = s1 + 2.5
       s2 = s2 + 3
+
+      if s1 > dc.n_verts / 6 then
+	 s1 = 0
+	 s2 = 10
+      end
 
       glfw.glfwSwapBuffers()
       glfw.glfwPollEvents()
