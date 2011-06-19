@@ -6,25 +6,10 @@ set _ARCH=%1
 if "%_ARCH%"=="" set _ARCH=32
 
 set _WDK=%2
-if "%_WDK%"=="" set _WDK=d:\wdk
+if "%_WDK%"=="" set _WDK=c:\wdk
 
 set _LUAJITDIR=%~dp0..\..\luajit\src
 set _UFODIR=%~dp0..
-
-set _VSDIR=
-if NOT "%VS100COMNTOOLS%"=="" ( 
-  set _VSDIR="%VS100COMNTOOLS%\..\..\"
-) ELSE IF NOT "%VS90COMNTOOLS%"=="" ( 
-  set _VSDIR="%VS90COMNTOOLS%\..\..\"
-) ELSE IF NOT "%VCINSTALLDIR%"=="" ( 
-  set _VSDIR="%VCINSTALLDIR%\..\"
-) ELSE IF NOT "%VSINSTALLDIR%"=="" ( 
-  set _VSDIR="%VSINSTALLDIR%\"
-) ELSE (
-  echo At least one of the environment variables must be set:
-  echo VS100COMNTOOLS, VS90COMNTOOLS, VCINSTALLDIR or VSINSTALLDIR
-  goto :EOF
-)
 
 if "%_ARCH%"=="32" set _TARGET=i386
 if "%_ARCH%"=="64" set _TARGET=amd64
