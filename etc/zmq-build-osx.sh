@@ -1,9 +1,8 @@
+pushd ${0%/*}
 LIBZMQ=../../libzmq
-
 pushd $LIBZMQ
 
 # http://www.cybergarage.org/twiki/bin/view/Main/IPhoneDevTips
-
 
 #ISDK=/Developer/Platforms/iPhoneOS.platform/Developer
 #ISDKVER=iPhoneOS4.3.sdk
@@ -26,7 +25,7 @@ make clean
 make -j8
 
 git log -1 >> src/.libs/libzmq.1.dylib
+
 popd
-
 mv $LIBZMQ/src/.libs/libzmq.1.dylib ../bin/zmq.dylib
-
+popd

@@ -2,7 +2,7 @@
 
 local ffi  = require( "ffi" )
 local cl   = require( "ffi/OpenCL" )
-local clx  = require( "ext/OpenCL" )( cl )
+local clx  = require( "lib/OpenCL" )( cl )
 local gl   = require( "ffi/OpenGL" )
 local glfw = require( "ffi/glfw" )
 local tw   = require( "ffi/AntTweakBar" )
