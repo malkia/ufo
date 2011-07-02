@@ -1,0 +1,20 @@
+Executable and dynamic libraries organization:
+
+	bin/$OS/$ARCH/...
+
+$OS can be:
+	- Windows
+	- OSX
+	- iOS
+	- Linux
+
+and $ARCH:
+	- x86 (32-bit i386)
+	- x64 (64-bit amd64)
+	- arm (armv6, armv7)
+
+Note:
+	For OSX, and iOS universal binaries might be used, binaries are just stored in bin/OSX or bin/iOS
+
+Note:
+	The OS, and ARCH values are taken directly by luajit's ffi.os, and ffi.arch, with one exception: iOS

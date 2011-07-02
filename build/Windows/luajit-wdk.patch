@@ -1,0 +1,15 @@
+diff --git a/src/msvcbuild.bat b/src/msvcbuild.bat
+index cd18236..4ea1776 100644
+--- a/src/msvcbuild.bat
++++ b/src/msvcbuild.bat
+@@ -14,8 +14,8 @@
+ @if not defined INCLUDE goto :FAIL
+
+ @setlocal
+-@set LJCOMPILE=cl /nologo /c /MD /O2 /W3 /D_CRT_SECURE_NO_DEPRECATE
+-@set LJLINK=link /nologo
++@set LJCOMPILE=call cl /nologo /c /MD /O2 /W3 /D_CRT_SECURE_NO_DEPRECATE
++@set LJLINK=call link /nologo
+ @set LJMT=mt /nologo
+ @set LJLIB=lib /nologo
+ @set DASMDIR=..\dynasm
