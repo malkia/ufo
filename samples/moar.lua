@@ -7,6 +7,7 @@ local gl    = require( "ffi/OpenGL" )
 local glu   = require( "ffi/glu" )
 local glfw  = require( "ffi/glfw" )
 local fonts = require( "lib/fonts" )
+local egl   = require( "ffi/egl" )
 
 --jit.off()
 --require('dbg')
@@ -62,29 +63,6 @@ end
 local function unbind_font( font )
    local tid = ffi.new( "GLuint[1]", font.tid )
    testGL( gl.glDeleteTextures(1, tid) )
-end
-
-local function measure_text( font, lines, line, col, pos )
-   local lines = type(lines)=="string" and { lines } or lines
-   local top, bottom = 1, #lines
-   local font = font.font
-   local cw, ch = font.cw, font.ch
-   local x0, y0, c, w = 0, 0, 0, 0
-   for y = top, bottom do
-      local x0, y1, line = x0, y0 + ch, lines[y]
-      for x = 1, #line do
-         local ch = line:byte(x)
-         local x1 = x0 + cw[ch]
-         c = c + 1
-         x0 = x1
-      end
-      w = max(w, x0)
-      y0 = y1
-   end
-   return {
-      w = w,
-      h = y1,
-   }
 end
 
 local function build_text( font, lines, top, bottom )
@@ -204,14 +182,9 @@ local state = {
    left = 0,
 }
 
-local glfw_window
-
-local function key_pressed(key)
-   return glfw.glfwGetKey( glfw_window, glfw[ "GLFW_KEY_" .. key:upper() ] ) == glfw.GLFW_PRESS
-end
-
 local function main()
    assert( glfw.glfwInit() )
+
 
    local desktop_mode = ffi.new( "GLFWvidmode[1]" )
    glfw.glfwGetDesktopMode( desktop_mode )
@@ -220,11 +193,14 @@ local function main()
 
    local window = glfw.glfwOpenWindow( width, height, glfw.GLFW_WINDOWED, "Font Demo", nil )
    assert( window, "Failed to open GLFW window" )
-   glfw_window = window
 
-   glfw.glfwDisable( window, glfw.GLFW_STICKY_KEYS )
+   local function key_pressed(key)
+      return glfw.glfwGetKey( window, glfw[ "GLFW_KEY_" .. key:upper() ] ) == glfw.GLFW_PRESS
+   end
+
+   glfw.glfwEnable( window, glfw.GLFW_STICKY_KEYS )
    glfw.glfwSetWindowPos( window, (desktop_width - width)/2, (desktop_height - height)/2 )
-   glfw.glfwSwapInterval( 1 ) -- 60fps
+   glfw.glfwSwapInterval( 0 ) -- 0=nosync 1=60fps
 
    local font = bind_font( fonts[4] )
    local font2 = bind_font( fonts[1] )

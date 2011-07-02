@@ -1,0 +1,15 @@
+Scripts for building executables and dynamic libraries that are put in ../bin and later distributed with the project
+
+There is no strict organization here. Start by going to the $OS folder described in ../bin/README, and then find the
+
+appropriate .sh, .cmd, etc. script to build. For some projects patches are provided.
+
+Note:
+	Most scripts expect that the projects being compiled are the same directory level of this one, and concrete names are expected, such as:
+
+		- luajit (../../luajit from here)
+		- glfw   (../../glfw from here)
+		- libzmq (../../libzmq from here)
+		- AntTweakBar (../../AntTweakbar from here)
+
+
