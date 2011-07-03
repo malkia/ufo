@@ -1,0 +1,5 @@
+UFO -- LuaJIT FFI Bindings for OpenGL, OpenCL, ZeroMQ, GLFW and AntTweakBar
+
+./luajit.sh samples/OpenCL/info.lua
+luajit.cmd  samples/OpenCL/info.lua
+
