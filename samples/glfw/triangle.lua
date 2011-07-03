@@ -1,6 +1,14 @@
 #!/usr/bin/env luajit
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+local ffi  = require( "ffi" )
+local gl   = require( "ffi/OpenGL" )
+local glu  = require( "ffi/glu" )
+local glfw = require( "ffi/glfw" )
+=======
+>>>>>>> 974c791b042fde8ff3da762068bddf3e9a48b46a
 local ffi   = require( "ffi" )
 local cl    = require( "ffi/OpenCL" )
 local gl    = require( "ffi/OpenGL" )
@@ -141,12 +149,16 @@ local function read_file_2(n)
 end
 
 local source = read_file_2( ... or (arg and arg[1]) or "glfw-triangle.lua" )
+<<<<<<< HEAD
 =======
 local ffi  = require( "ffi" )
 local gl   = require( "ffi/OpenGL" )
 local glu  = require( "ffi/glu" )
 local glfw = require( "ffi/glfw" )
 >>>>>>> a6fe74858bf127194b24aca940ed3f95133edbda
+=======
+>>>>>>> e677ba4425c2fb93768dd0ab559593873392e7ee
+>>>>>>> 974c791b042fde8ff3da762068bddf3e9a48b46a
 
 local function main()
    local px, py = 0, 0
