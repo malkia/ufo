@@ -1,16 +1,13 @@
 local ffi  = require( "ffi" )
-
 local libs = ffi_AntTweakBar_libs or {
-   OSX     = { x86 = "bin/AntTweakBar.dylib", x64 = "bin/AntTweakBar.dylib" },
-   Windows = { x86 = "bin/AntTweakBar32.dll", x64 = "bin/AntTweakBar64.dll" },
-   Linux   = { x86 = "bin/AntTweakBar32.so",  x64 = "bin/AntTweakBar64.so"  },
-   BSD     = { x86 = "bin/AntTweakBar32.so",  x64 = "bin/AntTweakBar64.so"  },
-   POSIX   = { x86 = "bin/AntTweakBar32.so",  x64 = "bin/AntTweakBar64.so"  },
-   Other   = { x86 = "bin/AntTweakBar32.so",  x64 = "bin/AntTweakBar64.so"  }, 
+   OSX     = { x86 = "bin/OSX/AntTweakBar.dylib",       x64 = "bin/OSX/AntTweakBar.dylib" },
+   Windows = { x86 = "bin/Windows/x86/AntTweakBar.dll", x64 = "bin/Windows/x64/AntTweakBar.dll" },
+   Linux   = { x86 = "bin/Linux/x86/AntTweakBar.so",    x64 = "bin/Linux/x86/AntTweakBar.so"  },
+   BSD     = { },
+   POSIX   = { },
+   Other   = { }, 
 }
-
 local lib  = ffi_AntTweakBar_lib or libs[ ffi.os ][ ffi.arch ]
-
 local tw   = ffi.load( lib )
 
 ffi.cdef [[

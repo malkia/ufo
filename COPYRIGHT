@@ -1,5 +1,5 @@
-===============================================================================
-UFO -- LuaJIT FFI Bindings for OpenGL, glu, OpenCL, glfw and AndTweakBar
+=============================================================================
+UFO -- LuaJIT FFI Bindings for OpenGL, OpenCL, ZeroMQ, GLFW and AntTweakBar
 
 Copyright (C) 2011 Dimiter "malkia" Stanev. All rights reserved.
 
@@ -23,4 +23,4 @@ THE SOFTWARE.
 
 [ MIT license: http://www.opensource.org/licenses/mit-license.php ]
 
-===============================================================================
+=============================================================================

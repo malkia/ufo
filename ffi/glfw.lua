@@ -1,8 +1,8 @@
 local ffi  = require( "ffi" )
 
 local libs = ffi_glfw_libs or {
-   OSX     = { x86 = "bin/glfw.dylib", x64 = "bin/glfw.dylib" },
-   Windows = { x86 = "bin/glfw32.dll", x64 = "bin/glfw64.dll" },
+   OSX     = { x86 = "bin/OSX/libglfw.dylib", x64 = "bin/OSX/libglfw.dylib" },
+   Windows = { x86 = "bin/Windows/x86/glfw.dll", x64 = "bin/Windows/x64/glfw.dll" },
    Linux   = { x86 = "bin/glfw32.so",  x64 = "bin/glfw64.so"  },
    BSD     = { x86 = "bin/glfw32.so",  x64 = "bin/glfw64.so"  },
    POSIX   = { x86 = "bin/glfw32.so",  x64 = "bin/glfw64.so"  },
