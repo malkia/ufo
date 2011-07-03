@@ -28,9 +28,10 @@ set INCLUDE=%CRT_INC_PATH%;%INCLUDE%;
 
 pushd %_SRC%
 del link.cmd cl.cmd *.obj buildvm_*.h 1>nul 2>nul
-rem echo cl.exe /D_MSC_VER=1399 %%* > cl.cmd
+
+set OBJS=
 if "%_TARGET%"=="i386" (
-   echo link.exe %_WDK%\lib\win7\%_TARGET%\msvcrt_win2000.obj %%* > link.cmd
+   set OBJS="%_WDK%\lib\win7\%_TARGET%\msvcrt_win2000.obj"
 )
 
 del config.h 1>nul 2>nul
@@ -38,7 +39,7 @@ copy /y "%~dpn0-config.h" config.h
 set _FILES=enable.c error.c fullscreen.c gamma.c init.c input.c joystick.c opengl.c time.c window.c win32\win32_dllmain.c win32\win32_enable.c win32\win32_fullscreen.c 
 set _FILES=%_FILES% win32\win32_gamma.c win32\win32_init.c win32\win32_joystick.c win32\win32_opengl.c win32\win32_time.c win32\win32_window.c 
 set _OPTS=-O2 -Os -Oy -GF -GL -arch:SSE2 -MP
-call cl -MD -Feglfw.dll -LD -DGLFW_BUILD_DLL=1 -nologo %_OPTS% -Iwin32 -I. %_FILES% user32.lib opengl32.lib
+call cl -MD -Feglfw.dll -LD -DGLFW_BUILD_DLL=1 -nologo %_OPTS% -Iwin32 -I. %OBJS% %_FILES% user32.lib opengl32.lib
 del config.h 1>nul 2>nul
 
 del link.cmd cl.cmd 1>nul 2>nul

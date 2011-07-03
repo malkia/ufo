@@ -29,13 +29,21 @@ set INCLUDE=%SDK_INC_PATH%\crt\stl60;%INCLUDE%;
 
 pushd %_SRC%
 del link.cmd cl.cmd *.obj buildvm_*.h 1>nul 2>nul
-rem echo cl.exe /D_MSC_VER=1399 %%* > cl.cmd
+set OBJS=
 if "%_TARGET%"=="i386" (
-   echo link.exe %_WDK%\lib\win7\%_TARGET%\msvcrt_win2000.obj %%* > link.cmd
+   set OBJS="%_WDK%\lib\win7\%_TARGET%\msvcrt_win2000.obj"
 )
 
+mkdir release%_ARCH% 1>nul 2>nul
+"%DXSDK_DIR%\Utilities\bin\x86\fxc" /T vs_4_0_level_9_1 /E LineRectVS /Fh release%_ARCH%\TwDirect3D11_LineRectVS.h TwDirect3D11.hlsl
+"%DXSDK_DIR%\Utilities\bin\x86\fxc" /T vs_4_0_level_9_1 /E LineRectCstColorVS /Fh release%_ARCH%\TwDirect3D11_LineRectCstColorVS.h TwDirect3D11.hlsl
+"%DXSDK_DIR%\Utilities\bin\x86\fxc" /T ps_4_0_level_9_1 /E LineRectPS /Fh release%_ARCH%\TwDirect3D11_LineRectPS.h TwDirect3D11.hlsl
+"%DXSDK_DIR%\Utilities\bin\x86\fxc" /T vs_4_0_level_9_1 /E TextVS /Fh release%_ARCH%\TwDirect3D11_TextVS.h TwDirect3D11.hlsl
+"%DXSDK_DIR%\Utilities\bin\x86\fxc" /T vs_4_0_level_9_1 /E TextCstColorVS /Fh release%_ARCH%\TwDirect3D11_TextCstColorVS.h TwDirect3D11.hlsl
+"%DXSDK_DIR%\Utilities\bin\x86\fxc" /T ps_4_0_level_9_1 /E TextPS /Fh release%_ARCH%\TwDirect3D11_TextPS.h TwDirect3D11.hlsl
+
 set _OPTS=-O2 -Os -Oy -GF -GL -arch:SSE2 -MP
-call cl -MD -FeAntTweakBar.dll -I%DXSDK_DIR%/Include -LD -nologo %_OPTS% -DTW_EXPORTS=1 -I../include LoadOGL.cpp LoadOGLCore.cpp TwBar.cpp TwColors.cpp TwEventSFML.cpp TwFonts.cpp TwMgr.cpp TwOpenGL.cpp TwDirect3D9.cpp TwDirect3D10.cpp TwDirect3D11.cpp user32.lib gdi32.lib kernel32.lib
+call cl -MD -FeAntTweakBar.dll -I%DXSDK_DIR%/Include -LD -nologo %_OPTS% -DTW_EXPORTS=1 -I../include %OBJS% LoadOGL.cpp LoadOGLCore.cpp TwBar.cpp TwColors.cpp TwEventSFML.cpp TwFonts.cpp TwMgr.cpp TwOpenGL.cpp TwDirect3D9.cpp TwDirect3D10.cpp TwDirect3D11.cpp user32.lib gdi32.lib kernel32.lib
 
 del link.cmd cl.cmd 1>nul 2>nul
 call :install AntTweakBar.dll %_ROOT%\bin\Windows\%_LUA_ARCH%

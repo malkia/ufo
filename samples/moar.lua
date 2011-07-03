@@ -7,7 +7,6 @@ local gl    = require( "ffi/OpenGL" )
 local glu   = require( "ffi/glu" )
 local glfw  = require( "ffi/glfw" )
 local fonts = require( "lib/fonts" )
-local egl   = require( "ffi/egl" )
 
 --jit.off()
 --require('dbg')
