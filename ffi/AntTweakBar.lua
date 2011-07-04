@@ -2,7 +2,7 @@ local ffi  = require( "ffi" )
 local libs = ffi_AntTweakBar_libs or {
    OSX     = { x86 = "bin/OSX/AntTweakBar.dylib",       x64 = "bin/OSX/AntTweakBar.dylib" },
    Windows = { x86 = "bin/Windows/x86/AntTweakBar.dll", x64 = "bin/Windows/x64/AntTweakBar.dll" },
-   Linux   = { x86 = "bin/Linux/x86/AntTweakBar.so",    x64 = "bin/Linux/x86/AntTweakBar.so"  },
+   Linux   = { x86 = "bin/Linux/x86/AntTweakBar.so",    x64 = "bin/Linux/x86/AntTweakBar.so", arm = "bin/Linux/arm/libAntTweakBar.so"  },
    BSD     = { },
    POSIX   = { },
    Other   = { }, 

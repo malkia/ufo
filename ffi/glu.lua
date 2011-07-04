@@ -3,7 +3,7 @@ local ffi  = require( "ffi" )
 local libs = ffi_glu_libs or {
    OSX     = { x86 = "OpenGL.framework/OpenGL", x64 = "OpenGL.framework/OpenGL" },
    Windows = { x86 = "GLU32.DLL",               x64 = "GLU32.DLL"               },
-   Linux   = { x86 = "libGLU.so",               x64 = "libGLU.so"               },
+   Linux   = { x86 = "libGLU.so",               x64 = "libGLU.so", arm = "libGLU.so" },
    BSD     = { x86 = "libGLU.so",               x64 = "libGLU.so"               },
    POSIX   = { x86 = "libGLU.so",               x64 = "libGLU.so"               },
    Other   = { x86 = "libGLU.so",               x64 = "libGLU.so"               },
