@@ -1,2 +1,23 @@
 #!/bin/sh
-"$(dirname $0)/bin/OSX/luajit" "$@"
+progname=$(dirname $0)
+case `uname -s` in
+    Linux)  OS=Linux ;;
+    Darwin) OS=OSX ;;
+    *)	    OS=Other ;;
+esac
+case `uname -m` in
+    x86_64) ARCH=x64 ;;
+    i386)   ARCH=x86 ;;
+    arm*)   ARCH=arm ;;
+    *)	    ARCH=Unknown ;;
+esac
+case $OS in
+    Linux) export LD_LIBRARY_PATH=$progname/bin/$OS/$ARCH:$LD_LIBRARY_PATH ;;
+esac
+if [ $OS == "OSX" ] ; then
+    # Universal 
+    OSARCH=$OS
+else
+    OSARCH=$OS/$ARCH
+fi
+"$progname/bin/$OSARCH/luajit" "$@"
