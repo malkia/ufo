@@ -155,13 +155,19 @@ local function main()
 
    local mx, my = ffi.new( "int[1]" ), ffi.new( "int[1]" )
    local sw, sh = ffi.new( "int[1]" ), ffi.new( "int[1]" )
+   local dx, dy
    while glfw.glfwIsWindow(window) and glfw.glfwGetKey(window, glfw.GLFW_KEY_ESCAPE) ~= glfw.GLFW_PRESS 
    do
+      local t = glfw.glfwGetTime()
+
       glfw.glfwGetMousePos(window, mx, my)
       local mx, my = mx[0], my[0]
 
       glfw.glfwGetWindowSize(window, sw, sh)
       local sw, sh = sw[0], sh[0]
+
+      dx = dx or sw / 2
+      dy = dy or sh / 2
 
       gl.glViewport(0, 0, sw, sh)
       gl.glClearColor(0, 0, 1, 0)
@@ -169,10 +175,40 @@ local function main()
 
       gl.glMatrixMode(gl.GL_PROJECTION)
       gl.glLoadIdentity()
+
+      glu.gluPerspective(65, sw / sh, 1, 100)
       
+      gl.glMatrixMode( gl.GL_MODELVIEW )
+      gl.glLoadIdentity()
+      glu.gluLookAt(
+	 0,  1, 0,   -- Eye-position
+	 0, 20, 0,   -- View-point
+	 0,  0, 1    -- Up Vector
+      )
+      
+      gl.glTranslatef(0, 14, 0)
+      gl.glRotatef(0.3 * mx + t * 100, 0, 0, 1)
+      gl.glBegin(gl.GL_TRIANGLES)
+      do
+	 gl.glColor3f(1, 0, 0)
+	 gl.glVertex3f(-5, 0, -4)
+	 gl.glColor3f(0, 1, 0)
+	 gl.glVertex3f(5, 0, -4)
+	 gl.glColor3f(0, 0, 1)
+	 gl.glVertex3f(0, 0, 6)
+      end
+      gl.glEnd()  
+    
+      gl.glMatrixMode(gl.GL_PROJECTION)
+      gl.glLoadIdentity()
+      gl.glMatrixMode( gl.GL_MODELVIEW )
+      gl.glLoadIdentity()
+      gl.glColor3f(1, 1, 1)
       gl.glOrtho(0, sw, sh, 0, -1, 1 )
 
---      draw_text( build_text( font, "Test" ), math.random(sw), math.random(sh))
+      draw_text( build_text( font, "Test" ), dx, dy)
+      dx = dx + math.random(-1, 1)
+      dy = dy + math.random(-1, 1)
 
 --      draw_text( build_text( font, source ), px, py ) --mx[0], py + my[0] )
       py = py - 1
