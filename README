@@ -2,7 +2,7 @@ UFO -- LuaJIT FFI Bindings for OpenGL, OpenCL, ZeroMQ, GLFW and AntTweakBar
 
 Some quick samples:
 
-     ./luajit samples/moar.lua
+     ./luajit samples/glfw/moar.lua
      ./luajit samples/AntTweakBar/simple.lua
      ./luajit samples/AntTweakBar/OpenCL-info.lua
      ./luajit samples/OpenCL/info.lua
