@@ -3,7 +3,7 @@ local ffi  = require( "ffi" )
 local libs = ffi_OpenCL_libs or {
    OSX     = { x86 = "OpenCL.framework/OpenCL", x64 = "OpenCL.framework/OpenCL" },
    Windows = { x86 = "OPENCL.DLL",              x64 = "OPENCL.DLL"              },
-   Linux   = { x86 = "libOpenCL.so",            x64 = "libOpenCL.so"            , arm = "bin/arm/libOpenCL.so"},
+   Linux   = { x86 = "libOpenCL.so",            x64 = "libOpenCL.so"            , arm = "bin/Linux/arm/libOpenCL.so"},
    BSD     = { x86 = "libOpenCL.so",            x64 = "libOpenCL.so"            },
    POSIX   = { x86 = "libOpenCL.so",            x64 = "libOpenCL.so"            },
    Other   = { x86 = "libOpenCL.so",            x64 = "libOpenCL.so"            },
