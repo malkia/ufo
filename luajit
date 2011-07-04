@@ -1,5 +1,5 @@
 #!/bin/bash
-progname=`readlink -f $(dirname $0)`
+progname=$(dirname $0)
 case `uname -s` in
     Linux)  OS=Linux;;
     Darwin) OS=OSX;;
@@ -16,6 +16,6 @@ case $OS in
     *)   OSARCH=$OS/$ARCH;;
 esac
 case $OS in
-    Linux) export LD_LIBRARY_PATH=$progname/bin/$OSARCH/:$LD_LIBRARY_PATH;;
+    Linux) export LD_LIBRARY_PATH=`readlink -f $progname/bin/$OSARCH/`:$LD_LIBRARY_PATH;;
 esac
 "$progname/bin/$OSARCH/luajit" "$@"
