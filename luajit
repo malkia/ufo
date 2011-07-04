@@ -1,9 +1,9 @@
-#!/bin/sh
-progname=$(dirname $0)
+#!/bin/bash
+progname=`readlink -f $(dirname $0)`
 case `uname -s` in
-    Linux)  OS=Linux ;;
-    Darwin) OS=OSX ;;
-    *)	    OS=Other ;;
+    Linux)  OS=Linux;;
+    Darwin) OS=OSX;;
+    *)	    OS=Other;;
 esac
 case `uname -m` in
     x86_64) ARCH=x64 ;;
@@ -12,12 +12,10 @@ case `uname -m` in
     *)	    ARCH=Unknown ;;
 esac
 case $OS in
-    Linux) export LD_LIBRARY_PATH=$progname/bin/$OS/$ARCH:$LD_LIBRARY_PATH ;;
+    OSX) OSARCH=$OS;;
+    *)   OSARCH=$OS/$ARCH;;
 esac
-if [ $OS == "OSX" ] ; then
-    # Universal 
-    OSARCH=$OS
-else
-    OSARCH=$OS/$ARCH
-fi
+case $OS in
+    Linux) export LD_LIBRARY_PATH=$progname/bin/$OSARCH/:$LD_LIBRARY_PATH;;
+esac
 "$progname/bin/$OSARCH/luajit" "$@"
