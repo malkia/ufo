@@ -1,1 +1,4 @@
-LuaJIT ffi bindings. Later we can add additional library
+All luajit FFI bindings are here. To use any of them just do, as in the example:
+
+local cl = require( "ffi/OpenCL" )
+
