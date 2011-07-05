@@ -1,7 +1,7 @@
-local ffi  = require( "ffi" )
-local gl   = require( "ffi/OpenGL" )
-local glu  = require( "ffi/glu" )
-local glfw = require( "ffi/glfw" )
+local ffi   = require( "ffi" )
+local gl    = require( "ffi/OpenGL" )
+local glu   = require( "ffi/glu" )
+local glfw  = require( "ffi/glfw" )
 local fonts = require( "lib/fonts" )
 
 local shr, band = bit.rshift, bit.band
@@ -136,7 +136,8 @@ local function read_file_2(n)
    return lines
 end
 
-local source = read_file_2( "README" )
+local progname = ... or (arg and arg[0]) or "README"
+local source = read_file_2( progname )
 
 local function main()
    local px, py = 0, 0
@@ -210,8 +211,13 @@ local function main()
       dx = dx + math.random(-1, 1)
       dy = dy + math.random(-1, 1)
 
---      draw_text( build_text( font, source ), px, py ) --mx[0], py + my[0] )
-      py = py - 1
+      draw_text( build_text( font, tostring(progname) ), sw-dx, sh-dy)
+      dx = dx + math.random(-1, 1)
+      dy = dy + math.random(-1, 1)
+
+
+      draw_text( build_text( font, source ), px, py ) --mx[0], py + my[0] )
+      py = py - 0.05
 
       glfw.glfwSwapBuffers()
       glfw.glfwPollEvents()
