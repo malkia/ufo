@@ -2,7 +2,7 @@ local ffi = require( "ffi" )
 
 local libs = ffi_zmq_libs or {
    OSX     = { x86 = "bin/zmq.dylib", x64 = "bin/zmq.dylib" },
-   Windows = { x86 = "bin/zmq32.dll", x64 = "bin/zmq64.dll" },
+   Windows = { x86 = "bin/Windows/x86/zmq.dll", x64 = "bin/Windows/x64/zmq.dll" },
    Linux   = { x86 = "bin/zmq32.so",  x64 = "bin/zmq64.so"  },
 }
 
