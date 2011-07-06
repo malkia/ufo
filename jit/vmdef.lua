@@ -25,7 +25,6 @@ ircall = {
 "lj_mem_newgco",
 "lj_math_random_step",
 "lj_vm_modi",
-"lj_carith_mul64",
 "lj_carith_divi64",
 "lj_carith_divu64",
 "lj_carith_modi64",
