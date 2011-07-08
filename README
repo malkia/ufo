@@ -7,10 +7,11 @@ Some quick samples:
      ./luajit samples/AntTweakBar/OpenCL-info.lua
      ./luajit samples/OpenCL/info.lua
 
-The first 5 (out of 7) tutorials of sol's imgui using SDL:
+The first 6 (out of 7) tutorials of sol's imgui using SDL:
     
-    ./luajit samples/SDL/imgui/ch01.lua
-    ./luajit samples/SDL/imgui/ch02.lua
-    ./luajit samples/SDL/imgui/ch03.lua
-    ./luajit samples/SDL/imgui/ch04.lua
-    ./luajit samples/SDL/imgui/ch05.lua
+     ./luajit samples/SDL/imgui/ch01.lua
+     ./luajit samples/SDL/imgui/ch02.lua
+     ./luajit samples/SDL/imgui/ch03.lua
+     ./luajit samples/SDL/imgui/ch04.lua
+     ./luajit samples/SDL/imgui/ch05.lua
+     ./luajit samples/SDL/imgui/ch06.lua

@@ -14,520 +14,369 @@ local lib  = ffi_SDL_lib or libs[ ffi.os ][ ffi.arch ]
 local sdl  = ffi.load( lib )
 
 ffi.cdef[[
-      const char * SDL_GetPlatform (void);
+   typedef enum SDL_bool {
+      SDL_FALSE,
+      SDL_TRUE
+   } SDL_bool;
+   
+   typedef enum SDL_assert_state {
+      SDL_ASSERTION_RETRY,  
+      SDL_ASSERTION_BREAK,  
+      SDL_ASSERTION_ABORT,  
+      SDL_ASSERTION_IGNORE,  
+      SDL_ASSERTION_ALWAYS_IGNORE,  
+   } SDL_assert_state;
 
-      typedef enum SDL_bool {
-	 SDL_FALSE,
-	 SDL_TRUE
-      } SDL_bool;
+   typedef enum SDL_ThreadPriority {
+      SDL_THREAD_PRIORITY_LOW,
+      SDL_THREAD_PRIORITY_NORMAL,
+      SDL_THREAD_PRIORITY_HIGH
+   } SDL_ThreadPriority;
+
+   typedef enum SDL_AudioStatus {
+      SDL_AUDIO_STOPPED = 0,
+      SDL_AUDIO_PLAYING,
+      SDL_AUDIO_PAUSED
+   } SDL_AudioStatus;
+
+   typedef enum SDL_PixelType {
+      SDL_PIXELTYPE_UNKNOWN,
+      SDL_PIXELTYPE_INDEX1,
+      SDL_PIXELTYPE_INDEX4,
+      SDL_PIXELTYPE_INDEX8,
+      SDL_PIXELTYPE_PACKED8,
+      SDL_PIXELTYPE_PACKED16,
+      SDL_PIXELTYPE_PACKED32,
+      SDL_PIXELTYPE_ARRAYU8,
+      SDL_PIXELTYPE_ARRAYU16,
+      SDL_PIXELTYPE_ARRAYU32,
+      SDL_PIXELTYPE_ARRAYF16,
+      SDL_PIXELTYPE_ARRAYF32
+   } SDL_PixelType;
+
+   typedef enum SDL_BitmapOrder {
+      SDL_BITMAPORDER_NONE,
+      SDL_BITMAPORDER_4321,
+      SDL_BITMAPORDER_1234
+   } SDL_BitmapOrder;
+
+   typedef enum SDL_PackedOrder {
+      SDL_PACKEDORDER_NONE,
+      SDL_PACKEDORDER_XRGB,
+      SDL_PACKEDORDER_RGBX,
+      SDL_PACKEDORDER_ARGB,
+      SDL_PACKEDORDER_RGBA,
+      SDL_PACKEDORDER_XBGR,
+      SDL_PACKEDORDER_BGRX,
+      SDL_PACKEDORDER_ABGR,
+      SDL_PACKEDORDER_BGRA
+   } SDL_PackedOrder;
+
+   typedef enum SDL_ArrayOrder {
+      SDL_ARRAYORDER_NONE,
+      SDL_ARRAYORDER_RGB,
+      SDL_ARRAYORDER_RGBA,
+      SDL_ARRAYORDER_ARGB,
+      SDL_ARRAYORDER_BGR,
+      SDL_ARRAYORDER_BGRA,
+      SDL_ARRAYORDER_ABGR
+   } SDL_ArrayOrder;
+
+   typedef enum SDL_PackedLayout {
+      SDL_PACKEDLAYOUT_NONE,
+      SDL_PACKEDLAYOUT_332,
+      SDL_PACKEDLAYOUT_4444,
+      SDL_PACKEDLAYOUT_1555,
+      SDL_PACKEDLAYOUT_5551,
+      SDL_PACKEDLAYOUT_565,
+      SDL_PACKEDLAYOUT_8888,
+      SDL_PACKEDLAYOUT_2101010,
+      SDL_PACKEDLAYOUT_1010102
+   } SDL_PackedLayout;
+
+   typedef enum SDL_PixelFormatType {
+      SDL_PIXELFORMAT_UNKNOWN,
+      SDL_PIXELFORMAT_INDEX1LSB =   ((1 << 31) | ((SDL_PIXELTYPE_INDEX1)   << 24) | ((SDL_BITMAPORDER_4321) << 20) | ((0) << 16) | ((1) << 8) | ((0) << 0)),
+      SDL_PIXELFORMAT_INDEX1MSB =   ((1 << 31) | ((SDL_PIXELTYPE_INDEX1)   << 24) | ((SDL_BITMAPORDER_1234) << 20) | ((0) << 16) | ((1) << 8) | ((0) << 0)),
+      SDL_PIXELFORMAT_INDEX4LSB =   ((1 << 31) | ((SDL_PIXELTYPE_INDEX4)   << 24) | ((SDL_BITMAPORDER_4321) << 20) | ((0) << 16) | ((4) << 8) | ((0) << 0)),
+      SDL_PIXELFORMAT_INDEX4MSB =   ((1 << 31) | ((SDL_PIXELTYPE_INDEX4)   << 24) | ((SDL_BITMAPORDER_1234) << 20) | ((0) << 16) | ((4) << 8) | ((0) << 0)),
+      SDL_PIXELFORMAT_INDEX8 =      ((1 << 31) | ((SDL_PIXELTYPE_INDEX8)   << 24) | ((0) << 20) | ((0) << 16) | ((8) << 8) | ((1) << 0)),
+      SDL_PIXELFORMAT_RGB332 =      ((1 << 31) | ((SDL_PIXELTYPE_PACKED8)  << 24) | ((SDL_PACKEDORDER_XRGB) << 20) | ((SDL_PACKEDLAYOUT_332)  << 16) | ((8)  << 8) | ((1) << 0)),
+      SDL_PIXELFORMAT_RGB444 =      ((1 << 31) | ((SDL_PIXELTYPE_PACKED16) << 24) | ((SDL_PACKEDORDER_XRGB) << 20) | ((SDL_PACKEDLAYOUT_4444) << 16) | ((12) << 8) | ((2) << 0)),
+      SDL_PIXELFORMAT_RGB555 =      ((1 << 31) | ((SDL_PIXELTYPE_PACKED16) << 24) | ((SDL_PACKEDORDER_XRGB) << 20) | ((SDL_PACKEDLAYOUT_1555) << 16) | ((15) << 8) | ((2) << 0)),
+      SDL_PIXELFORMAT_BGR555 =      ((1 << 31) | ((SDL_PIXELTYPE_PACKED16) << 24) | ((SDL_PACKEDORDER_XBGR) << 20) | ((SDL_PACKEDLAYOUT_1555) << 16) | ((15) << 8) | ((2) << 0)),
+      SDL_PIXELFORMAT_ARGB4444 =    ((1 << 31) | ((SDL_PIXELTYPE_PACKED16) << 24) | ((SDL_PACKEDORDER_ARGB) << 20) | ((SDL_PACKEDLAYOUT_4444) << 16) | ((16) << 8) | ((2) << 0)),
+      SDL_PIXELFORMAT_RGBA4444 =    ((1 << 31) | ((SDL_PIXELTYPE_PACKED16) << 24) | ((SDL_PACKEDORDER_RGBA) << 20) | ((SDL_PACKEDLAYOUT_4444) << 16) | ((16) << 8) | ((2) << 0)),
+      SDL_PIXELFORMAT_ABGR4444 =    ((1 << 31) | ((SDL_PIXELTYPE_PACKED16) << 24) | ((SDL_PACKEDORDER_ABGR) << 20) | ((SDL_PACKEDLAYOUT_4444) << 16) | ((16) << 8) | ((2) << 0)),
+      SDL_PIXELFORMAT_BGRA4444 =    ((1 << 31) | ((SDL_PIXELTYPE_PACKED16) << 24) | ((SDL_PACKEDORDER_BGRA) << 20) | ((SDL_PACKEDLAYOUT_4444) << 16) | ((16) << 8) | ((2) << 0)),
+      SDL_PIXELFORMAT_ARGB1555 =    ((1 << 31) | ((SDL_PIXELTYPE_PACKED16) << 24) | ((SDL_PACKEDORDER_ARGB) << 20) | ((SDL_PACKEDLAYOUT_1555) << 16) | ((16) << 8) | ((2) << 0)),
+      SDL_PIXELFORMAT_RGBA5551 =    ((1 << 31) | ((SDL_PIXELTYPE_PACKED16) << 24) | ((SDL_PACKEDORDER_RGBA) << 20) | ((SDL_PACKEDLAYOUT_5551) << 16) | ((16) << 8) | ((2) << 0)),
+      SDL_PIXELFORMAT_ABGR1555 =    ((1 << 31) | ((SDL_PIXELTYPE_PACKED16) << 24) | ((SDL_PACKEDORDER_ABGR) << 20) | ((SDL_PACKEDLAYOUT_1555) << 16) | ((16) << 8) | ((2) << 0)),
+      SDL_PIXELFORMAT_BGRA5551 =    ((1 << 31) | ((SDL_PIXELTYPE_PACKED16) << 24) | ((SDL_PACKEDORDER_BGRA) << 20) | ((SDL_PACKEDLAYOUT_5551) << 16) | ((16) << 8) | ((2) << 0)),
+      SDL_PIXELFORMAT_RGB565 =      ((1 << 31) | ((SDL_PIXELTYPE_PACKED16) << 24) | ((SDL_PACKEDORDER_XRGB) << 20) | ((SDL_PACKEDLAYOUT_565) << 16) | ((16) << 8) | ((2) << 0)),
+      SDL_PIXELFORMAT_BGR565 =      ((1 << 31) | ((SDL_PIXELTYPE_PACKED16) << 24) | ((SDL_PACKEDORDER_XBGR) << 20) | ((SDL_PACKEDLAYOUT_565) << 16) | ((16) << 8) | ((2) << 0)),
+      SDL_PIXELFORMAT_RGB24 =       ((1 << 31) | ((SDL_PIXELTYPE_ARRAYU8)  << 24) | ((SDL_ARRAYORDER_RGB)   << 20) | ((0) << 16) | ((24) << 8) | ((3) << 0)),
+      SDL_PIXELFORMAT_BGR24 =       ((1 << 31) | ((SDL_PIXELTYPE_ARRAYU8)  << 24) | ((SDL_ARRAYORDER_BGR)   << 20) | ((0) << 16) | ((24) << 8) | ((3) << 0)),
+      SDL_PIXELFORMAT_RGB888 =      ((1 << 31) | ((SDL_PIXELTYPE_PACKED32) << 24) | ((SDL_PACKEDORDER_XRGB) << 20) | ((SDL_PACKEDLAYOUT_8888) << 16) | ((24) << 8) | ((4) << 0)),
+      SDL_PIXELFORMAT_BGR888 =      ((1 << 31) | ((SDL_PIXELTYPE_PACKED32) << 24) | ((SDL_PACKEDORDER_XBGR) << 20) | ((SDL_PACKEDLAYOUT_8888) << 16) | ((24) << 8) | ((4) << 0)),
+      SDL_PIXELFORMAT_ARGB8888 =    ((1 << 31) | ((SDL_PIXELTYPE_PACKED32) << 24) | ((SDL_PACKEDORDER_ARGB) << 20) | ((SDL_PACKEDLAYOUT_8888) << 16) | ((32) << 8) | ((4) << 0)),
+      SDL_PIXELFORMAT_RGBA8888 =    ((1 << 31) | ((SDL_PIXELTYPE_PACKED32) << 24) | ((SDL_PACKEDORDER_RGBA) << 20) | ((SDL_PACKEDLAYOUT_8888) << 16) | ((32) << 8) | ((4) << 0)),
+      SDL_PIXELFORMAT_ABGR8888 =    ((1 << 31) | ((SDL_PIXELTYPE_PACKED32) << 24) | ((SDL_PACKEDORDER_ABGR) << 20) | ((SDL_PACKEDLAYOUT_8888) << 16) | ((32) << 8) | ((4) << 0)),
+      SDL_PIXELFORMAT_BGRA8888 =    ((1 << 31) | ((SDL_PIXELTYPE_PACKED32) << 24) | ((SDL_PACKEDORDER_BGRA) << 20) | ((SDL_PACKEDLAYOUT_8888) << 16) | ((32) << 8) | ((4) << 0)),
+      SDL_PIXELFORMAT_ARGB2101010 = ((1 << 31) | ((SDL_PIXELTYPE_PACKED32) << 24) | ((SDL_PACKEDORDER_ARGB) << 20) | ((SDL_PACKEDLAYOUT_2101010) << 16) | ((32) << 8) | ((4) << 0)),
+      SDL_PIXELFORMAT_YV12 = ((((uint32_t)(((uint8_t)(('Y'))))) << 0) | (((uint32_t)(((uint8_t)(('V'))))) << 8) | (((uint32_t)(((uint8_t)(('1'))))) << 16) | (((uint32_t)(((uint8_t)(('2'))))) << 24)),
+      SDL_PIXELFORMAT_IYUV = ((((uint32_t)(((uint8_t)(('I'))))) << 0) | (((uint32_t)(((uint8_t)(('Y'))))) << 8) | (((uint32_t)(((uint8_t)(('U'))))) << 16) | (((uint32_t)(((uint8_t)(('V'))))) << 24)),
+      SDL_PIXELFORMAT_YUY2 = ((((uint32_t)(((uint8_t)(('Y'))))) << 0) | (((uint32_t)(((uint8_t)(('U'))))) << 8) | (((uint32_t)(((uint8_t)(('Y'))))) << 16) | (((uint32_t)(((uint8_t)(('2'))))) << 24)),
+      SDL_PIXELFORMAT_UYVY = ((((uint32_t)(((uint8_t)(('U'))))) << 0) | (((uint32_t)(((uint8_t)(('Y'))))) << 8) | (((uint32_t)(((uint8_t)(('V'))))) << 16) | (((uint32_t)(((uint8_t)(('Y'))))) << 24)),
+      SDL_PIXELFORMAT_YVYU = ((((uint32_t)(((uint8_t)(('Y'))))) << 0) | (((uint32_t)(((uint8_t)(('V'))))) << 8) | (((uint32_t)(((uint8_t)(('Y'))))) << 16) | (((uint32_t)(((uint8_t)(('U'))))) << 24))
+   } SDL_PixelFormatType;
+
+   typedef struct SDL_Color {
+      uint8_t r;
+      uint8_t g;
+      uint8_t b;
+      uint8_t unused;
+   } SDL_Color;
+
+   typedef struct SDL_Palette {
+      int        ncolors;
+      SDL_Color* colors;
+      uint32_t   version;
+      int        refcount;
+   } SDL_Palette;
+
+   typedef struct SDL_PixelFormat {
+      uint32_t format;
+      SDL_Palette *palette;
+      uint8_t BitsPerPixel;
+      uint8_t BytesPerPixel;
+      uint8_t padding[2];
+      uint32_t Rmask;
+      uint32_t Gmask;
+      uint32_t Bmask;
+      uint32_t Amask;
+      uint8_t Rloss;
+      uint8_t Gloss;
+      uint8_t Bloss;
+      uint8_t Aloss;
+      uint8_t Rshift;
+      uint8_t Gshift;
+      uint8_t Bshift;
+      uint8_t Ashift;
+      int refcount;
+      struct SDL_PixelFormat *next;
+   } SDL_PixelFormat;
+
+   typedef struct SDL_assert_data {
+      int          always_ignore;
+      unsigned int trigger_count;
+      const char*  condition;
+      const char*  filename;
+      int linenum;
+      const char*  function_;
+      const struct SDL_assert_data *next;
+   } SDL_assert_data;
+
+   typedef struct SDL_RWops {
+      long   (* seek)(  struct SDL_RWops* context,     long offset, int whence );
+      size_t (* read)(  struct SDL_RWops* context,       void* ptr, size_t size, size_t maxnum );
+      size_t (* write)( struct SDL_RWops* context, const void* ptr, size_t size, size_t num );
+      int    (* close)( struct SDL_RWops* context );
+      uint32_t type;
+      union {
+	 struct {
+	    SDL_bool append;
+	    void *h;
+	    struct {
+	       void *data;
+	       size_t size;
+	       size_t left;
+	    } buffer;
+	 } windowsio;
+	 struct {
+	    uint8_t *base;
+	    uint8_t *here;
+	    uint8_t *stop;
+	 } mem;
+	 struct {
+	    void *data1;
+	 } unknown;
+      } hidden;
+   } SDL_RWops;
+   typedef uint16_t SDL_AudioFormat;
+   typedef void (* SDL_AudioCallback)( void *userdata, uint8_t* stream, int len );
+   
+   typedef struct SDL_AudioSpec {
+      int               freq;                   
+      SDL_AudioFormat   format;     
+      uint8_t           channels;             
+      uint8_t           silence;              
+      uint16_t          samples;             
+      uint16_t          padding;             
+      uint32_t          size;                
+      SDL_AudioCallback callback;
+      void*             userdata;
+   } SDL_AudioSpec;
+
+   struct SDL_AudioCVT;
+   typedef void (* SDL_AudioFilter)( struct SDL_AudioCVT * cvt, SDL_AudioFormat format );
+   
+   typedef struct SDL_AudioCVT {
+      int             needed;                 
+      SDL_AudioFormat src_format; 
+      SDL_AudioFormat dst_format; 
+      double          rate_incr;           
+      uint8_t*        buf;                 
+      int             len;                    
+      int             len_cvt;                
+      int             len_mult;               
+      double          len_ratio;           
+      SDL_AudioFilter filters[10];        
+      int             filter_index;           
+   } SDL_AudioCVT;
+
+   typedef uintptr_t(* pfnSDL_CurrentBeginThread) (void *, unsigned, unsigned (__stdcall *func) (void *), void *arg, unsigned, unsigned *threadID );
+   typedef void (* pfnSDL_CurrentEndThread) (unsigned code);
+   typedef struct SDL_Thread SDL_Thread;
+   typedef unsigned long SDL_threadID;
+   typedef int (__cdecl * SDL_ThreadFunction) (void *data);
+   typedef SDL_assert_state  (* SDL_AssertionHandler )( const SDL_assert_data* data, void* userdata );
+   typedef struct _SDL_iconv_t* SDL_iconv_t;
+   typedef uint32_t SDL_AudioDeviceID;
+
+   void*         SDL_malloc(        size_t size );
+   void*         SDL_calloc(        size_t nmemb, size_t size );
+   void*         SDL_realloc(       void* mem, size_t size );
+   void          SDL_free(          void* mem );
+   char*         SDL_getenv(        const char *name );
+   int           SDL_setenv(        const char *name, const char *value, int overwrite );
+   void          SDL_qsort(         void* base, size_t nmemb, size_t size, int (*compare) (const void *, const void *) );
+   void*         SDL_memset(        void* dst, int c, size_t len );
+   void*         SDL_memcpy(        void* dst, const void *src, size_t len );
+   void*         SDL_memmove(       void* dst, const void *src, size_t len );
+   int           SDL_memcmp(        const void *s1, const void *s2, size_t len );
+   size_t        SDL_strlen(        const char* string );
+   size_t        SDL_wcslen(        const wchar_t* string );
+   size_t        SDL_wcslcpy(       wchar_t* dst, const wchar_t *src, size_t maxlen );
+   size_t        SDL_wcslcat(       wchar_t* dst, const wchar_t *src, size_t maxlen );
+   size_t        SDL_strlcpy(       char* dst, const char *src, size_t maxlen );
+   size_t        SDL_utf8strlcpy(   char* dst, const char *src, size_t dst_bytes );
+   size_t        SDL_strlcat(       char* dst, const char *src, size_t maxlen );
+   char*         SDL_strdup(        const char* string );
+   char*         SDL_strrev(        char* string );
+   char*         SDL_strupr(        char* string );
+   char*         SDL_strlwr(        char* string );
+   char*         SDL_strchr(        const char* string, int c );
+   char*         SDL_strrchr(       const char* string, int c );
+   char*         SDL_strstr(        const char* haystack, const char* needle );
+   char*         SDL_ltoa(          long value, char* string, int radix );
+   char*         SDL_ultoa(         unsigned long value, char* string, int radix );
+   long          SDL_strtol(        const char* string, char** endp, int base );
+   unsigned long SDL_strtoul(       const char* string, char** endp, int base );
+   char*         SDL_lltoa(         int64_t  value, char* string, int radix );
+   char*         SDL_ulltoa(        uint64_t value, char* string, int radix );
+   int64_t       SDL_strtoll(       const char* string, char** endp, int base );
+   uint64_t      SDL_strtoull(      const char* string, char** endp, int base );
+   double        SDL_strtod(        const char* string, char** endp );
+   int           SDL_strcmp(        const char* str1, const char* str2 );
+   int           SDL_strncmp(       const char* str1, const char* str2, size_t maxlen );
+   int           SDL_strcasecmp(    const char* str1, const char* str2 );
+   int           SDL_strncasecmp(   const char* str1, const char* str2, size_t maxlen );
+   int           SDL_sscanf(        const char* text, const char* fmt, ... );
+   int           SDL_snprintf(      char* text, size_t maxlen, const char* fmt, ... );
+   int           SDL_vsnprintf(     char* text, size_t maxlen, const char* fmt, va_list ap );
+   double        SDL_atan(          double x );
+   double        SDL_atan2(         double y, double x );
+   double        SDL_copysign(      double x, double y );
+   double        SDL_cos(           double x );
+
+   double        SDL_fabs(          double x );
+   double        SDL_floor(         double x );
+   double        SDL_log(           double x );
+   double        SDL_pow(           double x, double y );
+   double        SDL_scalbn(        double x, int n );
+   double        SDL_sin(           double x );
+   double        SDL_sqrt(          double x );
+   SDL_iconv_t   SDL_iconv_open(    const char* tocode, const char* fromcode );
+   int           SDL_iconv_close(   SDL_iconv_t cd );
+   size_t        SDL_iconv(         SDL_iconv_t cd, const char** inbuf, size_t* inbytesleft, char** outbuf, size_t* outbytesleft );
+   char*                  SDL_iconv_string(         const char* tocode, const char* fromcode, const char* inbuf, size_t inbytesleft );
+   int                    SDL_main(                 int argc, char *argv[]);
+   int                    SDL_RegisterApp(          char *name, uint32_t style, void *hInst);
+   void                   SDL_UnregisterApp(        );
+   const char*            SDL_GetPlatform(          );
+   SDL_assert_state       SDL_ReportAssertion(      SDL_assert_data *, const char *, const char *, int);
+   void                   SDL_SetAssertionHandler(  SDL_AssertionHandler handler, void *userdata);
+   const SDL_assert_data* SDL_GetAssertionReport(   );
+   void                   SDL_ResetAssertionReport( );
+   SDL_Thread*            SDL_CreateThread(         SDL_ThreadFunction fn, void *data, pfnSDL_CurrentBeginThread pfnBeginThread, pfnSDL_CurrentEndThread pfnEndThread);
+   SDL_threadID           SDL_ThreadID(             );
+   SDL_threadID           SDL_GetThreadID(          SDL_Thread* thread);
+   int                    SDL_SetThreadPriority(    SDL_ThreadPriority priority);
+   void                   SDL_WaitThread(           SDL_Thread* thread, int* status);
+   SDL_RWops*             SDL_RWFromFile(           const char* file, const char* mode );
+   SDL_RWops*             SDL_RWFromFP(             void* fp, SDL_bool autoclose );
+   SDL_RWops*             SDL_RWFromMem(            void* mem, int size );
+   SDL_RWops*             SDL_RWFromConstMem(       const void* mem, int size );
+   SDL_RWops*             SDL_AllocRW(              );
+   void                   SDL_FreeRW(               SDL_RWops* area );
+   uint16_t               SDL_ReadLE16(             SDL_RWops* src  );
+   uint16_t               SDL_ReadBE16(             SDL_RWops* src  );
+   uint32_t               SDL_ReadLE32(             SDL_RWops* src  );
+   uint32_t               SDL_ReadBE32(             SDL_RWops* src  );
+   uint64_t               SDL_ReadLE64(             SDL_RWops* src  );
+   uint64_t               SDL_ReadBE64(             SDL_RWops* src  );
+   size_t                 SDL_WriteLE16(            SDL_RWops * dst, uint16_t value );
+   size_t                 SDL_WriteBE16(            SDL_RWops * dst, uint16_t value );
+   size_t                 SDL_WriteLE32(            SDL_RWops * dst, uint32_t value );
+   size_t                 SDL_WriteBE32(            SDL_RWops * dst, uint32_t value );
+   size_t                 SDL_WriteLE64(            SDL_RWops * dst, uint64_t value );
+   size_t                 SDL_WriteBE64(            SDL_RWops * dst, uint64_t value );
       
-      void*   SDL_malloc(  size_t size );
-      void*   SDL_calloc(  size_t nmemb, size_t size );
-      void*   SDL_realloc( void*  mem, size_t size );
-      void    SDL_free(    void* mem );
-      char*   SDL_getenv(  const char *name );
-      int     SDL_setenv(  const char *name, const char *value, int overwrite );
-      void    SDL_qsort(   void *base, size_t nmemb, size_t size, int (*compare) (const void *, const void *) );
-      void*   SDL_memset(  void *dst, int c, size_t len );
-      void*   SDL_memcpy(  void *dst, const void *src, size_t len );
-      void*   SDL_memmove( void *dst, const void *src, size_t len );
-      int     SDL_memcmp(  const void *s1, const void *s2, size_t len );
-      size_t  SDL_strlen(const char *string);
-      size_t  SDL_wcslen(const wchar_t * string);
-      size_t  SDL_wcslcpy(wchar_t *dst, const wchar_t *src, size_t maxlen);
-      size_t  SDL_wcslcat(wchar_t *dst, const wchar_t *src, size_t maxlen);
-      size_t  SDL_strlcpy(char *dst, const char *src, size_t maxlen);
-      size_t  SDL_utf8strlcpy(char *dst, const char *src, size_t dst_bytes);
-      size_t  SDL_strlcat(char *dst, const char *src, size_t maxlen);
-      char*   SDL_strdup(const char *string);
-      char*   SDL_strrev(char *string);
-      char*   SDL_strupr(char *string);
-      char*   SDL_strlwr(char *string);
-      char*   SDL_strchr(const char *string, int c);
-      char*   SDL_strrchr(const char *string, int c);
-      char*   SDL_strstr(const char *haystack, const char *needle);
-      char*   SDL_ltoa(long value, char *string, int radix);
-      char*         SDL_ultoa(    unsigned long value, char *string, int radix);
-      long          SDL_strtol(   const char *string, char **endp, int base);
-      unsigned long SDL_strtoul(  const char *string, char **endp, int base);
-      char*         SDL_lltoa(    int64_t value, char *string, int radix);
-      char*         SDL_ulltoa(   uint64_t value, char *string, int radix);
-      int64_t       SDL_strtoll(  const char *string, char **endp, int base);
-      uint64_t      SDL_strtoull( const char *string, char **endp, int base);
 
-double SDL_strtod(const char *string, char **endp);
-int SDL_strcmp(const char *str1, const char *str2);
-int SDL_strncmp(const char *str1, const char *str2, size_t maxlen);
-int SDL_strcasecmp(const char *str1, const char *str2);
-int SDL_strncasecmp(const char *str1, const char *str2, size_t maxlen);
-int SDL_sscanf(const char *text, const char *fmt, ...);
-int SDL_snprintf(char *text, size_t maxlen, const char *fmt, ...);
-int SDL_vsnprintf(char *text, size_t maxlen, const char *fmt, va_list ap);
-double SDL_atan(double x);
-double SDL_atan2(double y, double x);
-double SDL_copysign(double x, double y);
-double SDL_cos(double x);
-double SDL_fabs(double x);
-double SDL_floor(double x);
-double SDL_log(double x);
-double SDL_pow(double x, double y);
-double SDL_scalbn(double x, int n);
-double SDL_sin(double x);
-double SDL_sqrt(double x);
+   int                    SDL_GetNumAudioDrivers(    void );
+   const char*            SDL_GetAudioDriver(        int index );
+   int                    SDL_AudioInit(             const char *driver_name );
+   void                   SDL_AudioQuit(             void );
+   const char*            SDL_GetCurrentAudioDriver( void );
+   int                    SDL_OpenAudio(             SDL_AudioSpec* desired, SDL_AudioSpec* obtained );
+   int                    SDL_GetNumAudioDevices(    int iscapture );
+   const char*            SDL_GetAudioDeviceName(    int index, int iscapture );
+   SDL_AudioDeviceID      SDL_OpenAudioDevice(       const char* device, int iscapture, const SDL_AudioSpec* desired, SDL_AudioSpec *obtained, int allowed_changes );
+   SDL_AudioStatus        SDL_GetAudioStatus(        );
+   SDL_AudioStatus        SDL_GetAudioDeviceStatus(  SDL_AudioDeviceID dev );
+   void                   SDL_PauseAudio(            int pause_on );
+   void                   SDL_PauseAudioDevice(      SDL_AudioDeviceID dev, int pause_on );
+   SDL_AudioSpec*         SDL_LoadWAV_RW(            SDL_RWops* src, int freesrc, SDL_AudioSpec* spec, uint8_t** audio_buf, uint32_t* audio_len );
+   void                   SDL_FreeWAV(               uint8_t* audio_buf );
+   int                    SDL_BuildAudioCVT(         SDL_AudioCVT* cvt, SDL_AudioFormat src_format, uint8_t src_channels, int src_rate, SDL_AudioFormat dst_format, uint8_t dst_channels, int dst_rate );
+   int                    SDL_ConvertAudio(          SDL_AudioCVT* cvt );
+   void                   SDL_MixAudio(              uint8_t* dst, const uint8_t* src, uint32_t len, int volume );
+   void                   SDL_MixAudioFormat(        uint8_t* dst, const uint8_t* src, SDL_AudioFormat format, uint32_t len, int volume );
+   void                   SDL_LockAudio(             );
+   void                   SDL_LockAudioDevice(       SDL_AudioDeviceID dev );
+   void                   SDL_UnlockAudio(           );
+   void                   SDL_UnlockAudioDevice(     SDL_AudioDeviceID dev );
+   void                   SDL_CloseAudio(            );
+   void                   SDL_CloseAudioDevice(      SDL_AudioDeviceID dev );
+   int                    SDL_AudioDeviceConnected(  SDL_AudioDeviceID dev );
+
+   int                    SDL_SetClipboardText(      const char *text );
+   char*                  SDL_GetClipboardText(      void );
+   SDL_bool               SDL_HasClipboardText(      void );
+
+   int                    SDL_GetCPUCount(           );
+   int                    SDL_GetCPUCacheLineSize(   );
+   SDL_bool               SDL_HasRDTSC(              );
+   SDL_bool               SDL_HasAltiVec(            );
+   SDL_bool               SDL_HasMMX(                );
+   SDL_bool               SDL_Has3DNow(              );
+   SDL_bool               SDL_HasSSE(                );
+   SDL_bool               SDL_HasSSE2(               );
+   SDL_bool               SDL_HasSSE3(               );
+   SDL_bool               SDL_HasSSE41(              );
+   SDL_bool               SDL_HasSSE42(              );
 
-typedef struct _SDL_iconv_t *SDL_iconv_t;
-SDL_iconv_t SDL_iconv_open(const char *tocode,
-                                                   const char *fromcode);
-int SDL_iconv_close(SDL_iconv_t cd);
-
-size_t SDL_iconv(SDL_iconv_t cd, const char **inbuf,
-                                         size_t * inbytesleft, char **outbuf,
-                                         size_t * outbytesleft);
-
-char *SDL_iconv_string(const char *tocode,
-                                               const char *fromcode,
-                                               const char *inbuf,
-                                               size_t inbytesleft);
-
-int  SDL_main(int argc, char *argv[]);
-int  SDL_RegisterApp(char *name, uint32_t style, void *hInst);
-void SDL_UnregisterApp(void);
-
-typedef enum {
-   SDL_ASSERTION_RETRY,  
-   SDL_ASSERTION_BREAK,  
-   SDL_ASSERTION_ABORT,  
-   SDL_ASSERTION_IGNORE,  
-   SDL_ASSERTION_ALWAYS_IGNORE,  
-} SDL_assert_state;
-
-typedef struct SDL_assert_data {
-    int always_ignore;
-    unsigned int trigger_count;
-    const char *condition;
-    const char *filename;
-    int linenum;
-    const char *function;
-    const struct SDL_assert_data *next;
-} SDL_assert_data;
-
-SDL_assert_state SDL_ReportAssertion(SDL_assert_data *, const char *, const char *, int);
-
-typedef SDL_assert_state (*SDL_AssertionHandler)(const SDL_assert_data* data, void* userdata);
-
-void  SDL_SetAssertionHandler(SDL_AssertionHandler handler, void *userdata);
-const SDL_assert_data * SDL_GetAssertionReport(void);
-void  SDL_ResetAssertionReport(void);
-
-typedef uintptr_t(* pfnSDL_CurrentBeginThread) (void *, unsigned, unsigned (__stdcall *func) (void *), void *arg, unsigned, unsigned *threadID );
-typedef void (* pfnSDL_CurrentEndThread) (unsigned code);
-
-typedef struct SDL_Thread SDL_Thread;
-typedef unsigned long SDL_threadID;
-typedef int (__cdecl * SDL_ThreadFunction) (void *data);
-
-typedef enum {
-    SDL_THREAD_PRIORITY_LOW,
-    SDL_THREAD_PRIORITY_NORMAL,
-    SDL_THREAD_PRIORITY_HIGH
-} SDL_ThreadPriority;
-
-SDL_Thread* SDL_CreateThread(SDL_ThreadFunction fn, void *data, pfnSDL_CurrentBeginThread pfnBeginThread, pfnSDL_CurrentEndThread pfnEndThread);
-SDL_threadID SDL_ThreadID(void);
-SDL_threadID SDL_GetThreadID(SDL_Thread * thread);
-int SDL_SetThreadPriority(SDL_ThreadPriority priority);
-void SDL_WaitThread(SDL_Thread * thread, int *status);
-
-typedef struct SDL_RWops
-{
-   long (* seek) (struct SDL_RWops * context, long offset,  int whence);
-   size_t(* read) (struct SDL_RWops * context, void *ptr, size_t size, size_t maxnum);
-   size_t(* write) (struct SDL_RWops * context, const void *ptr, size_t size, size_t num);
-
-    
-
-    int (* close) (struct SDL_RWops * context);
-
-    uint32_t type;
-    union
-    {
-
-        struct
-        {
-            SDL_bool append;
-            void *h;
-            struct
-            {
-                void *data;
-                size_t size;
-                size_t left;
-            } buffer;
-        } windowsio;
-
-        struct
-        {
-            uint8_t *base;
-            uint8_t *here;
-            uint8_t *stop;
-        } mem;
-        struct
-        {
-            void *data1;
-        } unknown;
-    } hidden;
-
-} SDL_RWops;
-
-SDL_RWops *SDL_RWFromFile(const char *file, const char *mode);
-SDL_RWops *SDL_RWFromFP(void * fp, SDL_bool autoclose);
-SDL_RWops *SDL_RWFromMem(void *mem, int size);
-SDL_RWops *SDL_RWFromConstMem(const void *mem,  int size);
-SDL_RWops *SDL_AllocRW(void);
-void SDL_FreeRW(SDL_RWops * area);
-uint16_t SDL_ReadLE16(SDL_RWops * src);
-uint16_t SDL_ReadBE16(SDL_RWops * src);
-uint32_t SDL_ReadLE32(SDL_RWops * src);
-uint32_t SDL_ReadBE32(SDL_RWops * src);
-uint64_t SDL_ReadLE64(SDL_RWops * src);
-uint64_t SDL_ReadBE64(SDL_RWops * src);
-size_t SDL_WriteLE16(SDL_RWops * dst, uint16_t value);
-size_t SDL_WriteBE16(SDL_RWops * dst, uint16_t value);
-size_t SDL_WriteLE32(SDL_RWops * dst, uint32_t value);
-size_t SDL_WriteBE32(SDL_RWops * dst, uint32_t value);
-size_t SDL_WriteLE64(SDL_RWops * dst, uint64_t value);
-size_t SDL_WriteBE64(SDL_RWops * dst, uint64_t value);
-
-typedef uint16_t SDL_AudioFormat;
-typedef void (* SDL_AudioCallback) (void *userdata, uint8_t * stream,
-                                            int len);
-
-typedef struct SDL_AudioSpec {
-    int freq;                   
-    SDL_AudioFormat format;     
-    uint8_t channels;             
-    uint8_t silence;              
-    uint16_t samples;             
-    uint16_t padding;             
-    uint32_t size;                
-    SDL_AudioCallback callback;
-    void *userdata;
-} SDL_AudioSpec;
-
-struct SDL_AudioCVT;
-typedef void (* SDL_AudioFilter) (struct SDL_AudioCVT * cvt,
-                                          SDL_AudioFormat format);
-
-typedef struct SDL_AudioCVT
-{
-    int needed;                 
-    SDL_AudioFormat src_format; 
-    SDL_AudioFormat dst_format; 
-    double rate_incr;           
-    uint8_t *buf;                 
-    int len;                    
-    int len_cvt;                
-    int len_mult;               
-    double len_ratio;           
-    SDL_AudioFilter filters[10];        
-    int filter_index;           
-} SDL_AudioCVT;
-
-int SDL_GetNumAudioDrivers(void);
-const char *SDL_GetAudioDriver(int index);
-
-int SDL_AudioInit(const char *driver_name);
-void SDL_AudioQuit(void);
-
-const char *SDL_GetCurrentAudioDriver(void);
-
-int SDL_OpenAudio(SDL_AudioSpec * desired,
-                                          SDL_AudioSpec * obtained);
-
-typedef uint32_t SDL_AudioDeviceID;
-
-int SDL_GetNumAudioDevices(int iscapture);
-
-const char *SDL_GetAudioDeviceName(int index,
-                                                           int iscapture);
-
-SDL_AudioDeviceID SDL_OpenAudioDevice(const char
-                                                              *device,
-                                                              int iscapture,
-                                                              const
-                                                              SDL_AudioSpec *
-                                                              desired,
-                                                              SDL_AudioSpec *
-                                                              obtained,
-                                                              int
-                                                              allowed_changes);
-
-typedef enum
-{
-    SDL_AUDIO_STOPPED = 0,
-    SDL_AUDIO_PLAYING,
-    SDL_AUDIO_PAUSED
-} SDL_AudioStatus;
-SDL_AudioStatus SDL_GetAudioStatus(void);
-
-SDL_AudioStatus __cdecl
-SDL_GetAudioDeviceStatus(SDL_AudioDeviceID dev);
-
-void SDL_PauseAudio(int pause_on);
-void SDL_PauseAudioDevice(SDL_AudioDeviceID dev,
-                                                  int pause_on);
-
-SDL_AudioSpec *SDL_LoadWAV_RW(SDL_RWops * src,
-                                                      int freesrc,
-                                                      SDL_AudioSpec * spec,
-                                                      uint8_t ** audio_buf,
-                                                      uint32_t * audio_len);
-
-void SDL_FreeWAV(uint8_t * audio_buf);
-
-int SDL_BuildAudioCVT(SDL_AudioCVT * cvt,
-                                              SDL_AudioFormat src_format,
-                                              uint8_t src_channels,
-                                              int src_rate,
-                                              SDL_AudioFormat dst_format,
-                                              uint8_t dst_channels,
-                                              int dst_rate);
-
-int SDL_ConvertAudio(SDL_AudioCVT * cvt);
-
-void SDL_MixAudio(uint8_t * dst, const uint8_t * src,
-                                          uint32_t len, int volume);
-
-void SDL_MixAudioFormat(uint8_t * dst,
-                                                const uint8_t * src,
-                                                SDL_AudioFormat format,
-                                                uint32_t len, int volume);
-
-void SDL_LockAudio(void);
-void SDL_LockAudioDevice(SDL_AudioDeviceID dev);
-void SDL_UnlockAudio(void);
-void SDL_UnlockAudioDevice(SDL_AudioDeviceID dev);
-
-void SDL_CloseAudio(void);
-void SDL_CloseAudioDevice(SDL_AudioDeviceID dev);
-
-int SDL_AudioDeviceConnected(SDL_AudioDeviceID dev);
-
-#pragma pack(pop)
-
-#pragma warning(disable: 4103)
-
-#pragma pack(push,4)
-
-int SDL_SetClipboardText(const char *text);
-
-char * SDL_GetClipboardText(void);
-
-SDL_bool SDL_HasClipboardText(void);
-
-#pragma pack(pop)
-
-#pragma warning(disable: 4103)
-
-#pragma pack(push,4)
-
-int SDL_GetCPUCount(void);
-
-int SDL_GetCPUCacheLineSize(void);
-
-SDL_bool SDL_HasRDTSC(void);
-
-SDL_bool SDL_HasAltiVec(void);
-
-SDL_bool SDL_HasMMX(void);
-
-SDL_bool SDL_Has3DNow(void);
-
-SDL_bool SDL_HasSSE(void);
-
-SDL_bool SDL_HasSSE2(void);
-
-SDL_bool SDL_HasSSE3(void);
-
-SDL_bool SDL_HasSSE41(void);
-
-SDL_bool SDL_HasSSE42(void);
-
-#pragma pack(pop)
-
-#pragma warning(disable: 4103)
-
-#pragma pack(push,4)
-
-enum
-{
-    SDL_PIXELTYPE_UNKNOWN,
-    SDL_PIXELTYPE_INDEX1,
-    SDL_PIXELTYPE_INDEX4,
-    SDL_PIXELTYPE_INDEX8,
-    SDL_PIXELTYPE_PACKED8,
-    SDL_PIXELTYPE_PACKED16,
-    SDL_PIXELTYPE_PACKED32,
-    SDL_PIXELTYPE_ARRAYU8,
-    SDL_PIXELTYPE_ARRAYU16,
-    SDL_PIXELTYPE_ARRAYU32,
-    SDL_PIXELTYPE_ARRAYF16,
-    SDL_PIXELTYPE_ARRAYF32
-};
-
-enum
-{
-    SDL_BITMAPORDER_NONE,
-    SDL_BITMAPORDER_4321,
-    SDL_BITMAPORDER_1234
-};
-
-enum
-{
-    SDL_PACKEDORDER_NONE,
-    SDL_PACKEDORDER_XRGB,
-    SDL_PACKEDORDER_RGBX,
-    SDL_PACKEDORDER_ARGB,
-    SDL_PACKEDORDER_RGBA,
-    SDL_PACKEDORDER_XBGR,
-    SDL_PACKEDORDER_BGRX,
-    SDL_PACKEDORDER_ABGR,
-    SDL_PACKEDORDER_BGRA
-};
-
-enum
-{
-    SDL_ARRAYORDER_NONE,
-    SDL_ARRAYORDER_RGB,
-    SDL_ARRAYORDER_RGBA,
-    SDL_ARRAYORDER_ARGB,
-    SDL_ARRAYORDER_BGR,
-    SDL_ARRAYORDER_BGRA,
-    SDL_ARRAYORDER_ABGR
-};
-
-enum
-{
-    SDL_PACKEDLAYOUT_NONE,
-    SDL_PACKEDLAYOUT_332,
-    SDL_PACKEDLAYOUT_4444,
-    SDL_PACKEDLAYOUT_1555,
-    SDL_PACKEDLAYOUT_5551,
-    SDL_PACKEDLAYOUT_565,
-    SDL_PACKEDLAYOUT_8888,
-    SDL_PACKEDLAYOUT_2101010,
-    SDL_PACKEDLAYOUT_1010102
-};
-
-enum
-{
-    SDL_PIXELFORMAT_UNKNOWN,
-    SDL_PIXELFORMAT_INDEX1LSB =
-        ((1 << 31) | ((SDL_PIXELTYPE_INDEX1) << 24) | ((SDL_BITMAPORDER_4321) << 20) | ((0) << 16) | ((1) << 8) | ((0) << 0)),
-    SDL_PIXELFORMAT_INDEX1MSB =
-        ((1 << 31) | ((SDL_PIXELTYPE_INDEX1) << 24) | ((SDL_BITMAPORDER_1234) << 20) | ((0) << 16) | ((1) << 8) | ((0) << 0)),
-    SDL_PIXELFORMAT_INDEX4LSB =
-        ((1 << 31) | ((SDL_PIXELTYPE_INDEX4) << 24) | ((SDL_BITMAPORDER_4321) << 20) | ((0) << 16) | ((4) << 8) | ((0) << 0)),
-    SDL_PIXELFORMAT_INDEX4MSB =
-        ((1 << 31) | ((SDL_PIXELTYPE_INDEX4) << 24) | ((SDL_BITMAPORDER_1234) << 20) | ((0) << 16) | ((4) << 8) | ((0) << 0)),
-    SDL_PIXELFORMAT_INDEX8 =
-        ((1 << 31) | ((SDL_PIXELTYPE_INDEX8) << 24) | ((0) << 20) | ((0) << 16) | ((8) << 8) | ((1) << 0)),
-    SDL_PIXELFORMAT_RGB332 =
-        ((1 << 31) | ((SDL_PIXELTYPE_PACKED8) << 24) | ((SDL_PACKEDORDER_XRGB) << 20) | ((SDL_PACKEDLAYOUT_332) << 16) | ((8) << 8) | ((1) << 0)),
-    SDL_PIXELFORMAT_RGB444 =
-        ((1 << 31) | ((SDL_PIXELTYPE_PACKED16) << 24) | ((SDL_PACKEDORDER_XRGB) << 20) | ((SDL_PACKEDLAYOUT_4444) << 16) | ((12) << 8) | ((2) << 0)),
-    SDL_PIXELFORMAT_RGB555 =
-        ((1 << 31) | ((SDL_PIXELTYPE_PACKED16) << 24) | ((SDL_PACKEDORDER_XRGB) << 20) | ((SDL_PACKEDLAYOUT_1555) << 16) | ((15) << 8) | ((2) << 0)),
-    SDL_PIXELFORMAT_BGR555 =
-        ((1 << 31) | ((SDL_PIXELTYPE_PACKED16) << 24) | ((SDL_PACKEDORDER_XBGR) << 20) | ((SDL_PACKEDLAYOUT_1555) << 16) | ((15) << 8) | ((2) << 0)),
-    SDL_PIXELFORMAT_ARGB4444 =
-        ((1 << 31) | ((SDL_PIXELTYPE_PACKED16) << 24) | ((SDL_PACKEDORDER_ARGB) << 20) | ((SDL_PACKEDLAYOUT_4444) << 16) | ((16) << 8) | ((2) << 0)),
-    SDL_PIXELFORMAT_RGBA4444 =
-        ((1 << 31) | ((SDL_PIXELTYPE_PACKED16) << 24) | ((SDL_PACKEDORDER_RGBA) << 20) | ((SDL_PACKEDLAYOUT_4444) << 16) | ((16) << 8) | ((2) << 0)),
-    SDL_PIXELFORMAT_ABGR4444 =
-        ((1 << 31) | ((SDL_PIXELTYPE_PACKED16) << 24) | ((SDL_PACKEDORDER_ABGR) << 20) | ((SDL_PACKEDLAYOUT_4444) << 16) | ((16) << 8) | ((2) << 0)),
-    SDL_PIXELFORMAT_BGRA4444 =
-        ((1 << 31) | ((SDL_PIXELTYPE_PACKED16) << 24) | ((SDL_PACKEDORDER_BGRA) << 20) | ((SDL_PACKEDLAYOUT_4444) << 16) | ((16) << 8) | ((2) << 0)),
-    SDL_PIXELFORMAT_ARGB1555 =
-        ((1 << 31) | ((SDL_PIXELTYPE_PACKED16) << 24) | ((SDL_PACKEDORDER_ARGB) << 20) | ((SDL_PACKEDLAYOUT_1555) << 16) | ((16) << 8) | ((2) << 0)),
-    SDL_PIXELFORMAT_RGBA5551 =
-        ((1 << 31) | ((SDL_PIXELTYPE_PACKED16) << 24) | ((SDL_PACKEDORDER_RGBA) << 20) | ((SDL_PACKEDLAYOUT_5551) << 16) | ((16) << 8) | ((2) << 0)),
-    SDL_PIXELFORMAT_ABGR1555 =
-        ((1 << 31) | ((SDL_PIXELTYPE_PACKED16) << 24) | ((SDL_PACKEDORDER_ABGR) << 20) | ((SDL_PACKEDLAYOUT_1555) << 16) | ((16) << 8) | ((2) << 0)),
-    SDL_PIXELFORMAT_BGRA5551 =
-        ((1 << 31) | ((SDL_PIXELTYPE_PACKED16) << 24) | ((SDL_PACKEDORDER_BGRA) << 20) | ((SDL_PACKEDLAYOUT_5551) << 16) | ((16) << 8) | ((2) << 0)),
-    SDL_PIXELFORMAT_RGB565 =
-        ((1 << 31) | ((SDL_PIXELTYPE_PACKED16) << 24) | ((SDL_PACKEDORDER_XRGB) << 20) | ((SDL_PACKEDLAYOUT_565) << 16) | ((16) << 8) | ((2) << 0)),
-    SDL_PIXELFORMAT_BGR565 =
-        ((1 << 31) | ((SDL_PIXELTYPE_PACKED16) << 24) | ((SDL_PACKEDORDER_XBGR) << 20) | ((SDL_PACKEDLAYOUT_565) << 16) | ((16) << 8) | ((2) << 0)),
-    SDL_PIXELFORMAT_RGB24 =
-        ((1 << 31) | ((SDL_PIXELTYPE_ARRAYU8) << 24) | ((SDL_ARRAYORDER_RGB) << 20) | ((0) << 16) | ((24) << 8) | ((3) << 0)),
-    SDL_PIXELFORMAT_BGR24 =
-        ((1 << 31) | ((SDL_PIXELTYPE_ARRAYU8) << 24) | ((SDL_ARRAYORDER_BGR) << 20) | ((0) << 16) | ((24) << 8) | ((3) << 0)),
-    SDL_PIXELFORMAT_RGB888 =
-        ((1 << 31) | ((SDL_PIXELTYPE_PACKED32) << 24) | ((SDL_PACKEDORDER_XRGB) << 20) | ((SDL_PACKEDLAYOUT_8888) << 16) | ((24) << 8) | ((4) << 0)),
-    SDL_PIXELFORMAT_BGR888 =
-        ((1 << 31) | ((SDL_PIXELTYPE_PACKED32) << 24) | ((SDL_PACKEDORDER_XBGR) << 20) | ((SDL_PACKEDLAYOUT_8888) << 16) | ((24) << 8) | ((4) << 0)),
-    SDL_PIXELFORMAT_ARGB8888 =
-        ((1 << 31) | ((SDL_PIXELTYPE_PACKED32) << 24) | ((SDL_PACKEDORDER_ARGB) << 20) | ((SDL_PACKEDLAYOUT_8888) << 16) | ((32) << 8) | ((4) << 0)),
-    SDL_PIXELFORMAT_RGBA8888 =
-        ((1 << 31) | ((SDL_PIXELTYPE_PACKED32) << 24) | ((SDL_PACKEDORDER_RGBA) << 20) | ((SDL_PACKEDLAYOUT_8888) << 16) | ((32) << 8) | ((4) << 0)),
-    SDL_PIXELFORMAT_ABGR8888 =
-        ((1 << 31) | ((SDL_PIXELTYPE_PACKED32) << 24) | ((SDL_PACKEDORDER_ABGR) << 20) | ((SDL_PACKEDLAYOUT_8888) << 16) | ((32) << 8) | ((4) << 0)),
-    SDL_PIXELFORMAT_BGRA8888 =
-        ((1 << 31) | ((SDL_PIXELTYPE_PACKED32) << 24) | ((SDL_PACKEDORDER_BGRA) << 20) | ((SDL_PACKEDLAYOUT_8888) << 16) | ((32) << 8) | ((4) << 0)),
-    SDL_PIXELFORMAT_ARGB2101010 =
-        ((1 << 31) | ((SDL_PIXELTYPE_PACKED32) << 24) | ((SDL_PACKEDORDER_ARGB) << 20) | ((SDL_PACKEDLAYOUT_2101010) << 16) | ((32) << 8) | ((4) << 0)),
-
-    SDL_PIXELFORMAT_YV12 =      
-        ((((uint32_t)(((uint8_t)(('Y'))))) << 0) | (((uint32_t)(((uint8_t)(('V'))))) << 8) | (((uint32_t)(((uint8_t)(('1'))))) << 16) | (((uint32_t)(((uint8_t)(('2'))))) << 24)),
-    SDL_PIXELFORMAT_IYUV =      
-        ((((uint32_t)(((uint8_t)(('I'))))) << 0) | (((uint32_t)(((uint8_t)(('Y'))))) << 8) | (((uint32_t)(((uint8_t)(('U'))))) << 16) | (((uint32_t)(((uint8_t)(('V'))))) << 24)),
-    SDL_PIXELFORMAT_YUY2 =      
-        ((((uint32_t)(((uint8_t)(('Y'))))) << 0) | (((uint32_t)(((uint8_t)(('U'))))) << 8) | (((uint32_t)(((uint8_t)(('Y'))))) << 16) | (((uint32_t)(((uint8_t)(('2'))))) << 24)),
-    SDL_PIXELFORMAT_UYVY =      
-        ((((uint32_t)(((uint8_t)(('U'))))) << 0) | (((uint32_t)(((uint8_t)(('Y'))))) << 8) | (((uint32_t)(((uint8_t)(('V'))))) << 16) | (((uint32_t)(((uint8_t)(('Y'))))) << 24)),
-    SDL_PIXELFORMAT_YVYU =      
-        ((((uint32_t)(((uint8_t)(('Y'))))) << 0) | (((uint32_t)(((uint8_t)(('V'))))) << 8) | (((uint32_t)(((uint8_t)(('Y'))))) << 16) | (((uint32_t)(((uint8_t)(('U'))))) << 24))
-};
-
-typedef struct SDL_Color
-{
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-    uint8_t unused;
-} SDL_Color;
-
-typedef struct SDL_Palette
-{
-    int ncolors;
-    SDL_Color *colors;
-    uint32_t version;
-    int refcount;
-} SDL_Palette;
-
-typedef struct SDL_PixelFormat
-{
-    uint32_t format;
-    SDL_Palette *palette;
-    uint8_t BitsPerPixel;
-    uint8_t BytesPerPixel;
-    uint8_t padding[2];
-    uint32_t Rmask;
-    uint32_t Gmask;
-    uint32_t Bmask;
-    uint32_t Amask;
-    uint8_t Rloss;
-    uint8_t Gloss;
-    uint8_t Bloss;
-    uint8_t Aloss;
-    uint8_t Rshift;
-    uint8_t Gshift;
-    uint8_t Bshift;
-    uint8_t Ashift;
-    int refcount;
-    struct SDL_PixelFormat *next;
-} SDL_PixelFormat;
 
 const char* SDL_GetPixelFormatName(uint32_t format);
 
@@ -577,12 +426,6 @@ void SDL_GetRGBA(uint32_t pixel,
 
 void SDL_CalculateGammaRamp(float gamma, uint16_t * ramp);
 
-#pragma pack(pop)
-
-#pragma warning(disable: 4103)
-
-#pragma pack(push,4)
-
 typedef struct
 {
     int x;
@@ -616,12 +459,6 @@ SDL_bool SDL_IntersectRectAndLine(const SDL_Rect *
                                                           int *Y1, int *X2,
                                                           int *Y2);
 
-#pragma pack(pop)
-
-#pragma warning(disable: 4103)
-
-#pragma pack(push,4)
-
 typedef enum
 {
     SDL_BLENDMODE_NONE = 0x00000000,     
@@ -629,12 +466,6 @@ typedef enum
     SDL_BLENDMODE_ADD = 0x00000002,      
     SDL_BLENDMODE_MOD = 0x00000004       
 } SDL_BlendMode;
-
-#pragma pack(pop)
-
-#pragma warning(disable: 4103)
-
-#pragma pack(push,4)
 
 typedef struct SDL_Surface
 {
@@ -761,12 +592,6 @@ int SDL_UpperBlitScaled
 int SDL_LowerBlitScaled
     (SDL_Surface * src, SDL_Rect * srcrect,
     SDL_Surface * dst, SDL_Rect * dstrect);
-
-#pragma pack(pop)
-
-#pragma warning(disable: 4103)
-
-#pragma pack(push,4)
 
 typedef struct
 {
@@ -994,8 +819,6 @@ int SDL_GL_GetSwapInterval(void);
 void SDL_GL_SwapWindow(SDL_Window * window);
 
 void SDL_GL_DeleteContext(SDL_GLContext context);
-
-#pragma pack(pop)
 
 typedef enum
 {
@@ -1569,12 +1392,12 @@ typedef enum
     KMOD_NUM = 0x1000,
     KMOD_CAPS = 0x2000,
     KMOD_MODE = 0x4000,
-    KMOD_RESERVED = 0x8000
+    KMOD_RESERVED = 0x8000,
+    KMOD_CTRL     = KMOD_LCTRL | KMOD_RCTRL,
+    KMOD_SHIFT    = KMOD_LSHIFT | KMOD_RSHIFT,
+    KMOD_ALT      = KMOD_LALT | KMOD_RALT,
+    KMOD_GUI      = KMOD_LGUI | KMOD_RGUI,
 } SDL_Keymod;
-
-#pragma warning(disable: 4103)
-
-#pragma pack(push,4)
 
 typedef struct SDL_Keysym
 {
@@ -1607,12 +1430,6 @@ void SDL_StopTextInput(void);
 
 void SDL_SetTextInputRect(SDL_Rect *rect);
 
-#pragma pack(pop)
-
-#pragma warning(disable: 4103)
-
-#pragma pack(push,4)
-
 typedef struct SDL_Cursor SDL_Cursor;   
 
 SDL_Window * SDL_GetMouseFocus(void);
@@ -1644,12 +1461,6 @@ SDL_Cursor *SDL_GetCursor(void);
 void SDL_FreeCursor(SDL_Cursor * cursor);
 
 int SDL_ShowCursor(int toggle);
-
-#pragma pack(pop)
-
-#pragma warning(disable: 4103)
-
-#pragma pack(push,4)
 
 struct _SDL_Joystick;
 typedef struct _SDL_Joystick SDL_Joystick;
@@ -1689,12 +1500,6 @@ uint8_t SDL_JoystickGetButton(SDL_Joystick * joystick,
                                                     int button);
 
 void SDL_JoystickClose(SDL_Joystick * joystick);
-
-#pragma pack(pop)
-
-#pragma warning(disable: 4103)
-
-#pragma pack(push,4)
 
 typedef int64_t SDL_TouchID;
 typedef int64_t SDL_FingerID;
@@ -1745,11 +1550,6 @@ struct SDL_Touch {
   extern 
   __declspec(dllexport) SDL_Finger* SDL_GetFinger(SDL_Touch *touch, SDL_FingerID id);
 
-#pragma pack(pop)
-
-#pragma warning(disable: 4103)
-
-#pragma pack(push,4)
 
 typedef int64_t SDL_GestureID;
 
@@ -1760,12 +1560,6 @@ int SDL_SaveAllDollarTemplates(SDL_RWops *src);
 int SDL_SaveDollarTemplate(SDL_GestureID gestureId,SDL_RWops *src);
 
 int SDL_LoadDollarTemplates(SDL_TouchID touchId, SDL_RWops *src);
-
-#pragma pack(pop)
-
-#pragma warning(disable: 4103)
-
-#pragma pack(push,4)
 
 typedef enum
 {
@@ -2118,16 +1912,6 @@ uint8_t SDL_EventState(uint32_t type, int state);
 
 uint32_t SDL_RegisterEvents(int numevents);
 
-#pragma pack(pop)
-
-#pragma warning(disable: 4103)
-
-#pragma pack(push,4)
-
-	
-
-	
-
 typedef enum
 {
     SDL_HINT_DEFAULT,
@@ -2145,25 +1929,11 @@ SDL_bool SDL_SetHint(const char *name,
 const char * SDL_GetHint(const char *name);
 
 void SDL_ClearHints(void);
-
-#pragma pack(pop)
-
-#pragma warning(disable: 4103)
-
-#pragma pack(push,4)
-
 void *SDL_LoadObject(const char *sofile);
-
 void *SDL_LoadFunction(void *handle,
                                                const char *name);
 
 void SDL_UnloadObject(void *handle);
-
-#pragma pack(pop)
-
-#pragma warning(disable: 4103)
-
-#pragma pack(push,4)
 
 enum
 {
@@ -2240,12 +2010,6 @@ void SDL_LogGetOutputFunction(SDL_LogOutputFunction *callback, void **userdata);
 
 void SDL_LogSetOutputFunction(SDL_LogOutputFunction callback, void *userdata);
 
-#pragma pack(pop)
-
-#pragma warning(disable: 4103)
-
-#pragma pack(push,4)
-
 typedef enum
 {
     SDL_POWERSTATE_UNKNOWN,      
@@ -2256,12 +2020,6 @@ typedef enum
 } SDL_PowerState;
 
 SDL_PowerState SDL_GetPowerInfo(int *secs, int *pct);
-
-#pragma pack(pop)
-
-#pragma warning(disable: 4103)
-
-#pragma pack(push,4)
 
 typedef enum
 {
@@ -2422,11 +2180,6 @@ void SDL_DestroyTexture(SDL_Texture * texture);
 
 void SDL_DestroyRenderer(SDL_Renderer * renderer);
 
-#pragma pack(pop)
-
-#pragma warning(disable: 4103)
-
-#pragma pack(push,4)
 
 uint32_t SDL_GetTicks(void);
 
@@ -2446,12 +2199,6 @@ SDL_TimerID SDL_AddTimer(uint32_t interval,
 
 SDL_bool SDL_RemoveTimer(SDL_TimerID t);
 
-#pragma pack(pop)
-
-#pragma warning(disable: 4103)
-
-#pragma pack(push,4)
-
 typedef struct SDL_version
 {
     uint8_t major;        
@@ -2464,16 +2211,6 @@ void SDL_GetVersion(SDL_version * ver);
 const char *SDL_GetRevision(void);
 
 int SDL_GetRevisionNumber(void);
-
-#pragma pack(pop)
-
- 
-
- 
-
-#pragma warning(disable: 4103)
-
-#pragma pack(push,4)
 
 typedef struct SDL_VideoInfo
 {
