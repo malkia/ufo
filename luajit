@@ -1,21 +1,49 @@
 #!/bin/bash
 progname=$(dirname $0)
+
+# uname <option>, where <option>:
+# -s, --kernel-name        print the kernel name
+# -n, --nodename           print the network node hostname
+# -r, --kernel-release     print the kernel release
+# -v, --kernel-version     print the kernel version
+# -m, --machine            print the machine hardware name
+# -p, --processor          print the processor type or "unknown"
+# -i, --hardware-platform  print the hardware platform or "unknown"
+# -o, --operating-system   print the operating system
+
+OS=Other
+ARCH=Unknown
+
+# Find OS by kernel name
 case `uname -s` in
     Linux)  OS=Linux;;
     Darwin) OS=OSX;;
-    *)	    OS=Other;;
 esac
+
+# Find OS by operating system
+case `uname -o` in
+    Cygwin) OS=Windows;;
+esac
+
+# Find ARCH by machine
 case `uname -m` in
-    x86_64) ARCH=x64 ;;
-    i386)   ARCH=x86 ;;
-    arm*)   ARCH=arm ;;
-    *)	    ARCH=Unknown ;;
+    x86_64) ARCH=x64;;
+    i686)   ARCH=x86;;
+    i386)   ARCH=x86;;
+    arm*)   ARCH=arm;;
 esac
-case $OS in
-    OSX) OSARCH=$OS;;
-    *)   OSARCH=$OS/$ARCH;;
-esac
+
+# TODO: Use -rpath $ORIGIN instead
 case $OS in
     Linux) export LD_LIBRARY_PATH=`readlink -f $progname/bin/$OSARCH/`:$LD_LIBRARY_PATH;;
 esac
+
+OSARCH=$OS/$ARCH
+
+# OSX and iOS use universal binaries, there is no ARCH folder there
+case $OS in
+    OSX) OSARCH=$OS;;
+    iOS) OSARCH=$OS;;
+esac
+
 "$progname/bin/$OSARCH/luajit" "$@"

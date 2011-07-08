@@ -1,4 +1,7 @@
-All luajit FFI bindings are here. To use any of them just do, as in the example:
+	LuaJIT FFI bindings for various libraries:
 
-local cl = require( "ffi/OpenCL" )
-
+		- OpenGL, glu.lua
+		- OpenCL
+		- glfw	
+		- zmq (ZeroMQ)
+		

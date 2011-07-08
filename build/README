@@ -1,11 +1,6 @@
-Scripts for building executables and dynamic libraries that are put in ../bin and later distributed with the project
+	This folder contains scripts for compiling the binaries found in the ../bin folder.
 
-There is no strict organization here. Start by going to the $OS folder described in ../bin/README, and then find the
-
-appropriate .sh, .cmd, etc. script to build. For some projects patches are provided.
-
-Note:
-	Most scripts expect that the projects being compiled are the same directory level of this one, and concrete names are expected, such as:
+	Most scripts expect that the projects being compiled are the same directory level of this one, named like this:
 
 		- luajit (../../luajit from here)
 		- glfw   (../../glfw from here)
