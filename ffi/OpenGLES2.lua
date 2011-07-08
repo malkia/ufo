@@ -2,10 +2,12 @@ local ffi   = require( "ffi" )
 local libs  = ffi_gles2_libs or {
    OSX      = { x86 = "gles2.dylib", x64 = "gles2.dylib" },
    Windows = { x86 = "libGLESv2.dll", x64 = "libGLESv2.dll" },
+   Linux   = { arm = "GLESv2" }
 }
 --local lib   = ffi_gles2_lib or ( "bin/" .. ffi.os .. "/" .. ffi.arch .. "/angle/" .. libs[ ffi.os ][ ffi.arch ] )
 local lib   = ffi_gles2_lib or ( "bin/" .. ffi.os .. "/" .. ffi.arch .. "/" .. libs[ ffi.os ][ ffi.arch ] )
 print(lib)
+local lib = ffi_OpenGLES2_lib or libs[ ffi.os ][ ffi.arch ]
 local gles2 = ffi.load( (... and "" or "../") .. lib )
 
 ffi.cdef[[
