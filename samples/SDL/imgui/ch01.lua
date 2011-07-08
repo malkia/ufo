@@ -1,32 +1,32 @@
+-- Reference: http://sol.gfxile.net/imgui/ch01.html
+--  Based on: http://sol.gfxile.net/imgui/ch01.cpp
+
 local ffi = require( "ffi" )
 local sdl = require( "ffi/SDL" )
 
 local screen = sdl.SDL_SetVideoMode( 640, 480, 32, 0 )
-local event = ffi.new( "SDL_Event" )
-local rect = ffi.new( "SDL_Rect" )
+local event, rect = ffi.new( "SDL_Event" ), ffi.new( "SDL_Rect" )
 
-local function drawrect( x, y, w, h, color )
+local should_exit = false
+
+local function draw_rect( x, y, w, h, color )
    rect.x, rect.y, rect.w, rect.h = x, y, w, h
    sdl.SDL_FillRect( screen, rect, color )
 end
 
 local function render()
-   drawrect(0,0,640,480,0)
-   drawrect(64,48,64,48,0xff)
-   sdl.SDL_UpdateRect(screen, 0, 0, 640, 480)
-   sdl.SDL_Delay(10); 
+   draw_rect(  0,  0, 640, 480,    0 )
+   draw_rect( 64, 48,  64,  48, 0xff )
+   sdl.SDL_UpdateRect( screen, 0, 0, 640, 480 )
+   sdl.SDL_Delay( 10 ) 
 end
 
-while true do
-   local shouldExit = false
+while not should_exit do
    while sdl.SDL_PollEvent( event ) ~= 0 do
-      if event.type == sdl.SDL_QUIT
-      or event.type == sdl.SDL_KEYUP and event.key.keysym.sym == sdl.SDLK_ESCAPE then
-	 shouldExit = true
+      local evt, key = event.type, event.key.keysym.sym
+      if evt == sdl.SDL_QUIT or (evt == sdl.SDL_KEYUP and key == sdl.SDLK_ESCAPE) then
+	 should_exit = true
       end
-   end
-   if shouldExit then
-      break
    end
    render()
 end

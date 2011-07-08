@@ -1,55 +1,102 @@
+-- Reference: http://sol.gfxile.net/imgui/ch02.html
+--  Based on: http://sol.gfxile.net/imgui/ch02.cpp
+
 local ffi = require( "ffi" )
 local sdl = require( "ffi/SDL" )
 local shl = bit.lshift
 
 local screen = sdl.SDL_SetVideoMode( 640, 480, 32, 0 )
-local event = ffi.new( "SDL_Event" )
-local rect = ffi.new( "SDL_Rect" )
+local event, rect = ffi.new( "SDL_Event" ), ffi.new( "SDL_Rect" )
 
-local uistate = { 
-   mousex = 0, 
-   mousey = 0, 
-   mousedown = false, 
-   hotitem = 0, 
-   activeitem = 0 
+local should_exit = false
+
+local ui_state = { 
+   mouse_down = false, 
+   mouse_x = 0, mouse_y = 0, 
+   hot_item = 0, active_item = 0 
 }
 
-local function drawrect( x, y, w, h, color )
+local function draw_rect( x, y, w, h, color )
    rect.x, rect.y, rect.w, rect.h = x, y, w, h
    sdl.SDL_FillRect( screen, rect, color )
 end
 
 local function render()
-   drawrect(0,0,640,480,0)
-   drawrect(uistate.mousex - 32, uistate.mousey - 24, 64, 48, shl(0xFF, (uistate.mousedown and 1 or 0) * 8))
-   sdl.SDL_UpdateRect(screen, 0, 0, 640, 480)
-   sdl.SDL_Delay(10); 
+   draw_rect(  0,  0, 640, 480,  0 )
+   draw_rect( ui_state.mouse_x - 32,
+	      ui_state.mouse_y - 24,
+	      64, 48, shl( 0xFF, (ui_state.mouse_down and 1 or 0) * 8) )
+   sdl.SDL_UpdateRect( screen, 0, 0, 640, 480 )
+   sdl.SDL_Delay( 10 ) 
 end
 
-while true do
-   local shouldExit = false
+while not should_exit do
    while sdl.SDL_PollEvent( event ) ~= 0 do
-      if event.type == sdl.SDL_QUIT
-      or event.type == sdl.SDL_KEYUP and event.key.keysym.sym == sdl.SDLK_ESCAPE then
-	 shouldExit = true
+      local evt, key, motion, button = event.type, event.key.keysym.sym, event.motion, event.button.button
+      if evt == sdl.SDL_QUIT or (evt == sdl.SDL_KEYUP and key == sdl.SDLK_ESCAPE) then
+	 should_exit = true
       end
-
-      if event.type == sdl.SDL_MOUSEMOTION then
-	 uistate.mousex, uistate.mousey = event.motion.x, event.motion.y
+      if evt == sdl.SDL_MOUSEMOTION then
+	 ui_state.mouse_x, ui_state.mouse_y = motion.x, motion.y
       end
-
-      if event.type == sdl.SDL_MOUSEBUTTONDOWN and event.button.button == 1 then
-	 uistate.mousedown = true
+      if evt == sdl.SDL_MOUSEBUTTONDOWN and button == 1 then
+	 ui_state.mouse_down = true
       end
-
-      if event.type == sdl.SDL_MOUSEBUTTONUP and event.button.button == 1 then
-	 uistate.mousedown = false
+      if evt == sdl.SDL_MOUSEBUTTONUP and button == 1 then
+	 ui_state.mouse_down = false
       end
-   end
-   if shouldExit then
-      break
    end
    render()
 end
 
 sdl.SDL_Quit()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

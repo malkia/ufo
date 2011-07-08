@@ -1,108 +1,107 @@
+-- Reference: http://sol.gfxile.net/imgui/ch03.html
+--  Based on: http://sol.gfxile.net/imgui/ch03.cpp
+
 local ffi = require( "ffi" )
 local sdl = require( "ffi/SDL" )
 local shl, bor = bit.lshift, bit.bor
 
-local shouldExit = false
 local screen = sdl.SDL_SetVideoMode( 640, 480, 32, 0 )
-local event = ffi.new( "SDL_Event" )
-local rect = ffi.new( "SDL_Rect" )
+local event, rect = ffi.new( "SDL_Event" ), ffi.new( "SDL_Rect" )
 
-local uistate = { 
-   mousex = 0, 
-   mousey = 0, 
-   mousedown = false, 
-   hotitem = 0, 
-   activeitem = 0 
+local should_exit = false
+
+local ui_state = { 
+   mouse_down = false, 
+   mouse_x = 0, mouse_y = 0, 
+   hot_item = 0, active_item = 0 
 }
 
-local function drawrect( x, y, w, h, color )
+local function draw_rect( x, y, w, h, color )
    rect.x, rect.y, rect.w, rect.h = x, y, w, h
    sdl.SDL_FillRect( screen, rect, color )
 end
 
-local function regionhit( x, y, w, h )
-   return ( x >= uistate.mousex and
-	    y >= uistate.mousey and
-	    x + w <= uistate.mousex and
-	    y + h <= uistate.mousey )
+local function region_hit( x, y, w, h )
+   return ( ui_state.mouse_x >= x and
+	    ui_state.mouse_y >= y and
+	    ui_state.mouse_x <= x + w and
+	    ui_state.mouse_y <= y + h )
 end
 
-local function button(id, x, y)
-   if regionhit( x, y, 64, 48 ) then
-      uistate.hotitem = id
-      if uistate.activeitem == 00 and uistate.mousedown then
-	 uistate.activeitem = id
+local function button( id, x, y )
+   if region_hit( x, y, 64, 48 ) then
+      ui_state.hot_item = id
+      if ui_state.active_item == 0 and ui_state.mouse_down then
+	 ui_state.active_item = id
       end
    end
-   drawrect(x+8, y+8, 64, 48, 0);
-   if uistate.hotitem == id then
-      if uistate.activeitem == id then
-	 drawrect(x+2, y+2, 64, 48, 0xffffff);
-      else
-	 drawrect(x, y, 64, 48, 0xffffff);
-      end
-  else
-     drawrect(x, y, 64, 48, 0xaaaaaa);
-  end
 
-  return ( not uistate.mousedown
-	   and uistate.hotitem == id
-	   and uistate.activeitem == id )
+   draw_rect( x+8, y+8, 64, 48, 0 )
+
+   if ui_state.hot_item == id then
+      if ui_state.active_item == id then
+	 draw_rect( x+2, y+2, 64, 48, 0xffffff )
+      else
+	 draw_rect(   x,   y, 64, 48, 0xffffff )
+      end
+   else
+      draw_rect( x, y, 64, 48, 0xaaaaaa )
+   end
+
+   return ( not ui_state.mouse_down
+	    and ui_state.hot_item == id
+	    and ui_state.active_item == id )
 end
 
 local function imgui_prepare()
-   uistate.hotitem = 0
+   ui_state.hot_item = 0
 end
 
 local function imgui_finish()
-  if not uistate.mousedown then
-     uistate.activeitem = 0
-  elseif uistate.activeitem == 0 then
-     uistate.activeitem = -1
+  if not ui_state.mouse_down then
+     ui_state.active_item = 0
+  elseif ui_state.active_item == 0 then
+     ui_state.active_item = -1
   end
 end
 
-local bgcolor = 0x77
+local bg_color = 0x77
 local function render()
-   drawrect( 0, 0, 640, 480, bgcolor )
-   imgui_prepare()
-   button( 2, 50, 50 )
-   button( 2, 150, 50 )
-   if button( 3, 50, 150 ) then
-      bgcolor = bor(sdl.SDL_GetTicks() * 0xc0cac01a, 0x77)
-   end
+   draw_rect( 0, 0, 640, 480, bg_color )
 
-   if button(4,150,150) then
-      shouldExit = true
-   end
+   imgui_prepare() do
+      button( 2, 50, 50 )
+      
+      button( 2, 150, 50 )
+      
+      if button( 3, 50, 150 ) then
+	 bg_color = bor( sdl.SDL_GetTicks() * 0xc0cac01a, 0x77 )
+      end
+      
+      if button(4,150,150) then
+	 should_exit = true
+      end
+   end imgui_finish()
    
-   imgui_finish()
-   
-   sdl.SDL_UpdateRect(screen, 0, 0, 640, 480)
-   sdl.SDL_Delay(10)
+   sdl.SDL_UpdateRect( screen, 0, 0, 640, 480 )
+   sdl.SDL_Delay( 10 )
 end
 
-while true do
+while not should_exit do
    while sdl.SDL_PollEvent( event ) ~= 0 do
-      if event.type == sdl.SDL_QUIT
-      or event.type == sdl.SDL_KEYUP and event.key.keysym.sym == sdl.SDLK_ESCAPE then
-	 shouldExit = true
+      local evt, key, motion, button = event.type, event.key.keysym.sym, event.motion, event.button.button
+      if evt == sdl.SDL_QUIT or (evt == sdl.SDL_KEYUP and key == sdl.SDLK_ESCAPE) then
+	 should_exit = true
       end
-
-      if event.type == sdl.SDL_MOUSEMOTION then
-	 uistate.mousex, uistate.mousey = event.motion.x, event.motion.y
+      if evt == sdl.SDL_MOUSEMOTION then
+	 ui_state.mouse_x, ui_state.mouse_y = motion.x, motion.y
       end
-
-      if event.type == sdl.SDL_MOUSEBUTTONDOWN and event.button.button == 1 then
-	 uistate.mousedown = true
+      if evt == sdl.SDL_MOUSEBUTTONDOWN and button == 1 then
+	 ui_state.mouse_down = true
       end
-
-      if event.type == sdl.SDL_MOUSEBUTTONUP and event.button.button == 1 then
-	 uistate.mousedown = false
+      if evt == sdl.SDL_MOUSEBUTTONUP and button == 1 then
+	 ui_state.mouse_down = false
       end
-   end
-   if shouldExit then
-      break
    end
    render()
 end

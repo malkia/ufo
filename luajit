@@ -1,5 +1,6 @@
 #!/bin/bash
 progname=$(dirname $0)
+pushd $progname 1>/dev/null 2>/dev/null && absname=$(pwd) && popd 1>/dev/null 2>/dev/null 
 
 # uname <option>, where <option>:
 # -s, --kernel-name        print the kernel name
@@ -13,17 +14,25 @@ progname=$(dirname $0)
 
 OS=Other
 ARCH=Unknown
+SO=so
 
 # Find OS by kernel name
 case `uname -s` in
-    Linux)  OS=Linux;;
-    Darwin) OS=OSX;;
+    Linux)  
+	OS=Linux
+	SO=so
+	;;
+    Darwin) 
+	OS=OSX
+	SO=dylib
+	;;
 esac
 
 # Find OS by operating system
-case `uname -o` in
-    Cygwin) OS=Windows;;
-esac
+#case `uname -o` in
+#    Cygwin) OS=Windows;;
+#
+#	esac
 
 # Find ARCH by machine
 case `uname -m` in
@@ -31,11 +40,6 @@ case `uname -m` in
     i686)   ARCH=x86;;
     i386)   ARCH=x86;;
     arm*)   ARCH=arm;;
-esac
-
-# TODO: Use -rpath $ORIGIN instead
-case $OS in
-    Linux) export LD_LIBRARY_PATH=`readlink -f $progname/bin/$OSARCH/`:$LD_LIBRARY_PATH;;
 esac
 
 OSARCH=$OS/$ARCH
@@ -46,4 +50,13 @@ case $OS in
     iOS) OSARCH=$OS;;
 esac
 
+# TODO: Use -rpath $ORIGIN instead
+case $OS in
+    Linux) export LD_LIBRARY_PATH=$absname/:$absname/bin/$OSARCH/:$LD_LIBRARY_PATH;;
+    OSX) export DYLD_LIBRARY_PATH=$absname/:$absname/bin/$OSARCH/:$DYLD_LIBRARY_PATH;;
+esac
+
+
+export LUA_PATH=$absname/?.lua
+export LUA_CPATH=$absname/?.$SO
 "$progname/bin/$OSARCH/luajit" "$@"
