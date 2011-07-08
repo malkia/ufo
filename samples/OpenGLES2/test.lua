@@ -1,8 +1,8 @@
 #!/usr/bin/env luajit
 
 local ffi = require( "ffi" )
-local egl = require( "ffi/egl" )
-local gles2 = require( "ffi/gles2" )
+local egl = require( "ffi/EGL" )
+local gles2 = require( "ffi/OpenGLES2" )
 local gl = gles2
 
 ffi.cdef[[
@@ -95,14 +95,11 @@ local function load_shader( src, type )
    return nil
 end
 
-
 local vs = load_shader( vs_src, gl.GL_VERTEX_SHADER )
 print( 'vs', vs )
 
 local fs = load_shader( fs_src, gl.GL_FRAGMENT_SHADER )
 print( 'fs', fs )
-
-error( "To here" )
 
 local prog
 local loc_position
@@ -131,15 +128,22 @@ local phasep = 0
 local update_pos = true 
 
 local frames = 0
+local phase = 0
+local norm_x = 0
+local norm_y = 0
+local offset_x = 0
+local offset_y = 0
+local p1_pos_x = 0
+local p1_pos_y = 0
 
 while frames < 100 do
-   print( 'frames', frames )
+--   print( 'frames', frames )
    frames = frames + 1
 
-   print(3) 
+--   print(3) 
    gl.glViewport( 0, 0, ww, wh )
    gl.glClearColor( 0.08, 0.06, 0.07, 1)
-   gl.glClear ( GL_COLOR_BUFFER_BIT )
+   gl.glClear ( gl.GL_COLOR_BUFFER_BIT )
 --   gl.glUniform1f( loc_phase, phase )
    phase =  math.fmod( phase + 0.5, 2 * 3.141 )
  
