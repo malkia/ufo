@@ -14,6 +14,37 @@ local lib  = ffi_SDL_lib or libs[ ffi.os ][ ffi.arch ]
 local sdl  = ffi.load( lib )
 
 ffi.cdef[[
+//do
+   enum {
+      SDL_SWSURFACE     = 0x00000000,
+      SDL_SRCALPHA      = 0x00010000,
+      SDL_SRCCOLORKEY   = 0x00020000,
+      SDL_ANYFORMAT     = 0x00100000,
+      SDL_HWPALETTE     = 0x00200000,
+      SDL_DOUBLEBUF     = 0x00400000,
+      SDL_FULLSCREEN    = 0x00800000,
+      SDL_RESIZABLE     = 0x01000000,
+      SDL_NOFRAME       = 0x02000000,
+      SDL_OPENGL        = 0x04000000,
+      SDL_HWSURFACE     = 0x08000001,
+      SDL_ASYNCBLIT     = 0x08000000,
+      SDL_RLEACCELOK    = 0x08000000,
+      SDL_HWACCEL       = 0x08000000,
+
+      SDL_APPMOUSEFOCUS = 0x01,
+      SDL_APPINPUTFOCUS = 0x02,
+      SDL_APPACTIVE     = 0x04,
+
+      SDL_LOGPAL        = 0x01,
+      SDL_PHYSPAL       = 0x02,
+
+      SDL_BUTTON_WHEELUP   = 4,
+      SDL_BUTTON_WHEELDOWN = 5,
+
+      SDL_DEFAULT_REPEAT_DELAY    = 500,
+      SDL_DEFAULT_REPEAT_INTERVAL = 30
+   };
+
    typedef enum SDL_bool {
       SDL_FALSE,
       SDL_TRUE
