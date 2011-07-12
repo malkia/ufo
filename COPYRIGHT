@@ -1,5 +1,5 @@
 =============================================================================
-UFO -- LuaJIT FFI Bindings for OpenGL, OpenCL, ZeroMQ, GLFW and AntTweakBar
+UFO -- LuaJIT binary distribution and FFI Bindings for various libraries
 
 Copyright (C) 2011 Dimiter "malkia" Stanev. All rights reserved.
 
