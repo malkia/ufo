@@ -28,8 +28,9 @@ set INCLUDE=%CRT_INC_PATH%;%INCLUDE%;
 set INCLUDE=%SDK_INC_PATH%\crt\stl60;%INCLUDE%;
 
 pushd %_SRC%
-del link.cmd cl.cmd *.obj buildvm_*.h 1>nul 2>nul
+set _OPTS=
 if "%_TARGET%"=="i386" (
+   set _OPTS=%_OPTS% -arch:SSE2
    set _FILES=%_WDK%\lib\win7\%_TARGET%\msvcrt_win2000.obj
 )
 set _FILES=%_FILES% clock.cpp command.cpp connect_session.cpp ctx.cpp dealer.cpp decoder.cpp devpoll.cpp dist.cpp
@@ -41,11 +42,10 @@ set _FILES=%_FILES% signaler.cpp socket_base.cpp sub.cpp tcp_connecter.cpp tcp_l
 set _FILES=%_FILES% thread.cpp transient_session.cpp trie.cpp uuid.cpp xpub.cpp xrep.cpp xreq.cpp xsub.cpp
 set _FILES=%_FILES% zmq.cpp zmq_connecter.cpp zmq_engine.cpp zmq_init.cpp zmq_listener.cpp zmq_utils.cpp
 
-set _OPTS=-O2 -Os -Oy -GF -GL -arch:SSE2 -MP
-call cl -EHsc -MD -Fezmq.dll -LD -DDLL_EXPORT=1 -nologo %_OPTS% -Iwin32 -I. -I..\builds\msvc -I%~dp0 -DNOMINMAX  -FI%~dpn0-missing.h %_FILES% ws2_32.lib rpcrt4.lib
+set _OPTS=%_OPTS% -O2 -Os -Oi -Ob2 -Oy -GF -GL -MP -DNDEBUG=1
+call cl -GL -EHsc -MD -Fezmq.dll -LD -DDLL_EXPORT=1 -nologo %_OPTS% -Iwin32 -I. -I..\builds\msvc -I%~dp0 -DNOMINMAX -FI%~dpn0-missing.h %_FILES% /link"/LTCG /RELEASE /SWAPRUN:NET ws2_32.lib rpcrt4.lib"
 del config.h 1>nul 2>nul
 
-del link.cmd cl.cmd 1>nul 2>nul
 git log -1 >> zmq.dll
 call :install zmq.dll %_ROOT%\bin\Windows\%_LUA_ARCH%
 popd
