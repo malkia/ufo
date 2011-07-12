@@ -5,7 +5,7 @@ local glfw = require( "ffi/glfw" )
 local font = require( "lib/fonts/pearl8x8" )
 local font = ffi.new( "uint8_t[?]", #font, font )
 
-local rshift, band = bit.rshift, bit.band
+local floor, rshift, band = math.floor, bit.rshift, bit.band
 
 local width, height = 640, 480
 local vbo_capacity = 1024*1024
@@ -39,6 +39,8 @@ local function draw_string(x,y,s)
 	    break
 	 end
 	 x = 0
+      elseif c == 9 then
+	 x = floor(x/64 + 1) * 64
       else
 	 draw_char(x,y,c)
 	 x = x + 8
