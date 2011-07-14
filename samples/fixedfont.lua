@@ -76,27 +76,43 @@ local function main()
    
    gl.glMatrixMode( gl.GL_MODELVIEW );
    gl.glLoadIdentity();
+
+   local glClear = gl.glClear
+   local glfwGetTime = glfw.glfwGetTime
+   local GL_COLOR_BUFFER_BIT = gl.GL_COLOR_BUFFER_BIT
+   local glEnableClientState = gl.glEnableClientState
+   local glVertexPointer = gl.glVertexPointer
+   local glDrawArrays = gl.glDrawArrays
+   local glDisableClientState = gl.glDisableClientState
+   local GL_VERTEX_ARRAY = gl.GL_VERTEX_ARRAY
+   local GL_FLOAT = gl.GL_FLOAT
+   local GL_POINTS = gl.GL_POINTS
+   local glfwSwapBuffers = glfw.glfwSwapBuffers
+   local glfwPollEvents = glfw.glfwPollEvents
+   local glfwIsWindow = glfw.glfwIsWindow
+   local glfwGetKey = glfw.glfwGetKey
+   local GLFW_KEY_ESCAPE = glfw.GLFW_KEY_ESCAPE
+   local GLFW_PRESS = glfw.GLFW_PRESS
    
    local curr_time = glfw.glfwGetTime()
    local prev_time = glfw.glfwGetTime()
-   while glfw.glfwIsWindow(window) 
-   and   glfw.glfwGetKey(window, glfw.GLFW_KEY_ESCAPE) ~= glfw.GLFW_PRESS 
+   while glfwIsWindow(window) and glfwGetKey(window, GLFW_KEY_ESCAPE) ~= GLFW_PRESS 
    do
-      prev_time, curr_time = curr_time, glfw.glfwGetTime()
+      prev_time, curr_time = curr_time, glfwGetTime()
       
-      gl.glClear(gl.GL_COLOR_BUFFER_BIT);
+      glClear( GL_COLOR_BUFFER_BIT )
 
       draw_string( 0, 0, tostring( curr_time - prev_time ) .. " fps, vbo_index = " .. tostring(prev_vbo_index) )
       draw_string( 0, 10, text )
 
-      gl.glEnableClientState(gl.GL_VERTEX_ARRAY);
-      gl.glVertexPointer(2, gl.GL_FLOAT, 0, vbo);
-      gl.glDrawArrays(gl.GL_POINTS, 0, vbo_index);
-      gl.glDisableClientState(gl.GL_VERTEX_ARRAY);
+      glEnableClientState( GL_VERTEX_ARRAY ) 
+      glVertexPointer( 2, GL_FLOAT, 0, vbo )
+      glDrawArrays( GL_POINTS, 0, vbo_index )
+      glDisableClientState( GL_VERTEX_ARRAY )
       prev_vbo_index, vbo_index = vbo_index, 0 
       
-      glfw.glfwSwapBuffers();
-      glfw.glfwPollEvents();
+      glfwSwapBuffers();
+      glfwPollEvents();
    end
    glfw.glfwTerminate();
 end

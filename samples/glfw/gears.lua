@@ -261,9 +261,9 @@ local function main()
       elseif pressed( window, "DOWN" ) then
 	 view_rotx = view_rotx - 5
       elseif pressed( window, "LEFT" ) then
-	 view_roty = view_rotx + 5
+	 view_roty = view_roty + 5
       elseif pressed( window, "RIGHT" ) then
-	 view_roty = view_rotx - 5
+	 view_roty = view_roty - 5
       end
    end
    
