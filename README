@@ -1,19 +1,37 @@
-UFO -- LuaJIT binary distribution and FFI Bindings for various libraries
+----------------------------------------------------------------
+-                                                              -
+-                UFO - Un Finished Object                      -
+-                                                              -
+----------------------------------------------------------------
+UFO is a portable distribution of LuaJIT (http://luajit.org),
+that includes precompiled binaries for various platforms,
+and FFI bindings for several open source (precompiled) libraries
+----------------------------------------------------------------
 
-Bindings for: OpenGL and glu, OpenCL, SDL, ZeroMQ, GLFW and others
+Some of the bindings included are:
+   OpenGL and glu, OpenCL, SDL, ZeroMQ, GLFW and others
       
-Some quick samples:
+To fire up quickly a sample, please do:
+   ./luajit samples/intro.lua  (uses SDL)
 
-     ./luajit samples/glfw/moar.lua
-     ./luajit samples/AntTweakBar/simple.lua
-     ./luajit samples/AntTweakBar/OpenCL-info.lua
-     ./luajit samples/OpenCL/info.lua
+Some more:
+   ./luajit samples/glfw/moar.lua (uses OpenGL, glu, GLFW)
+   ./luajit samples/AntTweakBar/simple.lua (AntTweakBar, others)
+   ./luajit samples/AntTweakBar/OpenCL-info.lua
+   ./luajit samples/OpenCL/info.lua
 
-The first 6 (out of 7) tutorials of sol's imgui using SDL:
-    
-     ./luajit samples/SDL/imgui/ch01.lua
-     ./luajit samples/SDL/imgui/ch02.lua
-     ./luajit samples/SDL/imgui/ch03.lua
-     ./luajit samples/SDL/imgui/ch04.lua
-     ./luajit samples/SDL/imgui/ch05.lua
-     ./luajit samples/SDL/imgui/ch06.lua
+The most excellent sol's imgui implementation notes using SDL:
+   ./luajit samples/SDL/imgui/ch01.lua
+   ./luajit samples/SDL/imgui/ch02.lua
+   ./luajit samples/SDL/imgui/ch03.lua
+   ./luajit samples/SDL/imgui/ch04.lua
+   ./luajit samples/SDL/imgui/ch05.lua
+   ./luajit samples/SDL/imgui/ch06.lua
+
+-------------------------------------------------------
+FOR ALL LEGAL STUFF (LICENSE, COPYRIGHT, COPYLEFT, etc)
+PLEASE REFER TO THE doc/legal FOLDER
+------------------------------------------------------- 
+
+Dimiter "malkia" Stanev
+http://github.com/malkia/ufo
