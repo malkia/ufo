@@ -1,16 +1,20 @@
 local ffi = require( "ffi" )
 local sdl = require( "ffi/SDL" )
 local uint32ptr = ffi.typeof( "uint32_t*" )
-local abs, sqrt, band, bor, bxor = math.abs, math.sqrt, bit.band, bit.bor, bit.bxor
+local cos, sin, abs, sqrt, band, bor, bxor, shl, shr, rol, ror = math.cos, math.sin, math.abs, math.sqrt, bit.band, bit.bor, bit.bxor, bit.lshift, bit.rshift, bit.rol, bit.ror
 
 local function render( screen, tick )
     local pixels_u32 = ffi.cast( uint32ptr, screen.pixels )
     local width, height = screen.w, screen.h
     local halfw, halfh = width/2, height/2
+    local cos, sin = cos(tick/128), sin(tick/128)
     for i = 0, height-1 do
        for j = 0, width-1 do
 	  local y, x = i - halfh, j - halfw
-	  pixels_u32[ j + i*width ] = bxor(band(tick*x*y,tick*y*y,tick*x*x),x*x+y*tick,y*y+x*tick)
+	  local xx, yy, xy = x*x, y*y, x*y
+	  pixels_u32[ j + i*width ] = (
+	     bxor(band(tick*xy,tick*yy,tick*xx),xx+y*tick+xx*cos-yy*sin,yy+x*tick+xx*sin+yy*cos)
+	  )
        end
     end
 end
