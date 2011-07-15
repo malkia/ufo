@@ -64,7 +64,9 @@ ffi.cdef[[
       SDL_BUTTON_WHEELUP          = 4,
       SDL_BUTTON_WHEELDOWN        = 5,
       SDL_DEFAULT_REPEAT_DELAY    = 500,
-      SDL_DEFAULT_REPEAT_INTERVAL = 30
+      SDL_DEFAULT_REPEAT_INTERVAL = 30,
+      SDL_RELEASED                = 0,
+      SDL_PRESSED                 = 1,
    };
 
    typedef enum SDL_WindowFlags {
