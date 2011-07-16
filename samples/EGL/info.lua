@@ -1,5 +1,5 @@
 local ffi = require( "ffi" )
-local egl = require( "ffi/egl" )
+local egl = require( "ffi/EGL" )
 
 local function main()
   local dpy = egl.eglGetDisplay( egl.EGL_DEFAULT_DISPLAY )

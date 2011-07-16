@@ -92,8 +92,8 @@ local function print_shader_info( shader )
    gl.glGetShaderInfoLog( shader, length, nil, buffer )
    print( ffi.string(buffer) )
    local success = ffi.new( "GLint[1]" )
-   gl.glGetShaderiv( shader, gl.GL_COMPILER_STATUS, success )
-   local success = succes[0]
+   gl.glGetShaderiv( shader, gl.GL_COMPILE_STATUS, success )
+   local success = success[0]
    print( 'success', success )
 end
  
