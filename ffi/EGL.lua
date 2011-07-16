@@ -1,6 +1,6 @@
 local ffi  = require( "ffi" )
 local libs = ffi_egl_libs or {
-   OSX     = { x86 = "egl.dylib", x64 = "egl.dylib" },
+   OSX     = { x86 = "bin/OSX/libEGL.dylib", x64 = "bin/OSX/libEGL.dylib" },
    Windows = { x86 = "bin/Windows/x86/libEGL.dll", x64 = "bin/Windows/x64/libEGL.dll" },
    Linux   = { arm = "EGL" }
 }
