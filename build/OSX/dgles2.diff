@@ -1,0 +1,48 @@
+diff --git a/dgles2/src/EGL/hcocoa.h b/dgles2/src/EGL/hcocoa.h
+index b3a5b50..f383961 100644
+--- a/dgles2/src/EGL/hcocoa.h
++++ b/dgles2/src/EGL/hcocoa.h
+@@ -23,9 +23,9 @@
+ 
+ #include "common.h"
+ 
+-#if(CONFIG_OSMESA == 1)
++//#if(CONFIG_OSMESA == 1)
+ #define GL_TEXTURE_RECTANGLE_EXT          0x84F5
+-#endif
++//#endif
+ 
+ #include <ApplicationServices/ApplicationServices.h>
+ #include <OpenGL/OpenGL.h>
+diff --git a/dgles2/src/EGL/hcocoa.m b/dgles2/src/EGL/hcocoa.m
+index 69563f2..c9e1fc4 100644
+--- a/dgles2/src/EGL/hcocoa.m
++++ b/dgles2/src/EGL/hcocoa.m
+@@ -20,6 +20,7 @@
+ 
+ #import <AppKit/NSOpenGL.h>
+ #import <AppKit/NSView.h>
++#import <AppKit/NSWindow.h>
+ #import <Foundation/NSGeometry.h>
+ #import <Foundation/NSNotification.h>
+ #import "hcocoa.h"
+@@ -107,7 +108,12 @@ static void DestroyContext(void *nsctx)
+ static void *CreateView(EGLSurface s, void *nsview, unsigned *width,
+     unsigned *height)
+ {
++#if 0 
+     NSView *v = nsview;
++#else //malkia - SDL does not provide us with NSView, but NSWindow
++    NSWindow *w = nsview;
++    NSView   *v = [w contentView];
++#endif
+     NSRect bounds = [v bounds];
+     if(width)   *width = bounds.size.width;
+     if(height) *height = bounds.size.height;
+@@ -140,4 +146,4 @@ int hcocoaLoad(void)
+     hcocoa.SetView = &SetView;
+     hcocoa.BindTexImageFromView = &BindTexImageFromView;
+     return 1;
+-}
+\ No newline at end of file
++}
