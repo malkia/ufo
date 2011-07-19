@@ -6,15 +6,11 @@ local libs = ffi_zmq_libs or {
    Linux   = { x86 = "bin/Linux/x86/libzmq.so", x64 = "bin/Linux/x64/libzmq.so", arm = "bin/Linux/arm/libzmq.so"  },
 }
 
-local lib = ffi_zmq_lib or libs[ ffi.os ][ ffi.arch ]
-
-local zmq = ffi.load( (... and "" or "../") .. lib )
-
-local SOCKET = (ffi.os == "Windows") and "void*" or "int"
+local zmq = ffi.load( libs[ ffi.os ][ ffi.arch ] )
 
 ffi.cdef([[
    enum {
-      ZMQ_VERSION_MAJOR     = 3,
+      ZMQ_VERSION_MAJOR     = 4,
       ZMQ_VERSION_MINOR     = 0,
       ZMQ_VERSION_PATCH     = 0,
       ZMQ_VERSION           = ZMQ_VERSION_MAJOR * 10000 + ZMQ_VERSION_MINOR * 100 + ZMQ_VERSION_PATCH,
@@ -33,12 +29,10 @@ ffi.cdef([[
       ZMQ_PUSH              = 8,
       ZMQ_XPUB              = 9,
       ZMQ_XSUB              = 10,
-      ZMQ_ROUTER            = 11,
-      ZMQ_DEALER            = 12,
+      ZMQ_GENERIC           = 13,
 
       // Socket options
       ZMQ_AFFINITY          = 4,
-      ZMQ_IDENTITY          = 5,
       ZMQ_SUBSCRIBE         = 6,
       ZMQ_UNSUBSCRIBE       = 7,
       ZMQ_RATE              = 8,
@@ -60,11 +54,13 @@ ffi.cdef([[
       ZMQ_RCVTIMEO          = 27,
       ZMQ_SNDTIMEO          = 28,
       ZMQ_RCVLABEL          = 29,
+      ZMQ_RCVCMD            = 30,
     
       // Send/recv options
       ZMQ_DONTWAIT          = 1,
       ZMQ_SNDMORE           = 2,
       ZMQ_SNDLABEL          = 4,
+      ZMQ_SNDCMD            = 8,
 
       // I/O multiplexing
       ZMQ_POLLIN            = 1,
@@ -74,14 +70,14 @@ ffi.cdef([[
 
    typedef struct zmq_pollitem_t {
       void* socket;
-]] .. SOCKET .. [[ fd;
+]] .. ((ffi.os == "Windows") and "void*" or "int") .. [[ fd;
       short events;
       short revents;
    } zmq_pollitem_t;
 
    typedef unsigned char zmq_msg_t[32];
    
-   typedef void (zmq_free_fn) (void *data, void *hint);
+   typedef void (zmq_free_fn)(        void *data, void *hint );
 
    void          zmq_version(         int* major, int* minor, int* patch );
 
