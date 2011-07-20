@@ -1,10 +1,6 @@
-local ffi  = require( "ffi" )
-local sqrt = math.sqrt
+local ffi = require( "ffi" )
 local new = ffi.typeof( "double[3]" )
-
-local function eq(a, b)
-   return a[0]==b[0] and a[1]==b[1] and a[2]==b[2]
-end
+local sqrt = math.sqrt
 
 local function mag(a)
    return a[0]*a[0] + a[1]*a[1] + a[2]*a[2]
@@ -105,7 +101,7 @@ local function cross(r, a, b)
 end
 local function crossself(a, b)
    a[0], a[1], a[2] = a[1]*b[2] - a[2]*b[1], a[2]*b[0] - a[0]*b[2], a[0]*b[1] - a[1]*b[0]
-   return r
+   return a
 end
 local function crossnew(a, b)
    return cross(new(), a, b)
@@ -143,6 +139,6 @@ return {
    norm  = norm,  normself  = normself,  normnew  = normnew,
    cross = cross, crossself = crossself, crossnew = crossnew,
    dir   = dir,   dirself   = dirself,   dirnew   = dirnew,
-   tostring = tostring_,
+   str   = str, -- Should probably make this tostring, or make double[3] a structure and use metatables
 }
 
