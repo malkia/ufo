@@ -11,18 +11,18 @@ local function render( screen, tick )
     local cos, sin = cos(tick/128), sin(tick/128)
     local ooh = 1/height
     local oow = 1/width
-    local ox, oy = tick/8192, 0
+    local ox, oy = tick/16384, 0
     for i = 0, height-1 do
        for j = 0, width-1 do
-	  local y, x = i - halfh, j - halfw
-	  local xx, yy, xy = x*x, y*y, x*y
+--	  local y, x = i - halfh, j - halfw
+--	  local xx, yy, xy = x*x, y*y, x*y
 --	  pixels_u32[ j + i*pitch ] = (
 --	     bxor(band(tick*xy,tick*yy,tick*xx),xx+y*tick+xx*cos-yy*sin,yy+x*tick+xx*sin+yy*cos)
 --	  )
-	  local r = floor(pn.perlin2(i*oow+ox,j*ooh,1,1.0+tick*0.00001,4)*256)
-	  local g = floor(pn.perlin2(i*oow+ox,j*ooh,1,1.1+tick*0.00002,3)*256)
-	  local b = floor(pn.perlin2(i*oow+ox,j*ooh,1,1.2+tick*0.00003,2)*256)
-	  pixels_u32[ j + i*pitch ] = r+g*256+b*65536
+	  local r = pn.perlin2(i*oow+ox,j*ooh,2,2.0+tick*0.00001,4)*256
+	  local g = pn.perlin2(i*oow+ox,j*ooh,2,2.1+tick*0.00002,3)*256
+	  local b = pn.perlin2(i*oow+ox,j*ooh,2,2.2+tick*0.00003,2)*256
+	  pixels_u32[ j + i*pitch ] = bor(r, shl(g,8), shl(b,16))
        end
     end
 end

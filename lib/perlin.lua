@@ -2,10 +2,6 @@ local ffi = require( "ffi" )
 
 local sqrt, random, floor, band, min, max = math.sqrt, math.random, math.floor, bit.band, math.min, math.max
 
-local function int(a)
-   
-end
-
 local function v2normself(v)
    local oos = 1 / sqrt( v[0]*v[0] + v[1]*v[1] )
    v[0], v[1] = v[0]*oos, v[1]*oos
@@ -19,16 +15,16 @@ end
 local function perlin_init(B)
    local p  = ffi.new( "int[?]",       B + B + 2 )
    local g1 = ffi.new( "double[?]",    B + B + 2 )
-   local g2 = ffi.new( "double[?][2]", B + B + 2 )
+   local g2 = ffi.new( "double[?]", (B + B + 2)*2 )
    local g3 = ffi.new( "double[?][3]", B + B + 2 )
   
    for i = 0, B-1 do
       p[i] = i
       g1[i] = random()*2-1
-      for j = 0, 1 do
-	 g2[i][j] = random()*2-1
-      end
-      v2normself( g2[i] )
+      local x = random()*2-1
+      local y = random()*2-1
+      local n = sqrt(x*x + y*y)
+      g2[i*2],g2[i*2+1] = x/n, y/n
       for j = 0, 2 do
 	 g3[i][j] = random()*2-1
       end
@@ -44,7 +40,8 @@ local function perlin_init(B)
       p[B+i] = p[i]
       g1[B+i] = g1[i]
       for j = 0, 1 do
-	 g2[B+i][j] = g2[i][j]
+	 g2[(B+i)*2+0] = g2[i*2+0]
+	 g2[(B+i)*2+1] = g2[i*2+1]
       end
       for j = 0, 2 do
 	 g3[B+i][j] = g3[i][j]
@@ -54,43 +51,19 @@ local function perlin_init(B)
    return p, g1, g2, g3
 end
 
-local B  = 256
-local BM = B - 1
-local N  = 4096
-local NP = 12
-local NM = N - 1
-local p, g1, g2, g3 = perlin_init(B)
-
-if false then
-   for k=0, B + B - 1 do
-      print(g3[k][0], g3[k][1], g3[k][2])
-   end
-end
-
-local function int(t)
-   return floor(t)
-end
+local p, g1, g2, g3 = perlin_init(256)
 
 local function s_curve(t)
    return t*t*(3 - 2*t)
 end
 
-local function lerp(t, a, b)
-   return a + t * (b - a)
-end
-
-local function setup(arg)
-   local t  = arg + N
+local function setup(t)
    local ft = floor( t ) 
-   local b0 = band(BM, ft)
-   local b1 = band(BM, b0 + 1)
+   local b0 = band(255, ft)
    local r0 = t - ft
+   local b1 = band(255, b0 + 1)
    local r1 = r0 - 1
    return b0, b1, r0, r1
-end
-
-local function at2(q,rx,ry)
-   return rx * q[0] + ry*q[1]
 end
 
 local function at3(q,rx,ry,rz)
@@ -105,19 +78,29 @@ local function noise1( arg )
    return lerp( sx, u, v )
 end
 
+local function lerp(t, a, b)
+   return a + t * (b - a)
+end
+
 local function noise2( arg0, arg1 )
+   local g2 = g2
    local bx0, bx1, rx0, rx1 = setup( arg0 )
    local by0, by1, ry0, ry1 = setup( arg1 )
-   local i, j = p[ bx0 ], p[ bx1 ]
-   local b00, b10 = p[ i + by0 ], p[ j + by0 ]
-   local b01, b11 = p[ i + by1 ], p[ j + by1 ]
-   local sx,  sy  = s_curve( rx0 ), s_curve( ry0 )
-   local u = at2( g2[b00], rx0, ry0 )
-   local v = at2( g2[b10], rx1, ry0 )
-   local a = lerp( sx, u, v )
-   local u = at2( g2[b01], rx0, ry1 )
-   local v = at2( g2[b11], rx1, ry1 )
-   local b = lerp( sx, u, v )
+   local   i,   j = p[    bx0],   p[    bx1]
+   local b00, b10 = p[i + by0]*2, p[j + by0]*2
+   local b01, b11 = p[i + by1]*2, p[j + by1]*2
+   local sx = s_curve( rx0 )
+   local a = lerp( 
+      sx, 
+      rx0*g2[b00] + ry0*g2[b00+1],
+      rx1*g2[b10] + ry0*g2[b10+1]
+   )
+   local b = lerp( 
+      sx, 
+      rx0*g2[b01] + ry1*g2[b01+1],
+      rx1*g2[b11] + ry1*g2[b11+1]
+   )
+   local sy = s_curve( ry0 )
    return lerp( sy, a, b )
 end
 
@@ -163,11 +146,11 @@ local function perlin1( x, alpha, beta, n )
 end
 
 local function perlin2( x, y, alpha, beta, n )
-   local sum, scale = 0, 1
+   local sum, ooscale = 0, 1
+   local ooalpha = 1 / alpha
    for i = 0, n - 1 do
-      sum = sum + noise2( x, y ) / scale
-      scale = scale * alpha
-      x, y = x*beta, y*beta
+      sum = sum + noise2( x, y ) * ooscale
+      x,y,ooscale = x*beta, y*beta, ooscale*ooalpha
    end
    return sum
 end
