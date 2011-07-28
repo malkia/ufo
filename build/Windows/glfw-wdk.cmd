@@ -1,5 +1,5 @@
 @echo off
-setlocal
+SetLocal EnableExtensions EnableDelayedExpansion
 
 set _ROOT=%~dp0..\..
 set _SRC=%_ROOT%\..\glfw\src
@@ -36,8 +36,10 @@ if "%_TARGET%"=="i386" (
 
 del config.h 1>nul 2>nul
 copy /y "%~dpn0-config.h" config.h
-set _FILES=enable.c error.c fullscreen.c gamma.c init.c input.c joystick.c opengl.c time.c window.c win32\win32_dllmain.c win32\win32_enable.c win32\win32_fullscreen.c 
-set _FILES=%_FILES% win32\win32_gamma.c win32\win32_init.c win32\win32_joystick.c win32\win32_opengl.c win32\win32_time.c win32\win32_window.c 
+
+for /F %%i in (%~dp0..\source\glfw.files) do set _FILES=!_FILES! %%i
+for /F %%i in (%~dp0..\source\glfw.Windows.files) do set _FILES=!_FILES! %%i
+
 set _OPTS=-O2 -Os -Oy -GF -GL -arch:SSE2 -MP
 call cl -MD -Feglfw.dll -LD -DGLFW_BUILD_DLL=1 -nologo %_OPTS% -Iwin32 -I. %OBJS% %_FILES% user32.lib opengl32.lib
 del config.h 1>nul 2>nul
