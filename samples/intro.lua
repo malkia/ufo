@@ -10,26 +10,6 @@ local function intro_shader(x,y,tick,cos,sin)
    return bxor(band(tick*xy,tick*yy,tick*xx),xx+y*tick+xx*cos-yy*sin,yy+x*tick+xx*sin+yy*cos)
 end
 
-local function fmod(v, m)
-   if v < 0 then
-      return m - math.fmod(-v,m)
-   end
-   return math.fmod(v, m)
-end
-
--- http://playingwithmathematica.com/2011/06/17/friday-fun-6/#more-413
-local function margarita_shader( x, y, tick, cos, sin )
-   local z = math.sqrt( x*x + y*y ) - 3.5 * math.atan2(y, x) + math.sin(x) + math.cos(y)
-   local half_pi = math.pi * 0.5
-   if fmod(z, math.pi * 7) < half_pi then
-      return 0xFF0000
-   end
-   if fmod(z, math.pi) < half_pi then
-      return 0
-   end
-   return 0xFFFFFF
-end
-
 local function render( screen, tick )
     local pixels_u32 = ffi.cast( uint32ptr, screen.pixels )
     local width, height, pitch = screen.w, screen.h, screen.pitch / 4
@@ -38,8 +18,7 @@ local function render( screen, tick )
     local cos, sin = cos(tick/128), sin(tick/128)
     for i = 0, height-1 do
        for j = 0, width-1 do
---	  pixels_u32[ j + i*pitch ] = intro_shader(j-halfw, i-halfh,tick,cos,sin)
-	  pixels_u32[ j + i*pitch ] = margarita_shader( (j-halfw)*oow*40, (halfh-i)*ooh*40, tick, cos, sin )
+	  pixels_u32[ j + i*pitch ] = intro_shader(j-halfw, i-halfh,tick,cos,sin)
        end
     end
 end
