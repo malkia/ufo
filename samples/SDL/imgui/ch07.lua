@@ -11,8 +11,11 @@ local event, rect, rect2 = ffi.new( "SDL_Event" ), ffi.new( "SDL_Rect" ), ffi.ne
 sdl.SDL_EnableKeyRepeat( sdl.SDL_DEFAULT_REPEAT_DELAY, sdl.SDL_DEFAULT_REPEAT_INTERVAL )
 sdl.SDL_EnableUNICODE(1)
 
+local function make_font( data )
+end
+
 local function load_font( name )
-   local file = sdl.SDL_RWFromFile(name, "rb")
+   local file = sdl.SDL_RWFromFile(name .. ".bmp", "rb")
    local temp = sdl.SDL_LoadBMP_RW(file, 1)
    local font = sdl.SDL_ConvertSurface( temp, screen.format, sdl.SDL_SWSURFACE )
    sdl.SDL_FreeSurface( temp )
@@ -20,7 +23,18 @@ local function load_font( name )
    return font
 end
 
-local font = load_font( "font14x24.bmp" )
+local function require_font( name )
+   local font = require( "samples/SDL/imgui/" .. name )
+   local data = ffi.new( "uint8_t[?]", #font, font )
+   local file = sdl.SDL_RWFromConstMem( data, ffi.sizeof(data) )
+   local temp = sdl.SDL_LoadBMP_RW(file, 1)
+   local font = sdl.SDL_ConvertSurface( temp, screen.format, sdl.SDL_SWSURFACE )
+   sdl.SDL_FreeSurface( temp )
+   sdl.SDL_SetColorKey( font, sdl.SDL_SRCCOLORKEY, 0 )
+   return font
+end
+
+local font = require_font( "font14x24" )
 
 local should_exit = false
 
