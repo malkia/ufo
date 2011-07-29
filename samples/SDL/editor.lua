@@ -33,7 +33,7 @@ local function read_text_file(n)
    return lines
 end
 
-local source = read_text_file( ... or (arg and arg[1]) or "/Users/malkia/p/ufo/ffi/OpenGL.lua" )
+local source = read_text_file( ... or (arg and arg[1]) or "samples/SDL/editor.lua" )
 
 local function require_font( name )
    local font = require( "samples/SDL/imgui/" .. name )
