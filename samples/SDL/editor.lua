@@ -5,7 +5,7 @@ local ffi = require( "ffi" )
 local sdl = require( "ffi/SDL" )
 local shl, shr, bor, band, min, max = bit.lshift, bit.rshift, bit.bor, bit.band, math.min, math.max
 
-local sw, sh = 1024, 768
+local sw, sh = 768, 512
 
 local screen = sdl.SDL_SetVideoMode( sw, sh, 32, 0 )
 local event, rect, rect2 = ffi.new( "SDL_Event" ), ffi.new( "SDL_Rect" ), ffi.new( "SDL_Rect" )
