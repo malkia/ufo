@@ -243,7 +243,7 @@ local bg_color = 0x77
 local function render()
    draw_rect( 0, 0, sw, sh, bg_color )
    draw_text( 10, (some_y -1) % 24 - 24, source, math.floor(-some_y / 24), math.floor(sh / 24) )
-   print(some_y%24, math.floor(-some_y/24))
+--   print(some_y%24, math.floor(-some_y/24))
    some_y = some_y - 1
 
    imgui_prepare() do
