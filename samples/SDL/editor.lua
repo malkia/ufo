@@ -33,7 +33,11 @@ local function read_text_file(n)
    return lines
 end
 
-local source = read_text_file( ... or (arg and arg[1]) or "samples/SDL/editor.lua" )
+local source = debug.getinfo(1,"S").source
+if source:sub(1,1)=="@" then
+   print(source)
+   source = read_text_file( source:sub(2) )
+end
 
 local function require_font( name )
    local font = require( "samples/SDL/imgui/" .. name )
@@ -80,13 +84,17 @@ local function draw_string( s, x, y )
    end
 end
 
+local function clamp(v,minimum,maximum)
+   return max(minimum, min(maximum, v))
+end
 
-local function draw_text( x, y, lines, top, bottom )
+local function draw_text( x, y, lines, top, count )
    if type(lines)=="string" then
       lines = { lines }
    end
-   top = top or 1
-   bottom = bottom or #lines
+   top = clamp(top or 1, 1, #lines)
+   local bottom = top + count
+   bottom = clamp(bottom or #lines, top, #lines)
    for i = top, bottom do
       draw_string( lines[i], x, y )
       y = y + 24
@@ -230,11 +238,12 @@ local function imgui_finish()
    ui_state.key_entered = 0
 end
 
-local some_y = 0
+local some_y = -1
 local bg_color = 0x77
 local function render()
    draw_rect( 0, 0, sw, sh, bg_color )
-   draw_text( 10, some_y, source )
+   draw_text( 10, (some_y -1) % 24 - 24, source, math.floor(-some_y / 24), math.floor(sh / 24) )
+   print(some_y%24, math.floor(-some_y/24))
    some_y = some_y - 1
 
    imgui_prepare() do
