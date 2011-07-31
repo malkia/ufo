@@ -1,13 +1,23 @@
 local ffi = require( "ffi" )
 local sdl = require( "ffi/SDL" )
 local uint32ptr = ffi.typeof( "uint32_t*" )
-local cos, sin, abs, sqrt, band, bor, bxor, shl, shr, rol, ror = math.cos, math.sin, math.abs, math.sqrt, bit.band, bit.bor, bit.bxor, bit.lshift, bit.rshift, bit.rol, bit.ror
-
---jit.off()
+local cos, sin, abs, sqrt, band, bor, bxor, shl, shr, rol, ror, atan2, pi, fmod = math.cos, math.sin, math.abs, math.sqrt, bit.band, bit.bor, bit.bxor, bit.lshift, bit.rshift, bit.rol, bit.ror, math.atan2, math.pi, math.fmod
 
 local function intro_shader(x,y,tick,cos,sin)
    local xx, yy, xy = x*x, y*y, x*y
    return bxor(band(tick*xy,tick*yy,tick*xx),xx+y*tick+xx*cos-yy*sin,yy+x*tick+xx*sin+yy*cos)
+end
+
+-- http://playingwithmathematica.com/2011/06/17/friday-fun-6/#more-413
+local function margarita_shader( x, y )
+   local z = sqrt( x*x + y*y ) - 3.5 * atan2(y, x) + sin(x) + cos(y)
+   if z % (3.1415926535898 * 7) < 1.5707963267949 then
+      return 0xFF0000
+   end
+   if z % 3.1415926535898 < 1.5707963267949 then
+      return 0
+   end
+   return 0xFFFFFF
 end
 
 local function render( screen, tick )
@@ -18,7 +28,8 @@ local function render( screen, tick )
     local cos, sin = cos(tick/128), sin(tick/128)
     for i = 0, height-1 do
        for j = 0, width-1 do
-	  pixels_u32[ j + i*pitch ] = intro_shader(j-halfw, i-halfh,tick,cos,sin)
+--	  pixels_u32[ j + i*pitch ] = intro_shader(j-halfw, i-halfh,tick,cos,sin)
+	  pixels_u32[ j + i*pitch ] = margarita_shader( (j-halfw)*oow*40, (halfh-i)*ooh*40 )
        end
     end
 end

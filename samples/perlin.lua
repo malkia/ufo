@@ -1,24 +1,28 @@
 local ffi = require( "ffi" )
 local sdl = require( "ffi/SDL" )
+local pn = require( "lib/perlin" )
 local uint32ptr = ffi.typeof( "uint32_t*" )
-local cos, sin, abs, sqrt, band, bor, bxor, shl, shr, rol, ror = math.cos, math.sin, math.abs, math.sqrt, bit.band, bit.bor, bit.bxor, bit.lshift, bit.rshift, bit.rol, bit.ror
-
---jit.off()
-
-local function intro_shader(x,y,tick,cos,sin)
-   local xx, yy, xy = x*x, y*y, x*y
-   return bxor(band(tick*xy,tick*yy,tick*xx),xx+y*tick+xx*cos-yy*sin,yy+x*tick+xx*sin+yy*cos)
-end
+local cos, sin, abs, sqrt, band, bor, bxor, shl, shr, rol, ror, random, floor = math.cos, math.sin, math.abs, math.sqrt, bit.band, bit.bor, bit.bxor, bit.lshift, bit.rshift, bit.rol, bit.ror, math.random, math.floor
 
 local function render( screen, tick )
     local pixels_u32 = ffi.cast( uint32ptr, screen.pixels )
     local width, height, pitch = screen.w, screen.h, screen.pitch / 4
     local halfw, halfh = width/2, height/2
-    local oow, ooh = 1/width, 1/height
     local cos, sin = cos(tick/128), sin(tick/128)
+    local ooh = 1/height
+    local oow = 1/width
+    local ox, oy = tick/16384, 0
     for i = 0, height-1 do
        for j = 0, width-1 do
-	  pixels_u32[ j + i*pitch ] = intro_shader(j-halfw, i-halfh,tick,cos,sin)
+--	  local y, x = i - halfh, j - halfw
+--	  local xx, yy, xy = x*x, y*y, x*y
+--	  pixels_u32[ j + i*pitch ] = (
+--	     bxor(band(tick*xy,tick*yy,tick*xx),xx+y*tick+xx*cos-yy*sin,yy+x*tick+xx*sin+yy*cos)
+--	  )
+	  local r = pn.perlin2(i*oow+ox,j*ooh,2,2.0+tick*0.00001,4)*256
+	  local g = pn.perlin2(i*oow+ox,j*ooh,2,2.1+tick*0.00002,3)*256
+	  local b = pn.perlin2(i*oow+ox,j*ooh,2,2.2+tick*0.00003,2)*256
+	  pixels_u32[ j + i*pitch ] = bor(r, shl(g,8), shl(b,16))
        end
     end
 end
