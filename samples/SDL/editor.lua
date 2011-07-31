@@ -1,11 +1,10 @@
--- Reference: http://sol.gfxile.net/imgui/ch06.html
---  Based on: http://sol.gfxile.net/imgui/ch06.cpp
+-- Small Text Editor
 
 local ffi = require( "ffi" )
 local sdl = require( "ffi/SDL" )
 local shl, shr, bor, band, min, max = bit.lshift, bit.rshift, bit.bor, bit.band, math.min, math.max
 
-local sw, sh = 1024, 768
+local sw, sh = 768, 512
 
 local screen = sdl.SDL_SetVideoMode( sw, sh, 32, 0 )
 local event, rect, rect2 = ffi.new( "SDL_Event" ), ffi.new( "SDL_Rect" ), ffi.new( "SDL_Rect" )
@@ -13,22 +12,10 @@ local event, rect, rect2 = ffi.new( "SDL_Event" ), ffi.new( "SDL_Rect" ), ffi.ne
 sdl.SDL_EnableKeyRepeat( sdl.SDL_DEFAULT_REPEAT_DELAY, sdl.SDL_DEFAULT_REPEAT_INTERVAL )
 sdl.SDL_EnableUNICODE(1)
 
-local function make_font( data )
-end
-
-local function load_font( name )
-   local file = sdl.SDL_RWFromFile(name .. ".bmp", "rb")
-   local temp = sdl.SDL_LoadBMP_RW(file, 1)
-   local font = sdl.SDL_ConvertSurface( temp, screen.format, sdl.SDL_SWSURFACE )
-   sdl.SDL_FreeSurface( temp )
-   sdl.SDL_SetColorKey( font, sdl.SDL_SRCCOLORKEY, 0 )
-   return font
-end
-
 local function read_text_file(n)
    local lines = {}
    for line in io.lines(n) do
-      lines[#lines + 1] = line
+      lines[ #lines + 1 ] = line
    end
    return lines
 end
@@ -42,15 +29,16 @@ end
 local function require_font( name )
    local font = require( "samples/SDL/imgui/" .. name )
    local data = ffi.new( "uint8_t[?]", #font, font )
-   local file = sdl.SDL_RWFromConstMem( data, ffi.sizeof(data) )
-   local temp = sdl.SDL_LoadBMP_RW(file, 1)
+   local temp = sdl.SDL_LoadBMP_RW( sdl.SDL_RWFromConstMem(data, ffi.sizeof(data)), 1 )
    local font = sdl.SDL_ConvertSurface( temp, screen.format, sdl.SDL_SWSURFACE )
    sdl.SDL_FreeSurface( temp )
    sdl.SDL_SetColorKey( font, sdl.SDL_SRCCOLORKEY, 0 )
    return font
 end
 
-local font = require_font( "font14x24" )
+local fw, fh = 7, 12
+--local fw, fh = 14, 24
+local font = require_font( "font"..tostring(fw).."x"..tostring(fh) )
 
 local should_exit = false
 
@@ -71,8 +59,8 @@ local function GEN_ID()
 end
 
 local function draw_charcode( charcode, x, y )
-   rect.x,   rect.y,  rect.w,  rect.h = 0, (charcode - 32) * 24, 14, 24
-   rect2.x, rect2.y, rect2.w, rect2.h = x, y, 14, 24
+   rect.x,   rect.y,  rect.w,  rect.h = 0, (charcode - 32) * fh, fw, fh
+   rect2.x, rect2.y, rect2.w, rect2.h = x, y, fw, fh
    -- sdl.SDL_BlitSurface( font, rect, screen, rect2 )
    sdl.SDL_UpperBlit( font, rect, screen, rect2 )
 end
@@ -80,7 +68,7 @@ end
 local function draw_string( s, x, y )
    for i=1, #s do
       draw_charcode( s:byte(i), x, y )
-      x = x + 14
+      x = x + fw
    end
 end
 
@@ -97,7 +85,7 @@ local function draw_text( x, y, lines, top, count )
    bottom = clamp(bottom or #lines, top, #lines)
    for i = top, bottom do
       draw_string( lines[i], x, y )
-      y = y + 24
+      y = y + fh
    end
 end
 
@@ -160,10 +148,10 @@ local function button( id, x, y )
 	    and ui_state.active_item == id )
 end
 
-local function slider( id, x, y, max_value, value )
-   local ypos = (256 - 16) * value / max_value
+local function slider( id, x, y, w, h, max_value, value )
+   local ypos = (h - 16*2) * value / max_value
 
-   if region_hit( x+8, y+8, 16, 255 ) then
+   if region_hit( x+8, y+8, 16, h-16 ) then
       ui_state.hot_item = id
       if ui_state.active_item == 0 and ui_state.mouse_down then
 	 ui_state.active_item = id
@@ -175,10 +163,10 @@ local function slider( id, x, y, max_value, value )
    end
 
    if ui_state.kbd_item == id then
-      draw_rect( x-4, y-4, 40, 280, 0xff0000 )
+      draw_rect( x-4, y-4, 40, sh, 0xff0000 )
    end
 
-   draw_rect( x, y, 32, 256+16, 0x777777 )
+   draw_rect( x, y, 32, h, 0x777777 )
   
    if ui_state.active_item == id or ui_state.hot_item == id then
       draw_rect( x+8, y+8 + ypos, 16, 16, 0xffffff )
@@ -239,71 +227,88 @@ local function imgui_finish()
 end
 
 local some_y = -1
-local bg_color = 0x77
 local function render()
-   draw_rect( 0, 0, sw, sh, bg_color )
-   draw_text( 10, (some_y -1) % 24 - 24, source, math.floor(-some_y / 24), math.floor(sh / 24) )
+   draw_rect( 0, 0, sw, sh, 0 )
+
+   draw_text( 10, (some_y -1) % fh - fh, source, math.floor(-some_y / fh), math.floor(sh / fh)+1 )
 --   print(some_y%24, math.floor(-some_y/24))
    some_y = some_y - 1
 
-   imgui_prepare() do
-      button( GEN_ID(), 50, 50 )
-      
-      button( GEN_ID(), 150, 50 )
-      
-      if button( GEN_ID(), 50, 150 ) then
-	 bg_color = bor( sdl.SDL_GetTicks() * 0xc0cac01a, 0x77 )
-      end
-      
-      if button( GEN_ID(), 150, 150 ) then
-	 should_exit = true
-      end
-
-      local changed, slider_value = slider( GEN_ID(), 500, 40, 255, band( bg_color, 0xFF ) )
+   imgui_prepare() 
+   do
+      local changed, slider_value = slider( GEN_ID(), sw - 32, 0, 32, sh, #source, -some_y / fh)
       if changed then
-	 bg_color = bor( band( bg_color, 0xffff00 ), slider_value )
+	 some_y = clamp(slider_value, 1, #source) * fh
       end
-
-      local changed, slider_value = slider( GEN_ID(), 550, 40, 63, band( shr( bg_color, 10 ), 0x3F ) )
-      if changed then
-	 bg_color = bor( band( bg_color, 0xff00ff ), shl( slider_value, 10 ) )
-      end
-      
-      local changed, slider_value = slider( GEN_ID(), 600, 40, 15, band( shr( bg_color, 20 ), 0xF ) )
-      if changed then
-	 bg_color = bor( band( bg_color, 0x00ffff), shl( slider_value, 20 ) )
-      end
-   end imgui_finish()
+   end
+   imgui_finish()
 
 --   draw_string( "Test1238919283891289319823123", 10, 10 )
    
-   sdl.SDL_UpdateRect( screen, 0, 0, sw, sh )
---   sdl.SDL_Delay( 10 )
+   sdl.SDL_Flip(screen)
+--   sdl.SDL_Delay( 16 )
 end
 
-
-while not should_exit do
-   while sdl.SDL_PollEvent( event ) ~= 0 do
-      local evt, key, mod = event.type, event.key.keysym.sym, event.key.keysym.mod
-      local motion, button = event.motion, event.button.button
-      if evt == sdl.SDL_QUIT then
-	 should_exit = true
-      elseif evt == sdl.SDL_MOUSEMOTION then
-	 ui_state.mouse_x, ui_state.mouse_y = motion.x, motion.y
-      elseif evt == sdl.SDL_MOUSEBUTTONDOWN and button == 1 then
-	 ui_state.mouse_down = true
-      elseif evt == sdl.SDL_MOUSEBUTTONUP and button == 1 then
-	 ui_state.mouse_down = false
-      elseif evt == sdl.SDL_KEYDOWN then
-	 ui_state.key_entered = key
-	 ui_state.key_mod = mod
-      elseif evt == sdl.SDL_KEYUP then
-	 if key == sdl.SDLK_ESCAPE then
-	    should_exit = true
-	 end
-      end
+local function handle( event, handlers )
+   if handlers[event] then
+      return handlers[event]()
    end
-   render()
+end
+
+do
+   evt = ffi.new( "SDL_Event" )
+   evt.type = sdl.SDL_VIDEORESIZE
+   evt.resize.w, evt.resize.h = sw, sh
+   sdl.SDL_PushEvent( evt )
+   while evt.type ~= sdl.SDL_QUIT do
+      while sdl.SDL_PollEvent( event ) ~= 0 do
+	 local evt, key, mod = event.type, event.key.keysym.sym, event.key.keysym.mod
+	 local motion, button = event.motion, event.button.button
+	 
+	 handle(
+	    evt, {
+	       [sdl.SDL_QUIT]=
+	       function()
+		  should_exit = true
+	       end,
+	       
+	       [sdl.SDL_MOUSEMOTION]=
+	       function()
+		  ui_state.mouse_x = motion.x
+		  ui_state.mouse_y = motion.y
+	       end,
+	       
+	       [sdl.SDL_MOUSEBUTTONDOWN]=
+	       function()
+		  if button == 1 then
+		     ui_state.mouse_down = true
+		  end
+	       end,
+	       
+	       [sdl.SDL_MOUSEBUTTONUP]=
+	       function()
+		  if button == 1 then
+		     ui_state.mouse_down = false
+		  end
+	       end,
+	       
+	       [sdl.SDL_KEYDOWN]=
+	       function()
+		  ui_state.key_entered = key
+		  ui_state.key_mod = mod
+	       end,
+	       
+	       [sdl.SDL_KEYUP]=
+	       function()
+		  if key == sdl.SDLK_ESCAPE then
+		     should_exit = true
+		  end
+	       end,
+	    }
+	 )
+      end
+      render()
+   end
 end
 
 sdl.SDL_Quit()
