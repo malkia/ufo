@@ -29,8 +29,10 @@ set LIB=%BASEDIR%\lib\crt\%_TARGET%;%BASEDIR%\lib\win7\%_TARGET%;%LIB%
 set INCLUDE=%CRT_INC_PATH%;%INCLUDE%;
 
 set OBJS=
+set CUTSYMPOS=49
 if "%_TARGET%"=="i386" (
    set OBJS="%_WDK%\lib\win7\%_TARGET%\msvcrt_win2000.obj"
+   set CUTSYMPOS=50
 )
 
 pushd %_SRC%
@@ -42,7 +44,8 @@ echo LIBRARY PIXMAN > pixman%_LUA_ARCH%.def
 echo EXPORTS >> pixman%_LUA_ARCH%.def
 del pixman.lib
 link /LIB /MACHINE:%_LUA_ARCH% pixman\release\*.obj /OUT:pixman%_LUA_ARCH%.lib
-nm pixmanx86.lib | grep " T " | cut -b13- >> pixman%_LUA_ARCH%.def
+rem nm pixmanx86.lib | grep " T " | cut -b13- >> pixman%_LUA_ARCH%.def
+link /DUMP /symbols /exports pixman%_LUA_ARCH%.lib | grep " notype ()    External " | grep " SECT"  | cut -b%CUTSYMPOS%- | sort | uniq >> pixman%_LUA_ARCH%.def
 link /MACHINE:%_LUA_ARCH% /OUT:pixman.dll /DEF:pixman%_LUA_ARCH%.def /DLL %OBJS% pixman%_LUA_ARCH%.lib
 git log -1 >> %PROJECT%.dll
 call :install %PROJECT%.dll %_ROOT%\bin\Windows\%_LUA_ARCH%
