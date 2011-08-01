@@ -10,15 +10,15 @@ local function cairo_test()
    local cr = cr.cairo_create( surface )
    cr.cairo_select_font_face(
       cr, "serif", 
-      cr.CAIRO_FONT_SLANT_NORMAL, 
-      cr.CAIRO_FONT_WEIGHT_BOLD 
+      CAIRO_FONT_SLANT_NORMAL, 
+      CAIRO_FONT_WEIGHT_BOLD 
    )
    cr.cairo_set_font_size( cr, 32.0 )
    cr.cairo_set_source_rgb( cr, 0.0, 0.0, 1.0 )
    cr.cairo_move_to( cr, 10.0, 50.0 )
    cr.cairo_show_text( cr, "Hello, world" )
    cr.cairo_destroy( cr )
-   cr.cairo_surface_write_to_png( surface, "hello.png" )
+--   cr.cairo_surface_write_to_png( surface, "hello.png" )
    cr.cairo_surface_destroy( surface )
 end
 
@@ -63,8 +63,8 @@ local function cairo_image_surface_blur( surface, horzRadius, vertRadius )
    local height = cr.cairo_image_surface_get_height( surface )
    local format = cr.cairo_image_surface_get_format( surface )
    local chanmap = { 
-      cr.CAIRO_FORMAT_ARGB32 = 4, 
-      cr.CAIRO_FORMAT_RGB24  = 3 
+      [cr.CAIRO_FORMAT_ARGB32] = 4, 
+      [cr.CAIRO_FORMAT_RGB24]  = 3 
    }
    local channels = chanmap[ format ]
    assert( channels )
@@ -107,7 +107,7 @@ local function cairo_image_surface_blur( surface, horzRadius, vertRadius )
       end
    end
    for iy = 0, height - 1 do
-      for ix 0, width - 1 do
+      for ix = 0, width - 1 do
 	 local o = iy * stride + ix * channels
 	 if channels == 4 then
 	    src[ o+3 ] = verBlur[ o+3 ]
@@ -128,6 +128,7 @@ local function main()
    assert( window )
    fw.glfwEnable(window, fw.GLFW_STICKY_KEYS);
    fw.glfwSwapInterval(1);
+   print( window )
 
    gl.glClearColor( 0, 0, 0, 0 )
    gl.glDisable( gl.GL_DEPTH_TEST )
@@ -180,3 +181,4 @@ local function main()
 end
 
 
+cairo_test()

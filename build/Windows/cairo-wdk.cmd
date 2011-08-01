@@ -40,7 +40,7 @@ git clean -fdx
 copy /y %~dpn0.features build\Makefile.win32.features
 rem copy /y ..\pixman\pixman%_LUA_ARCH%.lib ..\pixman\pixman\release\pixman-1.lib
 copy /y ..\pixman\pixman.lib ..\pixman\pixman\release\pixman-1.lib
-make -f Makefile.win32 CFG=release AR="link /LIB" LD="link %OBJS%"
+make V=1 -f Makefile.win32 CFG=release AR="link /LIB" LD="link %OBJS%"
 git log -1 >> src/release/%PROJECT%.dll
 call :install src\release\%PROJECT%.dll %_ROOT%\bin\Windows\%_LUA_ARCH%
 popd
