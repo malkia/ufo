@@ -6,20 +6,67 @@ local fw  = require( "ffi/glfw" )
 local min, max, abs, sqrt, log, floor = math.min, math.max, math.abs, math.sqrt, math.log, math.floor
 
 local function cairo_test()
-   local surface = cr.cairo_image_surface_create( cr.CAIRO_FORMAT_ARGB32, 240, 80 )
-   local cr = cr.cairo_create( surface )
-   cr.cairo_select_font_face(
-      cr, "serif", 
-      CAIRO_FONT_SLANT_NORMAL, 
-      CAIRO_FONT_WEIGHT_BOLD 
+   local surface = ffi.gc( 
+      cr.cairo_image_surface_create( 
+	 cr.CAIRO_FORMAT_ARGB32, 
+	 240, 
+	 80 
+      ),
+      cr.cairo_surface_destroy 
    )
-   cr.cairo_set_font_size( cr, 32.0 )
-   cr.cairo_set_source_rgb( cr, 0.0, 0.0, 1.0 )
-   cr.cairo_move_to( cr, 10.0, 50.0 )
-   cr.cairo_show_text( cr, "Hello, world" )
-   cr.cairo_destroy( cr )
+
+   local c = ffi.gc( 
+      cr.cairo_create( surface ), 
+      cr.cairo_destroy 
+   )
+
+   cr.cairo_select_font_face(
+      c, "bizarre", 
+      cr.CAIRO_FONT_SLANT_OBLIQUE, 
+      cr.CAIRO_FONT_WEIGHT_BOLD 
+   )
+
+   local font_face = cr.cairo_font_face_reference( cr.cairo_get_font_face( c ))
+   print( 'font_face', font_face )
+   assert( ffi.string( cr.cairo_toy_font_face_get_family( font_face )) == "bizarre"      )
+   assert( cr.cairo_font_face_get_type(       font_face ) == cr.CAIRO_FONT_TYPE_TOY      )
+   assert( cr.cairo_toy_font_face_get_slant(  font_face ) == cr.CAIRO_FONT_SLANT_OBLIQUE )
+   assert( cr.cairo_toy_font_face_get_weight( font_face ) == cr.CAIRO_FONT_WEIGHT_BOLD   )
+   assert( cr.cairo_font_face_status(         font_face ) == cr.CAIRO_STATUS_SUCCESS     )
+   cr.cairo_font_face_destroy (font_face);
+   
+   print( 'font_face 1', font_face )
+
+   font_face = cr.cairo_toy_font_face_create(
+      "bozarre",
+      cr.CAIRO_FONT_SLANT_OBLIQUE,
+      cr.CAIRO_FONT_WEIGHT_BOLD
+   )
+   assert( ffi.string( cr.cairo_toy_font_face_get_family( font_face )) == "bozarre"      )
+   assert( cr.cairo_font_face_get_type(       font_face ) == cr.CAIRO_FONT_TYPE_TOY      )
+   assert( cr.cairo_toy_font_face_get_slant(  font_face ) == cr.CAIRO_FONT_SLANT_OBLIQUE )
+   assert( cr.cairo_toy_font_face_get_weight( font_face ) == cr.CAIRO_FONT_WEIGHT_BOLD   )
+   assert( cr.cairo_font_face_status(         font_face ) == cr.CAIRO_STATUS_SUCCESS     )
+   cr.cairo_font_face_destroy( font_face )
+
+   print( 'font_face 2', font_face )
+
+   print( surface, c )
+
+   local temp = [[
+
+   cr.cairo_move_to( c, 10, 50 )
+   cr.cairo_show_text( c, "Hello, world" )
+
+   print( surface, c )
+
+
+   cr.cairo_set_font_size(  c, 32 )
+   cr.cairo_set_source_rgb( c,  0,  0, 1 )
+
 --   cr.cairo_surface_write_to_png( surface, "hello.png" )
-   cr.cairo_surface_destroy( surface )
+]]
+
 end
 
 local function kernel_1d_new( radius, deviation )
