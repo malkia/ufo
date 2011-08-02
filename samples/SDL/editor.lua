@@ -2,11 +2,13 @@
 
 local ffi = require( "ffi" )
 local sdl = require( "ffi/SDL" )
-local shl, shr, bor, band, min, max = bit.lshift, bit.rshift, bit.bor, bit.band, math.min, math.max
+
+local shl, shr, bor, band = bit.lshift, bit.rshift, bit.bor, bit.band, math.min, math.max
+local min, max = math.min, math.max
 
 local sw, sh = 768, 512
 
-local screen = sdl.SDL_SetVideoMode( sw, sh, 32, 0 )
+local screen = sdl.SDL_SetVideoMode( sw, sh, 32, sdl.SDL_RESIZABLE )
 local event, rect, rect2 = ffi.new( "SDL_Event" ), ffi.new( "SDL_Rect" ), ffi.new( "SDL_Rect" )
 
 sdl.SDL_EnableKeyRepeat( sdl.SDL_DEFAULT_REPEAT_DELAY, sdl.SDL_DEFAULT_REPEAT_INTERVAL )
@@ -32,7 +34,9 @@ local function require_font( name )
    local temp = sdl.SDL_LoadBMP_RW( sdl.SDL_RWFromConstMem(data, ffi.sizeof(data)), 1 )
    local font = sdl.SDL_ConvertSurface( temp, screen.format, sdl.SDL_SWSURFACE )
    sdl.SDL_FreeSurface( temp )
-   sdl.SDL_SetColorKey( font, sdl.SDL_SRCCOLORKEY, 0 )
+--   sdl.SDL_SetColorKey( font, sdl.SDL_SRCCOLORKEY, 0 )
+--   sdl.SDL_SetSurfaceAlphaMod( font, 255 )
+   sdl.SDL_SetSurfaceBlendMode( font, sdl.SDL_BLENDMODE_ADD )
    return font
 end
 
@@ -69,6 +73,9 @@ local function draw_string( s, x, y )
    for i=1, #s do
       draw_charcode( s:byte(i), x, y )
       x = x + fw
+      if x >= sw then
+	 break
+      end
    end
 end
 
@@ -99,53 +106,6 @@ local function region_hit( x, y, w, h )
 	    ui_state.mouse_y >= y and
 	    ui_state.mouse_x <= x + w and
 	    ui_state.mouse_y <= y + h )
-end
-
-local function button( id, x, y )
-   if region_hit( x, y, 64, 48 ) then
-      ui_state.hot_item = id
-      if ui_state.active_item == 0 and ui_state.mouse_down then
-	 ui_state.active_item = id
-      end
-   end
-
-   if ui_state.kbd_item == 0 then
-      ui_state.kbd_item = id
-   end
-   
-   if ui_state.kbd_item == id then
-      draw_rect( x-6, y-6, 84, 68, 0xff0000 )
-   end
-   
-   draw_rect( x+8, y+8, 64, 48, 0 )
-   
-   if ui_state.hot_item == id then
-      if ui_state.active_item == id then
-	 draw_rect( x+2, y+2, 64, 48, 0xffffff )
-      else
-	 draw_rect(   x,   y, 64, 48, 0xffffff )
-      end
-   else
-      draw_rect( x, y, 64, 48, 0xaaaaaa )
-   end
-   
-   if ui_state.kbd_item == id then
-      if ui_state.key_entered == sdl.SDLK_TAB then
-	 ui_state.kbd_item = 0
-	 if band( ui_state.key_mod, sdl.KMOD_SHIFT ) then
-	    ui_state.kbd_item = ui_state.last_widget
-	 end
-	 ui_state.key_entered = 0
-      elseif ui_state.key_entered == sdl.SDLK_RETURN then
-	 return true
-      end
-   end
-   
-   ui_state.last_widget = id;
-   
-   return ( not ui_state.mouse_down
-	    and ui_state.hot_item == id
-	    and ui_state.active_item == id )
 end
 
 local function slider( id, x, y, w, h, max_value, value )
@@ -227,11 +187,10 @@ local function imgui_finish()
 end
 
 local some_y = -1
-local function render()
-   draw_rect( 0, 0, sw, sh, 0 )
+local function render(screen)
+   draw_rect( 0, 0, sw, sh, 0xFF )
 
    draw_text( 10, (some_y -1) % fh - fh, source, math.floor(-some_y / fh), math.floor(sh / fh)+1 )
---   print(some_y%24, math.floor(-some_y/24))
    some_y = some_y - 1
 
    imgui_prepare() 
@@ -242,11 +201,7 @@ local function render()
       end
    end
    imgui_finish()
-
---   draw_string( "Test1238919283891289319823123", 10, 10 )
-   
    sdl.SDL_Flip(screen)
---   sdl.SDL_Delay( 16 )
 end
 
 local function handle( event, handlers )
@@ -261,12 +216,17 @@ do
    evt.resize.w, evt.resize.h = sw, sh
    sdl.SDL_PushEvent( evt )
    while evt.type ~= sdl.SDL_QUIT do
-      while sdl.SDL_PollEvent( event ) ~= 0 do
-	 local evt, key, mod = event.type, event.key.keysym.sym, event.key.keysym.mod
-	 local motion, button = event.motion, event.button.button
-	 
-	 handle(
-	    evt, {
+      while sdl.SDL_PollEvent( evt ) ~= 0 do
+	 local type, key, mod = evt.type, evt.key.keysym.sym, evt.key.keysym.mod
+	 local motion, button = evt.motion, evt.button.button
+ 	 handle(
+	    type, {
+	       [sdl.SDL_VIDEORESIZE]=
+	       function()
+		  sw, sh = evt.resize.w, evt.resize.h
+		  screen = sdl.SDL_SetVideoMode( evt.resize.w, evt.resize.h, 32, sdl.SDL_RESIZABLE )
+	       end,
+
 	       [sdl.SDL_QUIT]=
 	       function()
 		  should_exit = true
@@ -301,13 +261,14 @@ do
 	       [sdl.SDL_KEYUP]=
 	       function()
 		  if key == sdl.SDLK_ESCAPE then
-		     should_exit = true
+		     evt.type = sdl.SDL_QUIT
+		     sdl.SDL_PushEvent( evt )
 		  end
 	       end,
 	    }
 	 )
       end
-      render()
+      render(screen)
    end
 end
 

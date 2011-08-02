@@ -59,7 +59,7 @@ local function main()
    assert( result == 1 + 2 + 3 + 4 + 5 + 6 )
 end
 
--- Windows 7 64-bit
+-- Windows 7 64-bit for 0x80000000 ITERATIONS
 -- 1 SingleLoop duration (ns) = 17.426
 -- 1 SplitLoop  duration (ns) = 6.8
 -- 2 SingleLoop duration (ns) = 17.462
