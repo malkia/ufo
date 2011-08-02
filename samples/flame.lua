@@ -12,21 +12,6 @@ local ffi = require( "ffi" )
 local sdl = require( "ffi/SDL" )
 local uint32ptr = ffi.typeof( "uint32_t*" )
 
-ffi.cdef[[
-void Sleep(int ms);
-int poll(struct pollfd *fds, unsigned long nfds, int timeout);
-]]
-local sleep
-if ffi.os == "Windows" then
-  function sleep(s)
-    ffi.C.Sleep(s*1000)
-  end
-else
-  function sleep(s)
-    ffi.C.poll(nil, 0, s*1000)
-  end
-end
-
 -- HELPERS
 --
 local bit = require'bit'
@@ -36,7 +21,7 @@ local rand, min, max, abs, floor = math.random, math.min, math.max, math.abs, ma
 local sin, cos, rad = math.sin, math.cos, math.rad
 math.randomseed(os.time())
 
-function color(r,g,b)
+local function color(r,g,b)
   return blshift(r,16)+blshift(g,8)+b
 end
 local white = color(255,255,255)
@@ -84,44 +69,43 @@ local function addfn(fnlist)
   end)
 end
 
+local count2log = {}
+for i=0,1000 do count2log[i]=math.log(i) end
+
+local history = ffi.new( "uint8_t[?]", 512 * 512 * 2 )
+
 function flame(w, h, n)
   local flamefns={}
-  local history={}
+  ffi.fill( history, ffi.sizeof(history) )
   for i=1,10 do addfn(flamefns) end
     local x, y = rand(), rand()
   for i=1,20 do
     local fn = flamefns[math.random(#flamefns)]
     x, y = fn(x, y)
-  end
+ end
+ print('1')
   for i=1,n do
     local fn = flamefns[math.random(#flamefns)]
     x, y = fn(x, y)
-    --xf, yf = flamefns[#flamefns](x, y)
-    if abs(x)<1 and abs(y)<1 then
-      local xf = floor((x+1)/2*(w-1))
-      local yf = floor((y+1)/2*(h-1))
-      history[yf]=history[yf] or {}
-      history[yf][xf]=history[yf][xf] and history[yf][xf]+1 or 1
-    end
-  end
-  return history
+    x, y = x*0.5 + 0.5, y*0.5 + 0.5
+    x, y = min(0,max(x,1)), min(0,max(y,1))
+    x, y = x*w, y*h
+    history[y*w+x]=history[y*w+x] + 1
+ end
+ print('2')
 end
 
 -- RENDER
 --
-function render(w, h, n)
-  local history = flame(w, h, n)
-  local event = ffi.new( "SDL_Event" )
-  event.type = sdl.SDL_VIDEORESIZE
-  event.resize.w, event.resize.h = w, h
-  local screen = sdl.SDL_SetVideoMode(event.resize.w,event.resize.h,32,sdl.SDL_RESIZABLE)
-  sdl.SDL_PushEvent(event)
+function render(screen, w, h, n)
+  flame(w, h, n)
   local p = screen.pitch/4
   local pixels_u32 = ffi.cast( uint32ptr, screen.pixels )
-  for y, row in pairs(history) do
-    for x, count in pairs(row) do
-      local b = math.log(count)*50+20
-      pixels_u32[y+x*p] = min(color(b,b,b), white)
+  for y = 0, h-1 do
+    for x = 0, w-1 do
+       local v = history[ y*w + x ]
+       local b = v + 20 --math.log(v)*50+20
+       pixels_u32[y*p+x] = b --min(color(b,b,b), white)
     end
   end
   sdl.SDL_Flip( screen )
@@ -129,14 +113,22 @@ end
 
 -- DEMO
 --
+local w, h = 512, 512
+local event = ffi.new( "SDL_Event" )
+event.type = sdl.SDL_VIDEORESIZE
+event.resize.w, event.resize.h = w, h
+local screen = sdl.SDL_SetVideoMode(event.resize.w,event.resize.h,32,sdl.SDL_RESIZABLE)
+sdl.SDL_PushEvent(event)
+
 print ""
 print "flame.lua by David Hollander"
 print "Implementation of Scott Drave's flame algorithm in LuaJIT and SDL"
 print "http://en.wikipedia.org/wiki/Fractal_flame"
 print ""
 while true do
-  print(512, 512, 10e6)
+--   print(w, h, 500 )10e6)
   local c = os.clock()
-  render(512, 512, 10e6)
+  render(screen, w, h, 10e6/10)
   print('time', os.clock()-c)
+  sdl.SDL_PumpEvents()
 end

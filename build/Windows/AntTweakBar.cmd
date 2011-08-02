@@ -1,6 +1,7 @@
 @echo off
 call %~dp0/wdk/setup %~n0 %*
 pushd %LB_PROJECT_ROOT%\src
+echo %LB_PROJECT_ROOT%
 
 mkdir release%LB_TARGET_BITS% 1>nul 2>nul
 "%DXSDK_DIR%\Utilities\bin\x86\fxc" /T vs_4_0_level_9_1 /E LineRectVS /Fh         release%LB_TARGET_BITS%\TwDirect3D11_LineRectVS.h         TwDirect3D11.hlsl
