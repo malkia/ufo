@@ -11,6 +11,7 @@ echo link.exe /RELEASE %LB_OBJS% %%* > link.cmd
 call msvcbuild amalg
 
 call %~dp0/wdk/install lua51.dll
+call %~dp0/wdk/install lua51.lib
 call %~dp0/wdk/install luajit.exe
 endlocal
 popd

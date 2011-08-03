@@ -18,11 +18,10 @@ if "%LB_TARGET_ARCH%"=="x86" set AS=ml
 if "%LB_TARGET_ARCH%"=="x64" set OBJA=inffasx64.obj gvmat64.obj inffas8664.obj
 if "%LB_TARGET_ARCH%"=="x64" set AS=ml64
 
-nmake -f win32/Makefile.msc CC="cl -I." OBJA="%OBJA%" AS="%AS%" LOC="-DASMV -DASMINF" AR="link /LIB" LD="link /RELEASE /SWAPRUN:NET /SWAPRUN:CD %LB_OBJS%"
+nmake -f win32/Makefile.msc CC="cl -I." SHAREDLIB="zlib.dll" OBJA="%OBJA%" AS="%AS%" LOC="-DASMV -DASMINF" AR="link /LIB" LD="link /RELEASE /SWAPRUN:NET /SWAPRUN:CD %LB_OBJS%"
 
 set NAME=%LB_PROJECT_NAME%
 
-move /y zlib1.dll %NAME%.dll
 move /y zdll.lib %NAME%.lib
 
 call %~dp0/wdk/install %NAME%.dll

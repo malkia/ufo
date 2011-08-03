@@ -14,4 +14,5 @@ mkdir release%LB_TARGET_BITS% 1>nul 2>nul
 cl -GL -MD -FeAntTweakBar.dll -I%DXSDK_DIR%/Include -LD -nologo -O1 -Os -Oy -GF -GL -arch:SSE2 -MP -DTW_EXPORTS=1 -I../include %LB_OBJS% LoadOGL.cpp LoadOGLCore.cpp TwBar.cpp TwColors.cpp TwEventSFML.cpp TwFonts.cpp TwMgr.cpp TwOpenGL.cpp TwDirect3D9.cpp TwDirect3D10.cpp TwDirect3D11.cpp user32.lib gdi32.lib kernel32.lib /link"/LTCG /RELEASE /SWAPRUN:NET /SWAPRUN:CD"
 
 call %~dp0/wdk/install AntTweakBar.dll
+call %~dp0/wdk/install AntTweakBar.lib
 popd

@@ -9,7 +9,8 @@ set OPTS=%OPTS% -O2 -Os -Oy -GF -GL -MP
 
 cl -MD -Feufo.dll -LD -nologo %_OPTS% %LB_OBJS% ufo.c /link"/LTCG /RELEASE /SWAPRUN:NET /SWAPRUN:CD"
 
-call %~dp0/wdk/install ufo.dll
+call %~dp0/wdk/install %LB_PROJECT_NAME%.dll
+call %~dp0/wdk/install %LB_PROJECT_NAME%.lib
 
 popd
 endlocal
