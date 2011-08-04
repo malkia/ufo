@@ -279,7 +279,6 @@ ffi.cdef [[
 	 cairo_rectangle_t *rectangles;
 	 int                num_rectangles;
       } cairo_rectangle_list_t;
-
       
       typedef struct {
 	 unsigned long        index;
@@ -769,7 +768,35 @@ GType cairo_gobject_pattern_type_get_type(       void );
 GType cairo_gobject_extend_get_type(             void );
 GType cairo_gobject_filter_get_type(             void );
 GType cairo_gobject_region_overlap_get_type(     void );
- 
+
+
+typedef enum _cairo_svg_version {
+    CAIRO_SVG_VERSION_1_1,
+    CAIRO_SVG_VERSION_1_2
+} cairo_svg_version_t;
+
+cairo_surface_t *
+cairo_svg_surface_create (const char   *filename,
+			  double	width_in_points,
+			  double	height_in_points);
+
+cairo_surface_t *
+cairo_svg_surface_create_for_stream (cairo_write_func_t	write_func,
+				     void	       *closure,
+				     double		width_in_points,
+				     double		height_in_points);
+
+void
+cairo_svg_surface_restrict_to_version (cairo_surface_t 		*surface,
+				       cairo_svg_version_t  	 version);
+
+void
+cairo_svg_get_versions (cairo_svg_version_t const	**versions,
+                        int                      	 *num_versions);
+
+const char *
+cairo_svg_version_to_string (cairo_svg_version_t version);
+
 
 ]]
 
