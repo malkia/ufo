@@ -13,7 +13,7 @@ copy /y %LB_ROOT%\bin\Windows\%LB_TARGET_ARCH%\zlib.lib   %LB_PROJECT_ROOT%\..\z
 copy /y %LB_ROOT%\bin\Windows\%LB_TARGET_ARCH%\libpng.lib %LB_PROJECT_ROOT%\..\libpng\libpng.lib
 mkdir %LB_PROJECT_ROOT%\src\GL
 copy /y %~dp0GL\glext.h %LB_PROJECT_ROOT%\src\GL
-make -f Makefile.win32 CFG=release CC="cl /Oy /Os /GL /Zi /GF /Fd%LB_PROJECT_NAME%.pdb /arch:SSE2" AR="link /LIB" LD="link /LTCG /PDB:%LB_PROJECT_NAME%.pdb /RELEASE /SWAPRUN:NET /SWAPRUN:CD %LB_OBJS% opengl32.lib maglev.obj"
+make -f Makefile.win32 CFG=release CC="cl /Oy /Os /GL /Zi /GF /Fd%LB_PROJECT_NAME%.pdb %LB_CL_ARCH_SSE2%" AR="link /LIB" LD="link /LTCG /DEBUG /PDB:%LB_PROJECT_NAME%.pdb /PDBCOMPRESS /OPT:REF /OPT:ICF=1000 /SWAPRUN:NET,CD %LB_OBJS% opengl32.lib maglev.obj"
 
 call %~dp0/wdk/install src\release\%LB_PROJECT_NAME%.dll
 call %~dp0/wdk/install src\release\%LB_PROJECT_NAME%.lib

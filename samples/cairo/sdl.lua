@@ -1,7 +1,6 @@
 local ffi = require( "ffi" )
 local sdl = require( "ffi/SDL" )
 local cr  = require( "ffi/cairo" )
-local gl  = require( "ffi/OpenGL" )
 local random = math.random
 
 local function handle( type, handlers )
@@ -39,6 +38,7 @@ do
 	 local ks, mm, bn = evt.key.keysym, evt.motion, evt.button.button
  	 handle (
 	    evt.type, {
+	       [sdl.SDL_QUIT]            = function() running = false           end,
 	       [sdl.SDL_MOUSEMOTION]     = function() mx, my   = mm.x, mm.y     end,
 	       [sdl.SDL_MOUSEBUTTONDOWN] = function() mb[ bn ] = true           end,
 	       [sdl.SDL_MOUSEBUTTONUP]   = function() mb[ bn ] = false          end,
@@ -49,7 +49,7 @@ do
 		     sw, sh = evt.resize.w, evt.resize.h
 		     screen = sdl.SDL_SetVideoMode(
 			sw, sh, 32,
-			sdl.SDL_RESIZABLE
+			bit.bor(sdl.SDL_DOUBLEBUF, sdl.SDL_RESIZABLE)
 		     )
 		     cr_srf = ffi.gc(
 			cr.cairo_image_surface_create( cr.CAIRO_FORMAT_ARGB32, sw, sh ),
@@ -67,9 +67,7 @@ do
 			),
 			SDL_FreeSurface
 		     )
-		     sdl.SDL_WM_SetCaption(
-			"Cairo testing... " .. tostring(cr_ctx) .. " " .. tostring(cr_srf), nil
-		     )
+		     sdl.SDL_WM_SetCaption( "Cairo Testing", nil )
 		  end,
 	    })
       end

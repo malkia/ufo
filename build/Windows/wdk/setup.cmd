@@ -92,6 +92,12 @@ set INCLUDE=%CRT_INC_PATH%;%SDK_INC_PATH%\crt\stl60;%INCLUDE%;
 
 set LB_OBJS=
 if "%LB_TARGET_ARCH%"=="x86" set LB_OBJS=msvcrt_win2000.obj
+
+if "%LB_CL_ARCH_SSE2%"=="" if "%LB_TARGET_BITS%"=="32" set LB_CL_ARCH_SSE2=/arch:SSE2
+if "%LB_CL_ARCH_SSE2%"=="" if "%LB_TARGET_BITS%"=="64" set LB_CL_ARCH_SSE2=
+
+set PATH=%~dp0..\bin;%PATH%
+
 goto :EOF
 
 :wdk-not-found
