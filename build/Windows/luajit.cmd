@@ -5,8 +5,8 @@ setlocal
 
 git clean -fdx
 
-echo cl.exe /D_MSC_VER=1399 %%* /DLUAJIT_ENABLE_LUA52COMPAT=1 > cl.cmd
-rem LOL! /SWAPRUN:CD /SWAPRUN:NET makes Symantec AntiVir go crazy :)
+echo cl.exe /D_MSC_VER=1399 /DLUAJIT_ENABLE_LUA52COMPAT=1 %%* > cl.cmd
+rem LOL! /SWAPRUN:NET,CD makes Symantec AntiVir go crazy :)
 echo link.exe /RELEASE %LB_OBJS% %%* > link.cmd
 call msvcbuild amalg
 

@@ -1,16 +1,14 @@
 @echo off
 call %~dp0/wdk/setup %~n0 %*
-
-setlocal
 pushd %LB_ROOT%\src
+setlocal
 
-if "%LB_PROJECT_ARCH%"=="x86" set OPTS=-arch:SSE2
-set OPTS=%OPTS% -O2 -Os -Oy -GF -GL -MP
+set NAME=%LB_PROJECT_NAME%
 
-cl -MD -Feufo.dll -LD -nologo %_OPTS% %LB_OBJS% ufo.c /link"/LTCG /RELEASE /SWAPRUN:NET /SWAPRUN:CD"
+cl -Fe%NAME%.dll %NAME%.c -LD %LB_CL_OPTS% /link"%LB_LINK_OPTS%"
 
-call %~dp0/wdk/install %LB_PROJECT_NAME%.dll
-call %~dp0/wdk/install %LB_PROJECT_NAME%.lib
-
-popd
+call %~dp0/wdk/install %NAME%.dll
+call %~dp0/wdk/install %NAME%.lib
+call %~dp0/wdk/install %NAME%.pdb
 endlocal
+popd
