@@ -1,9 +1,71 @@
-local wm = {}
-
 local ffi = require( "ffi" )
 local sdl = require( "ffi/SDL" )
 
-function wm:init(width, height)
+local function handle(type, handlers)
+   local handler = handlers[type]
+   if handler then
+      return true, handler()
+   end
+end
+
+local function notify(object, event_handler, ...)
+   local func = object[ event_handler ]
+   if func then
+      return true, func(object, ...)
+   end
+end
+
+local function update(self)
+   if self.window == nil then
+      self:init()
+   end
+   while sdl.SDL_PollEvent( self.event ) ~= 0 do
+      local ks, mm, bn = self.event.key.keysym, self.event.motion, self.event.button.button
+      local handled, result = handle(
+	 self.event.type, {
+	    [sdl.SDL_QUIT] =
+	       function()
+		  notify(self, "exiting")
+		  sdl.SDL_Quit()
+		  self.window = nil
+		  notify(self, "exited")
+		  self.update = function() return false end
+		  return false
+	       end,
+	    [sdl.SDL_MOUSEMOTION] =
+	       function()
+		  self.mx, self.my = mm.x, mm.y
+		  notify(self, "mouse_moved")
+	       end,
+	    [sdl.SDL_MOUSEBUTTONDOWN] = function() self.mb[ bn ] = true end,
+	    [sdl.SDL_MOUSEBUTTONUP]   = function() self.mb[ bn ] = false end,
+	    [sdl.SDL_KEYDOWN] =
+	       function()
+		  self.kb, self.km = ks.sym, ks.mod
+		  notify(self, "key_pressed")
+	       end,
+	    [sdl.SDL_VIDEORESIZE] =
+	       function()
+		  self.width, self.height = self.event.resize.w, self.event.resize.h
+		  notify(self, "resizing")
+		  self.window = sdl.SDL_SetVideoMode(
+		     self.width, self.height, 32,
+		     bit.bor(sdl.SDL_DOUBLEBUF, sdl.SDL_RESIZABLE)
+		  )
+		  notify(self, "resized")
+--		  return true
+	       end,
+      })
+      if not handled then
+	 -- print(..)
+      end
+   end
+   sdl.SDL_Flip( self.window )
+   return true
+end
+
+local function init(self, width, height)
+   assert(self.window == nil)
    sdl.SDL_Init(0xFFFF)
    self.width = width or self.width or 640
    self.height = height or self.height or 480
@@ -16,79 +78,35 @@ function wm:init(width, height)
    sdl.SDL_PushEvent( self.event )
    self.mx, self.my, self.mb = 0, 0, {}
    self.kb, self.km = 0, 0
+   self.update = self.update or update
 end
 
-function wm:exit()
+local function exit(self)
    self.event.type = sdl.SDL_QUIT
    sdl.SDL_PushEvent(self.event)
 end
 
-local function handle( type, handlers )
-   if handlers[type] then
-      handlers[type]()
-   end
-end
-
-function wm:update()
-   if self.window == nil then
-      self:init()
-   end
-   while sdl.SDL_PollEvent( self.event ) ~= 0 do
-      local ks, mm, bn = self.event.key.keysym, self.event.motion, self.event.button.button
-      handle(
-	 self.event.type, {
-	    [sdl.SDL_QUIT] =
-	       function()
-		  if wm.exiting then
-		     wm:exiting()
-		  end
-		  sdl.SDL_Quit()
-		  if wm.exited then
-		     wm:exited()
-		  end
-		  for k,_ in pairs(self) do
-		     self[k] = nil
-		  end
-		  self.update = function() return false end
-		  return false
-	       end,
-	    [sdl.SDL_MOUSEMOTION]     = function() self.mx, self.my = mm.x, mm.y     end,
-	    [sdl.SDL_MOUSEBUTTONDOWN] = function() self.mb[ bn ] = true              end,
-	    [sdl.SDL_MOUSEBUTTONUP]   = function() self.mb[ bn ] = false             end,
-	    [sdl.SDL_KEYDOWN] =
-	       function()
-		  self.kb, self.km = ks.sym, ks.mod
-		  if self.key_pressed then
-		     self:key_pressed()
-		  end
-	       end,
-	    [sdl.SDL_VIDEORESIZE] =
-	       function()
-		  self.width, self.height = self.event.resize.w, self.event.resize.h
-		  if self.resizing then
-		     self:resizing()
-		  end
-		  self.window = sdl.SDL_SetVideoMode(
-		     self.width, self.height, 32,
-		     bit.bor(sdl.SDL_DOUBLEBUF, sdl.SDL_RESIZABLE)
-		  )
-		  if self.resized then
-		     self:resized()
-		  end
-		  return true
-	       end,
-
-      })
-   end
-   sdl.SDL_Flip( self.window )
-   return true
+local function new()
+   return {
+      new = new,
+      init = init,
+      update = update,
+      exit = exit,
+   }
 end
 
 if ... then 
-   return wm
+   return new()
 end
 
+---- STANDALONE TESTING ----
+
+-- mocking require, making sure argument (module to be loaded) is ignored
+require = function() return new() end
+
+-- Test1
 do
+   local wm = require( "lib/wm/lua....but-it-does-not-matter-we-are-testing-this-here" )
    function wm:resizing()
       print( 'Resizing to', self.width, self.height )
    end
@@ -96,9 +114,11 @@ do
       print( 'Resized to', self.width, self.height )
    end
    function wm:exiting()
+      assert(self.window)
       print( 'Exiting' )
    end
    function wm:exited()
+      assert(self.window == nil)
       print( 'Exited' )
    end
    function wm:key_pressed()
@@ -107,10 +127,19 @@ do
 	 wm:exit()
       end
    end
+   local frame = 0
+   assert(wm.window == nil)
    while wm:update() do
       if wm.kb == 32 then
 	 -- polling exit
 	 wm:exit()
       end
+      if wm.kb == 50 then
+      end
+      if frame > 100 then
+	 wm:exit()
+      end
+      frame = frame + 1
    end
+   assert(wm.window == nil)
 end
