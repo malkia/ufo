@@ -15,50 +15,48 @@ local function notify(object, event_handler, ...)
    end
 end
 
-local function update(self)
+local function update(self, wait_for_events)
    if self.window == nil then
       self:init()
    end
-   while sdl.SDL_PollEvent( self.event ) ~= 0 do
+   while (wait_for_events and sdl.SDL_WaitEvent or sdl.SDL_PollEvent)( self.event ) ~= 0 do
+      wait_for_events = false
       local ks, mm, bn = self.event.key.keysym, self.event.motion, self.event.button.button
-      local handled, result = handle(
+      local handled_any, result = handle(
 	 self.event.type, {
 	    [sdl.SDL_QUIT] =
-	       function()
-		  notify(self, "exiting")
-		  sdl.SDL_Quit()
-		  self.window = nil
-		  notify(self, "exited")
-		  self.update = function() return false end
-		  return false
-	       end,
+	    function()
+	       notify(self, "exiting")
+	       sdl.SDL_Quit()
+	       self.window = nil
+	       notify(self, "exited")
+	       self.update = function() return false end
+	       return false
+	    end,
 	    [sdl.SDL_MOUSEMOTION] =
-	       function()
-		  self.mx, self.my = mm.x, mm.y
-		  notify(self, "mouse_moved")
-	       end,
+	    function()
+	       self.mx, self.my = mm.x, mm.y
+	       notify(self, "mouse_moved")
+	    end,
+	    [sdl.SDL_MOUSEWHEEL]      = function() self.wheel = self.wheel + self.event.wheel.y end,
 	    [sdl.SDL_MOUSEBUTTONDOWN] = function() self.mb[ bn ] = true end,
 	    [sdl.SDL_MOUSEBUTTONUP]   = function() self.mb[ bn ] = false end,
 	    [sdl.SDL_KEYDOWN] =
-	       function()
-		  self.kb, self.km = ks.sym, ks.mod
-		  notify(self, "key_pressed")
-	       end,
+	    function()
+	       self.kb, self.km = ks.sym, ks.mod
+	       notify(self, "key_pressed")
+	    end,
 	    [sdl.SDL_VIDEORESIZE] =
-	       function()
-		  self.width, self.height = self.event.resize.w, self.event.resize.h
-		  notify(self, "resizing")
-		  self.window = sdl.SDL_SetVideoMode(
-		     self.width, self.height, 32,
-		     bit.bor(sdl.SDL_DOUBLEBUF, sdl.SDL_RESIZABLE)
-		  )
-		  notify(self, "resized")
---		  return true
-	       end,
+	    function()
+	       self.width, self.height = self.event.resize.w, self.event.resize.h
+	       notify(self, "resizing")
+	       self.window = sdl.SDL_SetVideoMode(
+		  self.width, self.height, 32,
+		  bit.bor(sdl.SDL_DOUBLEBUF, sdl.SDL_RESIZABLE)
+	       )
+	       notify(self, "resized")
+	    end,
       })
-      if not handled then
-	 -- print(..)
-      end
    end
    sdl.SDL_Flip( self.window )
    return true
@@ -78,6 +76,8 @@ local function init(self, width, height)
    sdl.SDL_PushEvent( self.event )
    self.mx, self.my, self.mb = 0, 0, {}
    self.kb, self.km = 0, 0
+   self.wheel = 0
+   self.idle = true
    self.update = self.update or update
 end
 
@@ -129,14 +129,14 @@ do
    end
    local frame = 0
    assert(wm.window == nil)
-   while wm:update() do
+   while wm:update(true) do
       if wm.kb == 32 then
 	 -- polling exit
 	 wm:exit()
       end
       if wm.kb == 50 then
       end
-      if frame > 100 then
+      if frame > 10 then
 	 wm:exit()
       end
       frame = frame + 1
