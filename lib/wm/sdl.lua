@@ -52,7 +52,7 @@ local function update(self, wait_for_events)
 	       notify(self, "resizing")
 	       self.window = sdl.SDL_SetVideoMode(
 		  self.width, self.height, 32,
-		  bit.bor(sdl.SDL_DOUBLEBUF, sdl.SDL_RESIZABLE)
+		  bit.bor(sdl.SDL_DOUBLEBUF*0, sdl.SDL_RESIZABLE)
 	       )
 	       notify(self, "resized")
 	    end,

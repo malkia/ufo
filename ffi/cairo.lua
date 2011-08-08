@@ -2,8 +2,8 @@ local ffi = require( "ffi" )
 
 local libs = ffi_cairo_libs or {
    Windows = { x86 = "bin/Windows/x86/cairo.dll", x64 = "bin/Windows/x64/cairo.dll" },
-   OSX = { x86 = "bin/OSX/libcairo.dylib", x64 = "bin/OSX/libcairo.dylib" },
-   Linux = { x86 = "cairo", x64 = "cairo", arm = "cairo" },
+   OSX     = { x86 = "bin/OSX/libcairo.dylib", x64 = "bin/OSX/libcairo.dylib" },
+   Linux   = { x86 = "cairo", x64 = "cairo", arm = "cairo" },
 }
 
 local lib = ffi_cairo_lib or libs[ ffi.os ][ ffi.arch ]
@@ -26,11 +26,10 @@ ffi.cdef [[
       typedef struct _cairo_scaled_font  cairo_scaled_font_t;
       typedef struct _cairo_font_face    cairo_font_face_t;
       typedef struct _cairo_font_options cairo_font_options_t;
-      typedef union  _cairo_path_data_t  cairo_path_data_t;
       typedef struct _cairo_region       cairo_region_t;
       
       typedef enum _cairo_status {
-	 CAIRO_STATUS_SUCCESS = 0,
+	 CAIRO_STATUS_SUCCESS,
 	 CAIRO_STATUS_NO_MEMORY,
 	 CAIRO_STATUS_INVALID_RESTORE,
 	 CAIRO_STATUS_INVALID_POP_GROUP,
@@ -309,7 +308,7 @@ ffi.cdef [[
 	 double max_y_advance;
       } cairo_font_extents_t;
 
-      union _cairo_path_data_t {
+      typedef union _cairo_path_data_t {
 	 struct {
 	    cairo_path_data_type_t type;
 	    int length;
@@ -317,114 +316,121 @@ ffi.cdef [[
 	 struct {
 	    double x, y;
 	 } point;
-      };
+      } cairo_path_data_t;
       
       typedef struct cairo_path {
 	 cairo_status_t     status;
 	 cairo_path_data_t* data;
 	 int                num_data;
       } cairo_path_t;
-      
 
       typedef struct _cairo_rectangle_int {
 	 int x, y;
 	 int width, height;
       } cairo_rectangle_int_t;
           
-      typedef void           (* cairo_destroy_func_t)( void *data);
-      typedef cairo_status_t (* cairo_write_func_t)(   void *closure, const unsigned char *data, unsigned int length );
-      typedef cairo_status_t (* cairo_read_func_t) (   void *closure,       unsigned char *data, unsigned int length );
-      typedef cairo_status_t (*cairo_user_scaled_font_init_func_t)( cairo_scaled_font_t*  scaled_font, cairo_t* cr, cairo_font_extents_t* extents );
-      typedef cairo_status_t (*cairo_user_scaled_font_render_glyph_func_t) (cairo_scaled_font_t  *scaled_font,
-									    unsigned long         glyph,
-									    cairo_t              *cr,
-									    cairo_text_extents_t *extents);
+      typedef void           ( *cairo_destroy_func_t )
+                             (  void* data );
+
+      typedef cairo_status_t ( *cairo_write_func_t )
+                             (  void* closure, const unsigned char* data, unsigned int length );
+
+      typedef cairo_status_t (* cairo_read_func_t ) 
+                             (  void* closure, unsigned char* data, unsigned int length );
+
+      typedef cairo_status_t ( *cairo_user_scaled_font_init_func_t )
+                             (  cairo_scaled_font_t* scaled_font, 
+                                cairo_t* cr, cairo_font_extents_t* extents );
+
+      typedef cairo_status_t ( *cairo_user_scaled_font_render_glyph_func_t) 
+                             (  cairo_scaled_font_t* scaled_font, unsigned long glyph,
+			        cairo_t*, cairo_text_extents_t*  );
       
-      typedef cairo_status_t (*cairo_user_scaled_font_text_to_glyphs_func_t) (cairo_scaled_font_t        *scaled_font,
-									      const char	           *utf8,
-									      int		            utf8_len,
-									      cairo_glyph_t	          **glyphs,
-									      int		           *num_glyphs,
-									      cairo_text_cluster_t      **clusters,
-									      int		           *num_clusters,
-									      cairo_text_cluster_flags_t *cluster_flags);
+      typedef cairo_status_t ( *cairo_user_scaled_font_text_to_glyphs_func_t )
+                             (  cairo_scaled_font_t*, const char* utf8, int utf8_len,
+			        cairo_glyph_t**             glyphs,   int* n_glyphs,
+			        cairo_text_cluster_t**      clusters, int* n_clusters,
+			        cairo_text_cluster_flags_t* cluster_flags );
       
-      typedef cairo_status_t (*cairo_user_scaled_font_unicode_to_glyph_func_t) (cairo_scaled_font_t *scaled_font,
-										unsigned long        unicode,
-										unsigned long       *glyph_index);
+      typedef cairo_status_t ( *cairo_user_scaled_font_unicode_to_glyph_func_t )
+                             (  cairo_scaled_font_t* scaled_font, unsigned long unicode,
+                                unsigned long* glyph_index );
 
 int                     cairo_version(                    void );
 const char*             cairo_version_string(             void );
-cairo_t*                cairo_create(                     cairo_surface_t *target );
-cairo_t*                cairo_reference(                  cairo_t *cr  );
-void                    cairo_destroy(                    cairo_t *cr  );
-unsigned int            cairo_get_reference_count(        cairo_t *cr  );
-void *                  cairo_get_user_data(              cairo_t *cr, const cairo_user_data_key_t *key );
-cairo_status_t          cairo_set_user_data(              cairo_t *cr, const cairo_user_data_key_t *key, void *user_data, cairo_destroy_func_t destroy );
-void                    cairo_save(                       cairo_t *cr  );
-void                    cairo_restore(                    cairo_t *cr  );
-void                    cairo_push_group(                 cairo_t *cr  );
-void                    cairo_push_group_with_content(    cairo_t *cr, cairo_content_t content );
-cairo_pattern_t*        cairo_pop_group(                  cairo_t *cr  );
-void                    cairo_pop_group_to_source(        cairo_t *cr  );
-void                    cairo_set_operator(               cairo_t *cr, cairo_operator_t op );
-void                    cairo_set_source(                 cairo_t *cr, cairo_pattern_t* source );
-void                    cairo_set_source_rgb(             cairo_t *cr, double red, double green, double blue );
-void                    cairo_set_source_rgba(            cairo_t *cr, double red, double green, double blue, double alpha );
-void                    cairo_set_source_surface(         cairo_t *cr, cairo_surface_t *surface, double x, double	y );
-void                    cairo_set_tolerance(              cairo_t *cr, double tolerance );
-void                    cairo_set_antialias(              cairo_t *cr, cairo_antialias_t antialias );
-void                    cairo_set_fill_rule(              cairo_t *cr, cairo_fill_rule_t fill_rule );
-void                    cairo_set_line_width(             cairo_t *cr, double width );
-void                    cairo_set_line_cap(               cairo_t *cr, cairo_line_cap_t line_cap );
-void                    cairo_set_line_join(              cairo_t *cr, cairo_line_join_t line_join );
-void                    cairo_set_dash(                   cairo_t *cr, const double *dashes, int num_dashes, double offset );
-void                    cairo_set_miter_limit(            cairo_t *cr, double limit );
-void                    cairo_translate(                  cairo_t *cr, double tx, double ty );
-void                    cairo_scale(                      cairo_t *cr, double sx, double sy );
-void                    cairo_rotate(                     cairo_t *cr, double angle );
-void                    cairo_transform(                  cairo_t *cr, const cairo_matrix_t *matrix );
-void                    cairo_set_matrix(                 cairo_t *cr, const cairo_matrix_t *matrix );
-void                    cairo_identity_matrix(            cairo_t *cr );
-void                    cairo_user_to_device(             cairo_t *cr, double*  x, double*  y );
-void                    cairo_user_to_device_distance(    cairo_t *cr, double* dx, double* dy );
-void                    cairo_device_to_user(             cairo_t *cr, double*  x, double*  y );
-void                    cairo_device_to_user_distance(    cairo_t *cr, double* dx, double* dy );
-void                    cairo_new_path(                   cairo_t *cr );
-void                    cairo_move_to(                    cairo_t *cr, double x, double y );
-void                    cairo_new_sub_path(               cairo_t *cr );
-void                    cairo_line_to(                    cairo_t *cr, double x, double y );
-void                    cairo_curve_to(                   cairo_t *cr, double x1, double y1, double x2, double y2, double x3, double y3 );
-void                    cairo_arc(                        cairo_t *cr, double xc, double yc, double radius, double angle1, double angle2 );
-void                    cairo_arc_negative(               cairo_t *cr, double xc, double yc, double radius, double angle1, double angle2 );
-void                    cairo_arc_to(                     cairo_t *cr, double x1, double y1, double x2, double y2, double radius );
-void                    cairo_rel_move_to(                cairo_t *cr, double dx, double dy );
-void                    cairo_rel_line_to(                cairo_t *cr, double dx, double dy );
-void                    cairo_rel_curve_to(               cairo_t *cr, double dx1, double dy1, double dx2, double dy2, double dx3, double dy3 );
-void                    cairo_rectangle(                  cairo_t *cr, double x, double y, double width, double height );
-void                    cairo_stroke_to_path(             cairo_t *cr );
-void                    cairo_close_path(                 cairo_t *cr );
-void                    cairo_path_extents(               cairo_t *cr, double *x1, double *y1, double *x2, double *y2 );
-void                    cairo_paint(                      cairo_t *cr );
-void                    cairo_paint_with_alpha(           cairo_t *cr, double alpha );
-void                    cairo_mask(                       cairo_t *cr, cairo_pattern_t *pattern );
-void                    cairo_mask_surface(               cairo_t *cr, cairo_surface_t *surface, double surface_x, double surface_y );
-void                    cairo_stroke(                     cairo_t *cr );
-void                    cairo_stroke_preserve(            cairo_t *cr );
-void                    cairo_fill(                       cairo_t *cr );
-void                    cairo_fill_preserve(              cairo_t *cr );
-void                    cairo_copy_page(                  cairo_t *cr );
-void                    cairo_show_page(                  cairo_t *cr );
-cairo_bool_t            cairo_in_stroke(                  cairo_t *cr, double x, double y );
-cairo_bool_t            cairo_in_fill(                    cairo_t *cr, double x, double y );
-cairo_bool_t            cairo_in_clip(                    cairo_t *cr, double x, double y );
-void                    cairo_stroke_extents(             cairo_t *cr, double *x1, double *y1, double *x2, double *y2 );
-void                    cairo_fill_extents(               cairo_t *cr, double *x1, double *y1, double *x2, double *y2 );
-void                    cairo_reset_clip(                 cairo_t *cr );
-void                    cairo_clip(                       cairo_t *cr );
-void                    cairo_clip_preserve(              cairo_t *cr );
-void                    cairo_clip_extents(               cairo_t *cr, double *x1, double *y1, double *x2, double *y2 );
-cairo_rectangle_list_t* cairo_copy_clip_rectangle_list(   cairo_t *cr );
+
+cairo_t*                cairo_create(                     cairo_surface_t* target );
+
+cairo_t*                cairo_reference(                  cairo_t*  );
+void                    cairo_destroy(                    cairo_t*  );
+unsigned int            cairo_get_reference_count(        cairo_t*  );
+void *                  cairo_get_user_data(              cairo_t*, const cairo_user_data_key_t* key );
+cairo_status_t          cairo_set_user_data(              cairo_t*, const cairo_user_data_key_t* key, void* user_data, cairo_destroy_func_t destroy );
+void                    cairo_save(                       cairo_t*  );
+void                    cairo_restore(                    cairo_t*  );
+void                    cairo_push_group(                 cairo_t*  );
+void                    cairo_push_group_with_content(    cairo_t*, cairo_content_t content );
+cairo_pattern_t*        cairo_pop_group(                  cairo_t*  );
+void                    cairo_pop_group_to_source(        cairo_t*  );
+void                    cairo_set_operator(               cairo_t*, cairo_operator_t op );
+void                    cairo_set_source(                 cairo_t*, cairo_pattern_t* source );
+void                    cairo_set_source_rgb(             cairo_t*, double red, double green, double blue );
+void                    cairo_set_source_rgba(            cairo_t*, double red, double green, double blue, double alpha );
+void                    cairo_set_source_surface(         cairo_t*, cairo_surface_t *surface, double x, double	y );
+void                    cairo_set_tolerance(              cairo_t*, double tolerance );
+void                    cairo_set_antialias(              cairo_t*, cairo_antialias_t antialias );
+void                    cairo_set_fill_rule(              cairo_t*, cairo_fill_rule_t fill_rule );
+void                    cairo_set_line_width(             cairo_t*, double width );
+void                    cairo_set_line_cap(               cairo_t*, cairo_line_cap_t line_cap );
+void                    cairo_set_line_join(              cairo_t*, cairo_line_join_t line_join );
+void                    cairo_set_dash(                   cairo_t*, const double *dashes, int num_dashes, double offset );
+void                    cairo_set_miter_limit(            cairo_t*, double limit );
+void                    cairo_translate(                  cairo_t*, double tx, double ty );
+void                    cairo_scale(                      cairo_t*, double sx, double sy );
+void                    cairo_rotate(                     cairo_t*, double angle );
+void                    cairo_transform(                  cairo_t*, const cairo_matrix_t *matrix );
+void                    cairo_set_matrix(                 cairo_t*, const cairo_matrix_t *matrix );
+void                    cairo_identity_matrix(            cairo_t*  );
+void                    cairo_user_to_device(             cairo_t*, double*  x, double*  y );
+void                    cairo_user_to_device_distance(    cairo_t*, double* dx, double* dy );
+void                    cairo_device_to_user(             cairo_t*, double*  x, double*  y );
+void                    cairo_device_to_user_distance(    cairo_t*, double* dx, double* dy );
+void                    cairo_new_path(                   cairo_t*  );
+void                    cairo_move_to(                    cairo_t*, double x, double y );
+void                    cairo_new_sub_path(               cairo_t*  );
+void                    cairo_line_to(                    cairo_t*, double x, double y );
+void                    cairo_curve_to(                   cairo_t*, double x1, double y1, double x2, double y2, double x3, double y3 );
+void                    cairo_arc(                        cairo_t*, double xc, double yc, double radius, double angle1, double angle2 );
+void                    cairo_arc_negative(               cairo_t*, double xc, double yc, double radius, double angle1, double angle2 );
+void                    cairo_arc_to(                     cairo_t*, double x1, double y1, double x2, double y2, double radius );
+void                    cairo_rel_move_to(                cairo_t*, double dx, double dy );
+void                    cairo_rel_line_to(                cairo_t*, double dx, double dy );
+void                    cairo_rel_curve_to(               cairo_t*, double dx1, double dy1, double dx2, double dy2, double dx3, double dy3 );
+void                    cairo_rectangle(                  cairo_t*, double x, double y, double width, double height );
+void                    cairo_stroke_to_path(             cairo_t*  );
+void                    cairo_close_path(                 cairo_t*  );
+void                    cairo_path_extents(               cairo_t*, double *x1, double *y1, double *x2, double *y2 );
+void                    cairo_paint(                      cairo_t*  );
+void                    cairo_paint_with_alpha(           cairo_t*, double alpha );
+void                    cairo_mask(                       cairo_t*, cairo_pattern_t *pattern );
+void                    cairo_mask_surface(               cairo_t*, cairo_surface_t *surface, double surface_x, double surface_y );
+void                    cairo_stroke(                     cairo_t*  );
+void                    cairo_stroke_preserve(            cairo_t*  );
+void                    cairo_fill(                       cairo_t*  );
+void                    cairo_fill_preserve(              cairo_t*  );
+void                    cairo_copy_page(                  cairo_t*  );
+void                    cairo_show_page(                  cairo_t*  );
+cairo_bool_t            cairo_in_stroke(                  cairo_t*, double x, double y );
+cairo_bool_t            cairo_in_fill(                    cairo_t*, double x, double y );
+cairo_bool_t            cairo_in_clip(                    cairo_t*, double x, double y );
+void                    cairo_stroke_extents(             cairo_t*, double *x1, double *y1, double *x2, double *y2 );
+void                    cairo_fill_extents(               cairo_t*, double *x1, double *y1, double *x2, double *y2 );
+void                    cairo_reset_clip(                 cairo_t*  );
+void                    cairo_clip(                       cairo_t*  );
+void                    cairo_clip_preserve(              cairo_t*  );
+void                    cairo_clip_extents(               cairo_t*, double *x1, double *y1, double *x2, double *y2 );
+cairo_rectangle_list_t* cairo_copy_clip_rectangle_list(   cairo_t*  );
+
 void                    cairo_rectangle_list_destroy(     cairo_rectangle_list_t *rectangle_list );
 cairo_glyph_t*          cairo_glyph_allocate(             int num_glyphs );
 void                    cairo_glyph_free(                 cairo_glyph_t *glyphs );
@@ -445,27 +451,27 @@ void                    cairo_font_options_set_hint_style(           cairo_font_
 cairo_hint_style_t      cairo_font_options_get_hint_style(     const cairo_font_options_t *options );
 void                    cairo_font_options_set_hint_metrics(         cairo_font_options_t *options, cairo_hint_metrics_t hint_metrics );
 cairo_hint_metrics_t    cairo_font_options_get_hint_metrics(   const cairo_font_options_t *options );
-void                    cairo_select_font_face(                cairo_t *cr, const char *family, cairo_font_slant_t slant, cairo_font_weight_t  weight);
-void                    cairo_set_font_size(                   cairo_t *cr, double size );
-void                    cairo_set_font_matrix(                 cairo_t *cr, const cairo_matrix_t *matrix );
-void                    cairo_get_font_matrix(                 cairo_t *cr,       cairo_matrix_t *matrix );
-void                    cairo_set_font_options(                cairo_t *cr, const cairo_font_options_t *options );
-void                    cairo_get_font_options(                cairo_t *cr,       cairo_font_options_t *options );
-void                    cairo_set_font_face(                   cairo_t *cr,       cairo_font_face_t *font_face);
-cairo_font_face_t*      cairo_get_font_face(                   cairo_t *cr );      
-void                    cairo_set_scaled_font(                 cairo_t *cr, const cairo_scaled_font_t *scaled_font);
-cairo_scaled_font_t*    cairo_get_scaled_font(                 cairo_t *cr );
-void                    cairo_show_text(                       cairo_t *cr, const char *utf8 );
-void                    cairo_show_glyphs(                     cairo_t *cr, const cairo_glyph_t *glyphs, int num_glyphs );
-void                    cairo_show_text_glyphs(                cairo_t *cr, const char *utf8, int utf8_len, 
+void                    cairo_select_font_face(                cairo_t*, const char *family, cairo_font_slant_t slant, cairo_font_weight_t  weight);
+void                    cairo_set_font_size(                   cairo_t*, double size );
+void                    cairo_set_font_matrix(                 cairo_t*, const cairo_matrix_t *matrix );
+void                    cairo_get_font_matrix(                 cairo_t*,       cairo_matrix_t *matrix );
+void                    cairo_set_font_options(                cairo_t*, const cairo_font_options_t *options );
+void                    cairo_get_font_options(                cairo_t*,       cairo_font_options_t *options );
+void                    cairo_set_font_face(                   cairo_t*,       cairo_font_face_t *font_face);
+cairo_font_face_t*      cairo_get_font_face(                   cairo_t* );      
+void                    cairo_set_scaled_font(                 cairo_t*, const cairo_scaled_font_t *scaled_font);
+cairo_scaled_font_t*    cairo_get_scaled_font(                 cairo_t* );
+void                    cairo_show_text(                       cairo_t*, const char *utf8 );
+void                    cairo_show_glyphs(                     cairo_t*, const cairo_glyph_t *glyphs, int num_glyphs );
+void                    cairo_show_text_glyphs(                cairo_t*, const char *utf8, int utf8_len, 
                                                                             const cairo_glyph_t *glyphs, int num_glyphs, 
                                                                             const cairo_text_cluster_t *clusters, int num_clusters,
                                                                             cairo_text_cluster_flags_t  cluster_flags );
-void                    cairo_text_path(                       cairo_t *cr, const char *utf8 );
-void                    cairo_glyph_path(                      cairo_t *cr, const cairo_glyph_t *glyphs, int num_glyphs );
-void                    cairo_text_extents(                    cairo_t *cr, const char *utf8, cairo_text_extents_t *extents );
-void                    cairo_glyph_extents(                   cairo_t *cr, const cairo_glyph_t *glyphs, int num_glyphs, cairo_text_extents_t *extents );
-void                    cairo_font_extents(                    cairo_t *cr, cairo_font_extents_t *extents );
+void                    cairo_text_path(                       cairo_t*, const char *utf8 );
+void                    cairo_glyph_path(                      cairo_t*, const cairo_glyph_t *glyphs, int num_glyphs );
+void                    cairo_text_extents(                    cairo_t*, const char *utf8, cairo_text_extents_t *extents );
+void                    cairo_glyph_extents(                   cairo_t*, const cairo_glyph_t *glyphs, int num_glyphs, cairo_text_extents_t *extents );
+void                    cairo_font_extents(                    cairo_t*, cairo_font_extents_t *extents );
 
 cairo_font_face_t*      cairo_font_face_reference(             cairo_font_face_t*   font_face );
 void                    cairo_font_face_destroy(               cairo_font_face_t*   font_face );
@@ -656,29 +662,6 @@ cairo_status_t         cairo_region_xor_rectangle(            cairo_region_t* ds
 
 void                   cairo_debug_reset_static_data(         void );
 
-typedef struct FT_Face_ *FT_Face;
-typedef struct FcPattern_ *FcPattern;
-
-cairo_font_face_t* cairo_ft_font_face_create_for_ft_face( FT_Face face, int load_flags );
-FT_Face            cairo_ft_scaled_font_lock_face(        cairo_scaled_font_t* scaled_font );
-void               cairo_ft_scaled_font_unlock_face(      cairo_scaled_font_t* scaled_font );
-cairo_font_face_t* cairo_ft_font_face_create_for_pattern( FcPattern *pattern );
-void               cairo_ft_font_options_substitute(      const cairo_font_options_t* options, FcPattern* pattern );
-
-typedef enum _cairo_pdf_version {
-    CAIRO_PDF_VERSION_1_4,
-    CAIRO_PDF_VERSION_1_5
-} cairo_pdf_version_t;
-
-cairo_surface_t* cairo_pdf_surface_create(              const char* filename, double width_in_points, double height_in_points );
-cairo_surface_t* cairo_pdf_surface_create_for_stream(   cairo_write_func_t write_func, void* closure, double width_in_points, double height_in_points );
-void             cairo_pdf_surface_restrict_to_version( cairo_surface_t* surface, cairo_pdf_version_t version );
-void             cairo_pdf_get_versions(                cairo_pdf_version_t const **versions, int* num_versions );
-const char*      cairo_pdf_version_to_string(           cairo_pdf_version_t version );
-void             cairo_pdf_surface_set_size(            cairo_surface_t* surface, double width_in_points, double height_in_points );
-
-cairo_surface_t* cairo_quartz_image_surface_create(    cairo_surface_t* image_surface );
-cairo_surface_t* cairo_quartz_image_surface_get_image( cairo_surface_t* surface );
 
 typedef struct _cairo_script_interpreter cairo_script_interpreter_t;
 
@@ -710,30 +693,6 @@ cairo_script_interpreter_t* cairo_script_interpreter_reference(        cairo_scr
 cairo_status_t              cairo_script_interpreter_finish(           cairo_script_interpreter_t*  );
 cairo_status_t              cairo_script_interpreter_destroy(          cairo_script_interpreter_t*  );
 cairo_status_t              cairo_script_interpreter_translate_stream( FILE* stream, cairo_write_func_t write_func, void *closure );
-
-typedef enum {
-    CAIRO_SCRIPT_MODE_BINARY,
-    CAIRO_SCRIPT_MODE_ASCII
-} cairo_script_mode_t;
-
-cairo_device_t*     cairo_script_create(                    const char *filename );
-cairo_device_t*     cairo_script_create_for_stream(         cairo_write_func_t write_func, void *closure );
-void                cairo_script_write_comment(             cairo_device_t *script, const char *comment, int len);
-void                cairo_script_set_mode(                  cairo_device_t *script, cairo_script_mode_t mode);
-cairo_script_mode_t cairo_script_get_mode(                  cairo_device_t* script  );
-cairo_surface_t*    cairo_script_surface_create(            cairo_device_t* script, cairo_content_t content, double width, double height);
-cairo_surface_t*    cairo_script_surface_create_for_target( cairo_device_t* script, cairo_surface_t* target);
-cairo_status_t      cairo_script_from_recording_surface(    cairo_device_t* script, cairo_surface_t* recording_surface);
-
-cairo_surface_t*    cairo_tee_surface_create( cairo_surface_t *master );
-void                cairo_tee_surface_add(    cairo_surface_t *surface, cairo_surface_t *target );
-void                cairo_tee_surface_remove( cairo_surface_t *surface, cairo_surface_t *target );
-cairo_surface_t*    cairo_tee_surface_index(  cairo_surface_t *surface, int index );
-
-cairo_device_t*     cairo_xml_create(                const char* filename );
-cairo_device_t*     cairo_xml_create_for_stream(     cairo_write_func_t write_func, void* closure );
-cairo_surface_t*    cairo_xml_surface_create(        cairo_device_t* xml, cairo_content_t content, double width, double height );
-cairo_status_t      cairo_xml_for_recording_surface( cairo_device_t* xml, cairo_surface_t *surface );
 
 typedef void* GType;
 
@@ -770,34 +729,288 @@ GType cairo_gobject_extend_get_type(             void );
 GType cairo_gobject_filter_get_type(             void );
 GType cairo_gobject_region_overlap_get_type(     void );
 
-
 typedef enum _cairo_svg_version {
-    CAIRO_SVG_VERSION_1_1,
-    CAIRO_SVG_VERSION_1_2
+  CAIRO_SVG_VERSION_1_1,
+  CAIRO_SVG_VERSION_1_2
 } cairo_svg_version_t;
 
-cairo_surface_t *
-cairo_svg_surface_create (const char   *filename,
-			  double	width_in_points,
-			  double	height_in_points);
+cairo_surface_t* cairo_svg_surface_create(              const char* filename,
+ 			                                double width_in_points, double height_in_points );
+cairo_surface_t* cairo_svg_surface_create_for_stream(   cairo_write_func_t write_func, void* closure,
+				                        double width_in_points, double height_in_points );
+void             cairo_svg_surface_restrict_to_version( cairo_surface_t*, cairo_svg_version_t version );
+void             cairo_svg_get_versions(                cairo_svg_version_t const**, int* n_versions );
+const char*      cairo_svg_version_to_string(           cairo_svg_version_t version );
 
-cairo_surface_t *
-cairo_svg_surface_create_for_stream (cairo_write_func_t	write_func,
-				     void	       *closure,
-				     double		width_in_points,
-				     double		height_in_points);
+typedef enum _cairo_pdf_version {
+  CAIRO_PDF_VERSION_1_4,
+  CAIRO_PDF_VERSION_1_5
+} cairo_pdf_version_t;
 
-void
-cairo_svg_surface_restrict_to_version (cairo_surface_t 		*surface,
-				       cairo_svg_version_t  	 version);
+cairo_surface_t* cairo_pdf_surface_create(              const char* filename, 
+                                                        double width_in_points, double height_in_points );
+cairo_surface_t* cairo_pdf_surface_create_for_stream(   cairo_write_func_t write_func, void* closure, 
+                                                        double width_in_points, double height_in_points );
+void             cairo_pdf_surface_restrict_to_version( cairo_surface_t*, cairo_pdf_version_t version );
+void             cairo_pdf_get_versions(                cairo_pdf_version_t const**, int* n_versions );
+const char*      cairo_pdf_version_to_string(           cairo_pdf_version_t version );
+void             cairo_pdf_surface_set_size(            cairo_surface_t* surface, 
+                                                        double width_in_points, double height_in_points );
+typedef enum _cairo_ps_level {
+  CAIRO_PS_LEVEL_2,
+  CAIRO_PS_LEVEL_3
+} cairo_ps_level_t;
 
-void
-cairo_svg_get_versions (cairo_svg_version_t const	**versions,
-                        int                      	 *num_versions);
+cairo_surface_t* cairo_ps_surface_create(               const char* filename,
+			                                double width_in_points, double height_in_points );
+cairo_surface_t* cairo_ps_surface_create_for_stream(    cairo_write_func_t write_func, void *closure,
+			                                double width_in_points, double height_in_points );
+void             cairo_ps_surface_restrict_to_level(    cairo_surface_t*, cairo_ps_level_t level );
+void             cairo_ps_get_levels(                   cairo_ps_level_t const** levels, int* n_levels );
+const char*      cairo_ps_level_to_string(              cairo_ps_level_t level );
+void             cairo_ps_surface_set_eps(              cairo_surface_t*, cairo_bool_t eps );
+cairo_bool_t     cairo_ps_surface_get_eps(              cairo_surface_t*  );
+void             cairo_ps_surface_set_size(             cairo_surface_t*,
+			                                double width_in_points, double height_in_points );
+void             cairo_ps_surface_dsc_comment(          cairo_surface_t*, const char* comment );
+void             cairo_ps_surface_dsc_begin_setup(      cairo_surface_t*  );
+void             cairo_ps_surface_dsc_begin_page_setup( cairo_surface_t*  );
 
-const char *
-cairo_svg_version_to_string (cairo_svg_version_t version);
+cairo_surface_t* cairo_tee_surface_create(              cairo_surface_t* master );
+void             cairo_tee_surface_add(                 cairo_surface_t*, cairo_surface_t* target );
+void             cairo_tee_surface_remove(              cairo_surface_t*, cairo_surface_t* target );
+cairo_surface_t* cairo_tee_surface_index(               cairo_surface_t*, int index );
 
+cairo_device_t*  cairo_xml_create(                      const char* filename );
+cairo_device_t*  cairo_xml_create_for_stream(           cairo_write_func_t write_func, void* closure );
+cairo_surface_t* cairo_xml_surface_create(              cairo_device_t* xml, cairo_content_t content,
+                                                        double width, double height );
+cairo_status_t   cairo_xml_for_recording_surface(       cairo_device_t* xml, cairo_surface_t* surface );
+
+typedef enum {
+  CAIRO_SCRIPT_MODE_BINARY,
+  CAIRO_SCRIPT_MODE_ASCII
+} cairo_script_mode_t;
+
+cairo_device_t*  cairo_script_create(                    const char *filename );
+cairo_device_t*  cairo_script_create_for_stream(         cairo_write_func_t write_func, void *closure );
+void             cairo_script_write_comment(             cairo_device_t* scr, const char *comment, int len );
+void             cairo_script_set_mode(                  cairo_device_t* scr, cairo_script_mode_t mode );
+cairo_script_mode_t cairo_script_get_mode(               cairo_device_t* scr  );
+cairo_surface_t* cairo_script_surface_create(            cairo_device_t* scr, cairo_content_t content, 
+                                                         double width, double height);
+cairo_surface_t* cairo_script_surface_create_for_target( cairo_device_t* scr, cairo_surface_t* target );
+cairo_status_t   cairo_script_from_recording_surface(    cairo_device_t* scr, cairo_surface_t* rec_surf );
+
+
+
+
+
+
+
+typedef struct _cairo_vg_context cairo_vg_context_t;
+typedef struct __GLXcontextRec *GLXContext;
+typedef struct _XDisplay Display;
+typedef struct FT_Face_ *FT_Face;
+typedef struct FcPattern_ *FcPattern;
+
+typedef void* Window;
+typedef void* HGLRC;
+typedef void* HDC;
+typedef void* EGLDisplay;
+typedef void* EGLContext;
+typedef void* EGLSurface;
+typedef void* LOGFONTW;
+typedef void* HFONT;
+typedef void* VGImage;
+typedef void* VGImageFormat;
+typedef void* BView;
+typedef void* BBitmap;
+typedef void* IDirectFB;
+typedef void* IDirectFBSurface;
+typedef void* HPS;
+typedef void* HWND;
+typedef void* PRECTL;
+typedef void* QPainter;
+typedef void* QImage;
+typedef void* CGContextRef;
+typedef void* CGFontRef;
+typedef void* ATSUFontID;
+typedef void* xcb_connection_t;
+typedef void* xcb_drawable_t;
+typedef void* xcb_visualtype_t;
+typedef void* xcb_screen_t;
+typedef void* xcb_pixmap_t;
+typedef void* xcb_render_pictforminfo_t;
+typedef void* Drawable;
+typedef void* Visual;
+typedef void* Pixmap;
+typedef void* Screen;
+typedef void* XRenderPictFormat;
+
+cairo_surface_t*    cairo_gl_surface_create(                cairo_device_t*, cairo_content_t, int w, int h );
+cairo_surface_t*    cairo_gl_surface_create_for_texture(    cairo_device_t*, cairo_content_t,
+
+                                                            unsigned int texture, int width, int height );
+void                cairo_gl_surface_set_size(              cairo_surface_t*, int w, int h );
+int                 cairo_gl_surface_get_width(             cairo_surface_t* );
+int                 cairo_gl_surface_get_height(            cairo_surface_t* );
+void                cairo_gl_surface_swapbuffers(           cairo_surface_t* );
+
+
+cairo_device_t*     cairo_glx_device_create(                Display *dpy, GLXContext gl_ctx );
+Display*            cairo_glx_device_get_display(           cairo_device_t* );
+GLXContext          cairo_glx_device_get_context(           cairo_device_t* );
+cairo_surface_t*    cairo_gl_surface_create_for_window(     cairo_device_t*, Window win, int w, int h );
+
+
+cairo_device_t*     cairo_wgl_device_create(                HGLRC rc );
+HGLRC               cairo_wgl_device_get_context(           cairo_device_t* );
+cairo_surface_t*    cairo_gl_surface_create_for_dc(         cairo_device_t*, HDC dc, int w, int h );
+
+
+cairo_device_t*     cairo_egl_device_create(                EGLDisplay dpy,  EGLContext egl );
+cairo_surface_t*    cairo_gl_surface_create_for_egl(        cairo_device_t*, EGLSurface, int w, int h );
+
+
+cairo_surface_t*    cairo_win32_surface_create(             HDC hdc );
+cairo_surface_t*    cairo_win32_printing_surface_create(    HDC hdc );
+cairo_surface_t*    cairo_win32_surface_create_with_ddb(    HDC hdc, cairo_format_t, int w, int h );
+cairo_surface_t*    cairo_win32_surface_create_with_dib(             cairo_format_t, int w, int h );
+HDC                 cairo_win32_surface_get_dc(             cairo_surface_t* );
+cairo_surface_t*    cairo_win32_surface_get_image(          cairo_surface_t* surface );
+
+
+cairo_font_face_t*  cairo_win32_font_face_create_for_logfontw(       LOGFONTW* );
+cairo_font_face_t*  cairo_win32_font_face_create_for_hfont(                     HFONT );
+cairo_font_face_t*  cairo_win32_font_face_create_for_logfontw_hfont( LOGFONTW*, HFONT );
+cairo_status_t      cairo_win32_scaled_font_select_font(             cairo_scaled_font_t*, HDC hdc );
+void                cairo_win32_scaled_font_done_font(               cairo_scaled_font_t*  );
+double              cairo_win32_scaled_font_get_metrics_factor(      cairo_scaled_font_t*  );
+void                cairo_win32_scaled_font_get_logical_to_device(   cairo_scaled_font_t*, cairo_matrix_t* );
+void                cairo_win32_scaled_font_get_device_to_logical(   cairo_scaled_font_t*, cairo_matrix_t* );
+
+
+cairo_vg_context_t* cairo_vg_context_create_for_glx(   Display*, GLXContext );
+cairo_vg_context_t* cairo_vg_context_create_for_egl(   EGLDisplay, EGLContext );
+cairo_status_t      cairo_vg_context_status(           cairo_vg_context_t* );
+void                cairo_vg_context_destroy(          cairo_vg_context_t* );
+cairo_surface_t*    cairo_vg_surface_create(           cairo_vg_context_t*, cairo_content_t, int w, int h );
+cairo_surface_t*    cairo_vg_surface_create_for_image( cairo_vg_context_t*, VGImage, VGImageFormat, int, int );
+VGImage             cairo_vg_surface_get_image(        cairo_surface_t* );
+VGImageFormat       cairo_vg_surface_get_format(       cairo_surface_t* );
+int                 cairo_vg_surface_get_height(       cairo_surface_t* );
+int                 cairo_vg_surface_get_width(        cairo_surface_t* );
+
+
+cairo_font_face_t*  cairo_ft_font_face_create_for_ft_face( FT_Face face, int load_flags );
+FT_Face             cairo_ft_scaled_font_lock_face(        cairo_scaled_font_t* scaled_font );
+void                cairo_ft_scaled_font_unlock_face(      cairo_scaled_font_t* scaled_font );
+cairo_font_face_t*  cairo_ft_font_face_create_for_pattern( FcPattern *pattern );
+void                cairo_ft_font_options_substitute(      const cairo_font_options_t*, FcPattern* pattern );
+
+
+cairo_surface_t*    cairo_beos_surface_create(             BView*  );
+cairo_surface_t*    cairo_beos_surface_create_for_bitmap(  BView*, BBitmap* );
+
+
+cairo_surface_t*    cairo_directfb_surface_create(         IDirectFB *dfb, IDirectFBSurface *surface );
+
+
+cairo_surface_t*    cairo_skia_surface_create(             cairo_format_t, int w, int h );
+cairo_surface_t*    cairo_skia_surface_create_for_data(    unsigned char*,cairo_format_t,int w,int h,int skip);
+unsigned char*      cairo_skia_surface_get_data(           cairo_surface_t* );
+cairo_format_t      cairo_skia_surface_get_format(         cairo_surface_t* );
+int                 cairo_skia_surface_get_width(          cairo_surface_t* );
+int                 cairo_skia_surface_get_height(         cairo_surface_t* );
+int                 cairo_skia_surface_get_stride(         cairo_surface_t* );
+cairo_surface_t*    cairo_skia_surface_get_image(          cairo_surface_t* );
+
+
+void                cairo_os2_init(                        );
+void                cairo_os2_fini(                        );
+cairo_surface_t*    cairo_os2_surface_create(              HPS hps_client_window, int w, int h );
+cairo_surface_t*    cairo_os2_surface_create_for_window(   HWND hwnd_client_window,int w, int h );
+void                cairo_os2_surface_set_hwnd(            cairo_surface_t*, HWND hwnd_client_window );
+int                 cairo_os2_surface_set_size(            cairo_surface_t*, int w, int h, int timeout );
+void                cairo_os2_surface_refresh_window(      cairo_surface_t*, HPS paint, PRECTL paint_rect );
+void                cairo_os2_surface_set_manual_window_refresh( cairo_surface_t*, cairo_bool_t manual );
+cairo_bool_t        cairo_os2_surface_get_manual_window_refresh( cairo_surface_t*  );
+cairo_status_t      cairo_os2_surface_get_hps(             cairo_surface_t*, HPS* hps );
+cairo_status_t      cairo_os2_surface_set_hps(             cairo_surface_t*, HPS hps );
+ 
+
+cairo_surface_t*    cairo_qt_surface_create(               QPainter* );
+cairo_surface_t*    cairo_qt_surface_create_with_qimage(   cairo_format_t,   int w, int h );
+cairo_surface_t*    cairo_qt_surface_create_with_qpixmap(  cairo_content_t,  int w, int h );
+QPainter*           cairo_qt_surface_get_qpainter(         cairo_surface_t*  );
+cairo_surface_t*    cairo_surface_map_image(               cairo_surface_t*  );
+void                cairo_surface_unmap_image(             cairo_surface_t*, cairo_surface_t* );
+cairo_surface_t*    cairo_qt_surface_get_image(            cairo_surface_t*  );
+QImage*             cairo_qt_surface_get_qimage(           cairo_surface_t*  );
+
+
+cairo_surface_t*    cairo_quartz_surface_create(                    cairo_format_t format, int w, int h );
+cairo_surface_t*    cairo_quartz_surface_create_for_cg_context(     CGContextRef cgContext, int w, int h );
+CGContextRef        cairo_quartz_surface_get_cg_context(            cairo_surface_t* );
+cairo_font_face_t*  cairo_quartz_font_face_create_for_cgfont(       CGFontRef  font );
+cairo_font_face_t*  cairo_quartz_font_face_create_for_atsu_font_id( ATSUFontID font_id );
+cairo_surface_t*    cairo_quartz_image_surface_create(              cairo_surface_t* image_surface );
+cairo_surface_t*    cairo_quartz_image_surface_get_image(           cairo_surface_t* surface );
+
+
+cairo_device_t*     cairo_drm_device_get(                           struct udev_device* device );
+cairo_device_t*     cairo_drm_device_get_for_fd(                    int fd );
+cairo_device_t*     cairo_drm_device_default(                       );
+int                 cairo_drm_device_get_fd(                        cairo_device_t* );
+void                cairo_drm_device_throttle(                      cairo_device_t* );
+cairo_surface_t*    cairo_drm_surface_create(                       cairo_device_t*, cairo_format_t,
+                                                                    int w, int h ); 
+cairo_surface_t*    cairo_drm_surface_create_for_name(              cairo_device_t*, unsigned int name,
+	                                                            cairo_format_t, int w, int h, int stride );
+cairo_surface_t*    cairo_drm_surface_create_from_cacheable_image(  cairo_device_t*,  cairo_surface_t* );
+cairo_status_t      cairo_drm_surface_enable_scan_out(              cairo_surface_t*  );
+unsigned int        cairo_drm_surface_get_handle(                   cairo_surface_t*  );
+unsigned int        cairo_drm_surface_get_name(                     cairo_surface_t*  );
+cairo_format_t      cairo_drm_surface_get_format(                   cairo_surface_t*  );
+int                 cairo_drm_surface_get_width(                    cairo_surface_t*  );
+int                 cairo_drm_surface_get_height(                   cairo_surface_t*  );
+int                 cairo_drm_surface_get_stride(                   cairo_surface_t*  );
+cairo_surface_t*    cairo_drm_surface_map_to_image(                 cairo_surface_t*  );
+void                cairo_drm_surface_unmap(                        cairo_surface_t*, cairo_surface_t* );
+
+
+cairo_surface_t*    cairo_xcb_surface_create(                       xcb_connection_t*, xcb_drawable_t, 
+                                                                    xcb_visualtype_t*, int w, int h );
+cairo_surface_t*    cairo_xcb_surface_create_for_bitmap(            xcb_connection_t*, xcb_screen_t*,
+	 			                                    xcb_pixmap_t,      int w, int h );
+cairo_surface_t*    cairo_xcb_surface_create_with_xrender_format(   xcb_connection_t*, xcb_screen_t*,
+		  	    		                            xcb_drawable_t, xcb_render_pictforminfo_t*,
+                                                                    int width, int height );
+void                cairo_xcb_surface_set_size(                     cairo_surface_t*, int w, int h );
+xcb_connection_t*   cairo_xcb_device_get_connection(                cairo_device_t* );
+void                cairo_xcb_device_debug_cap_xshm_version(        cairo_device_t*, int major, int minor );
+void                cairo_xcb_device_debug_cap_xrender_version(     cairo_device_t*, int major, int minor );
+void                cairo_xcb_device_debug_set_precision(           cairo_device_t*, int precision );
+int                 cairo_xcb_device_debug_get_precision(           cairo_device_t* );
+
+
+cairo_surface_t*    cairo_xlib_surface_create(                      Display*, Drawable, Visual, int w, int h );
+cairo_surface_t*    cairo_xlib_surface_create_for_bitmap(           Display*, Pixmap, Screen*,  int w, int h );
+void                cairo_xlib_surface_set_size(                    cairo_surface_t*, int w, int h );
+void                cairo_xlib_surface_set_drawable(                cairo_surface_t*, Drawable, int w, int h );
+Display*            cairo_xlib_surface_get_display(                 cairo_surface_t*  );
+Drawable            cairo_xlib_surface_get_drawable(                cairo_surface_t*  );
+Screen*             cairo_xlib_surface_get_screen(                  cairo_surface_t*  );
+Visual*             cairo_xlib_surface_get_visual(                  cairo_surface_t*  );
+int                 cairo_xlib_surface_get_depth(                   cairo_surface_t*  );
+int                 cairo_xlib_surface_get_width(                   cairo_surface_t*  );
+int                 cairo_xlib_surface_get_height(                  cairo_surface_t*  );
+cairo_surface_t*    cairo_xlib_surface_create_with_xrender_format(  Display*, Drawable, Screen *,
+                                                                    XRenderPictFormat*, int w, int h );
+XRenderPictFormat*  cairo_xlib_surface_get_xrender_format(          cairo_surface_t* );
+void                cairo_xlib_device_debug_set_precision(          cairo_device_t*,  int precision);
+int                 cairo_xlib_device_debug_get_precision(          cairo_device_t*   );
 
 ]]
 

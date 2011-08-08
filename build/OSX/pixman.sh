@@ -1,3 +1,4 @@
+set -e
 PROJECT=pixman
 SOURCE=../../../$PROJECT
 OBJDIR=$PROJECT/.libs
@@ -5,10 +6,9 @@ DYLIB=lib$PROJECT-1.0.dylib
 TARGET=../../bin/OSX/lib$PROJECT.dylib
 
 pushd $SOURCE
-make clean
-./configure CFLAGS="-Os -arch i386 -arch x86_64 -mmacosx-version-min=10.4" --disable-dependency-tracking --disable-static --disable-gtk
+git clean -fdx
+./autogen.sh CPP="cpp" CC="cc -arch i386 -arch x86_64 -mmacosx-version-min=10.4" --disable-dependency-tracking --disable-gtk --disable-timers --disable-static-testprogs
 make -j
-git log -1 >> $OBJDIR/$DYLIB
 popd
 mv $SOURCE/$OBJDIR/$DYLIB $TARGET
 
@@ -17,3 +17,5 @@ file $TARGET
 otool -L $TARGET
 size $TARGET
 ls -l $TARGET
+
+git --git-dir=$SOURCE/.git log -1 >> $TARGET

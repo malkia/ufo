@@ -13,7 +13,7 @@ local function v3normself(v)
 end
 
 local function perlin_init(B)
-   local p  = ffi.new( "int[?]",       B + B + 2 )
+   local p  = ffi.new( "uint8_t[?]",       B + B + 2 )
    local g1 = ffi.new( "double[?]",    B + B + 2 )
    local g2 = ffi.new( "double[?]", (B + B + 2)*2 )
    local g3 = ffi.new( "double[?][3]", B + B + 2 )
@@ -66,6 +66,12 @@ local function setup(t)
    return b0, b1, r0, r1
 end
 
+local function setup2(t)
+   local ft = floor( t ) 
+   local b0 = band(255, ft)
+   return b0, band(255, b0 + 1), t - ft
+end
+
 local function at3(q,rx,ry,rz)
    return rx*q[0] + ry*q[1] + rz*q[2]
 end
@@ -84,24 +90,23 @@ end
 
 local function noise2( arg0, arg1 )
    local g2 = g2
-   local bx0, bx1, rx0, rx1 = setup( arg0 )
-   local by0, by1, ry0, ry1 = setup( arg1 )
+   local bx0, bx1, rx = setup2( arg0 )
+   local by0, by1, ry = setup2( arg1 )
    local   i,   j = p[    bx0],   p[    bx1]
    local b00, b10 = p[i + by0]*2, p[j + by0]*2
    local b01, b11 = p[i + by1]*2, p[j + by1]*2
-   local sx = s_curve( rx0 )
+   local sx = rx*rx*(3-2*rx)
    local a = lerp( 
       sx, 
-      rx0*g2[b00] + ry0*g2[b00+1],
-      rx1*g2[b10] + ry0*g2[b10+1]
+       rx   *g2[b00] + ry*g2[b00+1],
+      (rx-1)*g2[b10] + ry*g2[b10+1]
    )
    local b = lerp( 
       sx, 
-      rx0*g2[b01] + ry1*g2[b01+1],
-      rx1*g2[b11] + ry1*g2[b11+1]
+       rx   *g2[b01] + (ry-1)*g2[b01+1],
+      (rx-1)*g2[b11] + (ry-1)*g2[b11+1]
    )
-   local sy = s_curve( ry0 )
-   return lerp( sy, a, b )
+   return lerp( ry*ry*(3-2*ry), a, b )
 end
 
 local function noise3( arg0, arg1, arg2 )
@@ -147,7 +152,7 @@ end
 
 local function perlin2( x, y, alpha, beta, n )
    local sum, ooscale = 0, 1
-   local ooalpha = 1 / alpha
+   local ooalpha = 0.5 -- 1 / alpha
    for i = 0, n - 1 do
       sum = sum + noise2( x, y ) * ooscale
       x,y,ooscale = x*beta, y*beta, ooscale*ooalpha
