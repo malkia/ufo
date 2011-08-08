@@ -26,5 +26,16 @@ call %~dp0/wdk/install lua51.lib
 call %~dp0/wdk/install lua51.pdb
 call %~dp0/wdk/install luajit.exe
 call %~dp0/wdk/install luajit.pdb
+
+rem static version of the lua51.lib library,
+rem renamed to luajit.lib
+rem as lua51.lib already is the dll import library for lua51.dll
+rem
+del link.cmd
+call msvcbuild static
+echo @echo off > cl.cmd
+echo cl.exe %LB_CL_OPTS% /D_MSC_VER=1399 /DLUAJIT_ENABLE_LUA52COMPAT=1 %%* >> cl.cmd
+call %~dp0/wdk/install lua51.lib lua51_static.lib
+
 endlocal
 popd
