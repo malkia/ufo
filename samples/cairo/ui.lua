@@ -114,9 +114,20 @@ function gfx:list_box(x, y, w, h, items)
    local ctx = gfx.ctx
    local eh = 24 -- element height
    local ev = floor( h / eh ) -- elements visible
+   local h = ev * eh
    local top = items.top or 1
    local bottom = items.bottom or #items
    local current = items.current or 1
+
+   if top < current - ev + 1 then
+      top = current - ev + 1
+   end
+
+   bottom = math.min(#items, top + ev - 1)
+
+   items.top, items.bottom = top, bottom
+
+   cr.cairo_set_line_width( ctx, 0.25 )
 
    -- Make the rectangle path
    cr.cairo_new_path( ctx )
@@ -124,33 +135,33 @@ function gfx:list_box(x, y, w, h, items)
    cr.cairo_close_path( ctx )
 
    -- Fill it first, but preserve the path
-   cr.cairo_set_source_rgb( ctx, 0.125, 0.25, 1 ) -- listbox background color
+   cr.cairo_set_source_rgb( ctx, 1, 1, 1 ) -- listbox background color
    cr.cairo_fill_preserve( ctx )
 
    -- Next stroke it, and preserve the path
-   cr.cairo_set_source_rgb( ctx, 1, 1, 0 ) -- listbox "wire" color
+   cr.cairo_set_source_rgb( ctx, 0, 0, 0 ) -- listbox "wire" color
    cr.cairo_stroke_preserve( ctx )
 
    -- Now set the clip, do not keep the path
    cr.cairo_clip( ctx )
-   for i=1, ev do
-	 local y = y + (i - top) * eh
-	 local current = (i == current)
-	 if current then
-	    cr.cairo_new_path(       ctx )
-	    cr.cairo_move_to(        ctx,  x,  y )
-	    cr.cairo_rel_line_to(    ctx,  w,  0 )
-	    cr.cairo_rel_line_to(    ctx,  0, eh )
-	    cr.cairo_rel_line_to(    ctx, -w,  0 )
-	    cr.cairo_close_path(     ctx )
-	    cr.cairo_set_source_rgb( ctx, 0.75, 0, 0.5 )
-	    cr.cairo_fill_preserve(  ctx )
-	    cr.cairo_set_source_rgb( ctx, 0.75, 1, 0.5 )
-	    cr.cairo_stroke(         ctx )
-	 end
-	 cr.cairo_move_to(        ctx, x + 8, y + eh * 0.8 )
-	 cr.cairo_set_source_rgb( ctx, current and 1 or 0, 1, selected and 1 or 0 )
-	 cr.cairo_show_text(      ctx, items[i] )
+   for i=top, bottom do
+      local y = y + (i - top) * eh
+      local current = (i == current)
+      if current then
+	 cr.cairo_new_path(       ctx )
+	 cr.cairo_move_to(        ctx,  x,  y )
+	 cr.cairo_rel_line_to(    ctx,  w,  0 )
+	 cr.cairo_rel_line_to(    ctx,  0, eh )
+	 cr.cairo_rel_line_to(    ctx, -w,  0 )
+	 cr.cairo_close_path(     ctx )
+	 cr.cairo_set_source_rgb( ctx, 0, 0, 1 )
+	 cr.cairo_fill_preserve(  ctx )
+	 cr.cairo_set_source_rgb( ctx, 1, 1, 1 )
+	 cr.cairo_stroke(         ctx )
+      end
+      cr.cairo_move_to(        ctx, x + 8, y + eh * 0.8 )
+      cr.cairo_set_source_rgb( ctx, current and 1 or 0, current and 1 or 0, current and 1 or 0 )
+      cr.cairo_show_text(      ctx, items[i] )
    end
    cr.cairo_reset_clip( ctx )
 end
@@ -185,8 +196,8 @@ local function make_colors(n)
       local oolen = 1 / math.sqrt(mag)
       r, g, b = r*oolen, g*oolen, b*oolen
       v = { random(), random(), random() }
-      v[random(1,#v)] = 0.25
-      v[random(1,#v)] = 0.75
+      v[random(1,#v)] = 1 --0.50
+      v[random(1,#v)] = 1 --0.75
       colors[#colors+1] = { r*v[1], g*v[1], b*v[2], 1 }
    end
    return colors
@@ -195,7 +206,6 @@ end
 do
    local format, surf, ctx, sdl_surf = cr.CAIRO_FORMAT_ARGB32
 
-   wm:init(1024,768)
    function wm:resized()
       surf = ffi.gc(
 	 cr.cairo_image_surface_create( format, self.width, self.height ),
@@ -232,9 +242,9 @@ do
 
    while wm:update(false) do
       cr.cairo_save(               ctx )
-      cr.cairo_set_operator(       ctx, cr.CAIRO_OPERATOR_CLEAR )
+      cr.cairo_set_operator(       ctx, cr.CAIRO_OPERATOR_SOURCE )
+      cr.cairo_set_source_rgba(    ctx, 1, 0.75, 0.15, 1 )
       cr.cairo_paint(              ctx )
-      cr.cairo_set_source_rgba(    ctx, 1, 1, 1, 1 )
       cr.cairo_restore(            ctx )
 
       cr.cairo_select_font_face(   ctx, "Tahoma", 0, 0 )
@@ -275,8 +285,10 @@ do
 	 lines = {{ x=wm.mx, y = wm.my, solid=true }}
 	 colors = make_colors()
       end
-      
-      local bw, bh = 32 + 16 + frame,32 + frame
+
+      cr.cairo_set_line_width( ctx, 0.5 )
+
+      local bw, bh = 128 + 16 + frame,32 + frame
       local cols, rows = floor(wm.width / bw) + 1, floor(wm.height / bh) + 1
       cols, rows = 4, 4
       for i=0, cols*rows - 1 do
@@ -289,18 +301,16 @@ do
 	 cr.cairo_new_path( gfx.ctx )
 	 gfx["round_rect_"..string.char(32+64+method)](gfx, x+inset, y+inset, bw-inset, bh-inset, bh / 3 )
 	 cr.cairo_close_path( gfx.ctx )
-	 if i % 3 ~= 0 then
-	    cr.cairo_stroke( gfx.ctx )
+	 local a, b, c, d = random(#colors), random(#colors),random(#colors),random(#colors)
+	 if i ~= os.time() % (cols*rows) then
+	    cr.cairo_set_source_rgba( ctx, 1, 1, 1, 1 )
 	 else
-	    local color = colors[ i % #colors + 1 ]
-	    cr.cairo_set_source_rgba( ctx, color[1], color[2], color[3], color[4] )
-	    cr.cairo_fill( gfx.ctx )
-	    cr.cairo_new_path( gfx.ctx )
-	    gfx["round_rect_"..string.char(32+64+method)](gfx, x+inset, y+inset, bw-inset, bh-inset, bh / 3 )
-	    cr.cairo_close_path( gfx.ctx )
-	    cr.cairo_set_source_rgba(    ctx, 1, 1, 1, 1 )
-	    cr.cairo_stroke( gfx.ctx )
+	    cr.cairo_set_source_rgba( ctx, 0.25, 0.5, 1, 1 )
 	 end
+	 cr.cairo_fill_preserve( gfx.ctx )
+	 local a, b, c, d = random(#colors), random(#colors),random(#colors),random(#colors),
+	 cr.cairo_set_source_rgba( ctx, 0, 0, 0, 1 )
+	 cr.cairo_stroke( gfx.ctx )
 
 	 local current = items.current - 1
 
@@ -311,7 +321,8 @@ do
 	 end
 	 wm.kb = 0
 
-	 gfx:list_box( 10, wm.height/2, 100, 200, items )
+	 gfx:list_box( 10, wm.height/2-50, 100, 200, items )
+	 gfx:list_box( 70, wm.height/2-25, 175, 300, items )
 	 
 	 cr.cairo_move_to(            ctx, x + 22, y + bh * 0.8 )
 	 local p = i %8 + 2
@@ -321,6 +332,6 @@ do
 
       sdl.SDL_UpperBlit( sdl_surf, nil, wm.window, nil )
 
---      frame = frame + 0.1 -- + 0.025
+--      frame = frame + 0.01 -- + 0.025
    end
 end
