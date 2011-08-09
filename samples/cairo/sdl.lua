@@ -2,7 +2,7 @@ local ffi = require( "ffi" )
 local sdl = require( "ffi/SDL" )
 local cr  = require( "ffi/cairo" )
 local wm  = require( "lib/wm/sdl" )
-local random, floor = math.random, math.floor
+local random, floor, pi = math.random, math.floor, math.pi
 
 local lines = {{ x=0, y=0, solid = false }}
 
@@ -62,11 +62,11 @@ function gfx:round_rect_b(x,y,w,h,radius_x,radius_y)
    local radius_y = radius_y or 5
 
    if radius_x > w - radius_x then
-      radius_x = w / 2
+      radius_x = w * 0.5
    end
 
    if radius_y > h - radius_y then
-      radius_y = h / 2
+      radius_y = h * 0.5
    end
 
    -- approximate (quite close) the arc using a bezier curve
@@ -81,33 +81,32 @@ function gfx:round_rect_b(x,y,w,h,radius_x,radius_y)
    cr.cairo_rel_curve_to( ctx, 0, c2, c1 - radius_x, radius_y, -radius_x, radius_y )
    cr.cairo_rel_line_to(  ctx, -w + 2 * radius_x, 0 )
    cr.cairo_rel_curve_to( ctx, -c1, 0, -radius_x, -c2, -radius_x, -radius_y )
-   cr.cairo_rel_line_to(  ctx, 0, -h + 2 * radius_y )
-   cr.cairo_rel_curve_to( ctx, 0, -c2, radius_x - c1, -radius_y, radius_x, -radius_y )
+   cr.cairo_rel_line_to(  ctx,   0, -h + 2 * radius_y )
+   cr.cairo_rel_curve_to( ctx,   0, -c2, radius_x - c1, -radius_y, radius_x, -radius_y )
 end
 
 function gfx:round_rect_c(x, y, w, h, r)
    local r = r or 5
    local ctx = self.ctx
-   cr.cairo_move_to(ctx, x+r,y)                  
-   cr.cairo_line_to(ctx, x+w-r,y)                
-   cr.cairo_curve_to(ctx, x+w,y,x+w,y,x+w,y+r) 
-   cr.cairo_line_to(ctx, x+w,y+h-r)           
-   cr.cairo_curve_to(ctx, x+w,y+h,x+w,y+h,x+w-r,y+h)
-   cr.cairo_line_to(ctx, x+r,y+h)                   
-   cr.cairo_curve_to(ctx, x,y+h,x,y+h,x,y+h-r)      
-   cr.cairo_line_to(ctx, x,y+r)                     
-   cr.cairo_curve_to(ctx, x,y,x,y,x+r,y)            
+   cr.cairo_move_to(  ctx, x  +r, y                            )                  
+   cr.cairo_line_to(  ctx, x+w-r, y                            )                
+   cr.cairo_curve_to( ctx, x+w,   y,    x+w, y,   x+w,   y  +r ) 
+   cr.cairo_line_to(  ctx, x+w,   y+h-r                        )           
+   cr.cairo_curve_to( ctx, x+w,   y+h,  x+w, y+h, x+w-r, y+h   )
+   cr.cairo_line_to(  ctx, x  +r, y+h                          )                   
+   cr.cairo_curve_to( ctx, x,     y+h,  x,   y+h, x,     y+h-r )      
+   cr.cairo_line_to(  ctx, x,     y  +r                        )                     
+   cr.cairo_curve_to( ctx, x,     y,    x,   y,   x  +r, y     )            
 end
 
 function gfx:round_rect_d(x, y, w, h, radius)
-   local radius = radius or 1000
-   local half_pi = math.pi * 0.5
-   local a, b, c, d = x, x + w, y, y + h
+   local radius = radius or 5
+   local half_pi = pi * 0.5
    local ctx = gfx.ctx
-   cr.cairo_arc( ctx, a + radius, c + radius, radius, 2*half_pi, 3*half_pi)
-   cr.cairo_arc( ctx, b - radius, c + radius, radius, 3*half_pi, 4*half_pi)
-   cr.cairo_arc( ctx, b - radius, d - radius, radius, 0*half_pi, 1*half_pi)
-   cr.cairo_arc( ctx, a + radius, d - radius, radius, 1*half_pi, 2*half_pi)
+   cr.cairo_arc( ctx, x     + radius, y     + radius, radius, 2*half_pi, 3*half_pi)
+   cr.cairo_arc( ctx, x + w - radius, y     + radius, radius, 3*half_pi, 4*half_pi)
+   cr.cairo_arc( ctx, x + w - radius, y + h - radius, radius, 0*half_pi, 1*half_pi)
+   cr.cairo_arc( ctx, x     + radius, y + h - radius, radius, 1*half_pi, 2*half_pi)
 end
 
 local function make_colors(n)
@@ -212,7 +211,7 @@ do
 	 colors = make_colors()
       end
       
-      local bw, bh = 128 + 16 + frame*4,32 + frame
+      local bw, bh = 32 + 16 + frame,32 + frame
       local cols, rows = floor(wm.width / bw) + 1, floor(wm.height / bh) + 1
       for i=0, cols*rows - 1 do
 	 local col, row = floor(i / rows), (i % rows)
@@ -241,7 +240,7 @@ do
 	 cr.cairo_move_to(            ctx, x + 22, y + bh * 0.8 )
 	 local p = i %8 + 2
 	 cr.cairo_set_font_size(      ctx, (bh * 0.5) )
-	 cr.cairo_show_text(          ctx, "AaBbCc DdEeFf" )
+	 cr.cairo_show_text(          ctx, "Aa" )
       end
 
       sdl.SDL_UpperBlit( sdl_surf, nil, wm.window, nil )
