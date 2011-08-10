@@ -35,9 +35,12 @@ for %%i in (glibconfig.h.win32.in glib/glibconfig.h.win32.in glib/glib.rc.in gli
         > %%~dpni
 )
 
-echo.>intl.c
-cl -c intl.c
-link /lib /out:intl.lib intl.obj
+echo.>dummy.c
+cl -c dummy.c
+link /lib /out:dummy.lib dummy.obj
+copy dummy.lib intl.lib
+copy dummy.lib glib\pcre\pcre.lib
+copy dummy.lib build\win32\dirent\dirent.lib
 
 nmake -f Makefile.msc INTL=".."
 

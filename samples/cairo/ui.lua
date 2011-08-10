@@ -111,6 +111,41 @@ function gfx:round_rect_d(x, y, w, h, r)
    cr.cairo_arc( ctx, x     + r, y + h - r, r, 1*half_pi, 2*half_pi )
 end
 
+local actors = {{}}
+local actor = {
+   name    = "Blah",
+   root    = {}, -- The grand-daddy!
+   parent  = {}, -- Direct parent
+   index   = 0,  -- Child number (can change, if sibling is removed)
+   extents = {   -- Rectangle on the screen  (x,y,w,h) 
+      0, 0, 0, 0
+   }
+   draw =
+      function()
+      end,
+   action =
+      function()
+      end
+}
+
+local function new_actor(actor, parent)
+   local parent = parent or actors
+   local index = #parent + 1
+   assert( type(actor.parent)==nil )
+   assert( type(actor.index)==nil )
+   actor.parent = parent
+   actor.index = index
+   actor.root = parent.root or parent
+   parent[ index ] = actor
+end
+
+local function delete_actor(actor)
+   local parent, index = actor.parent, actor.index
+   parent[ index ] = parent[ #parent ]
+   parent[ index ].index = index
+   parent[ #parent ] = nil
+end
+
 local function take_string( table_or_string, table_key )
    local s = table_or_string or ""
    local t = type(s)
@@ -289,12 +324,7 @@ local items = {
    current = 2,
 }
 
---[[ -*- mode:c -*-
-
---]]
-
-local main_menu = 
-{
+local main_menu = {
    {
       "File",
       {

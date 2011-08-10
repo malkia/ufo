@@ -1,1 +1,1 @@
-@link /lib %*
+@link -lib %*
