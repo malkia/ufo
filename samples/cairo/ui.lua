@@ -111,10 +111,23 @@ function gfx:round_rect_d(x, y, w, h, r)
    cr.cairo_arc( ctx, x     + r, y + h - r, r, 1*half_pi, 2*half_pi )
 end
 
+local function take_string( table_or_string, table_key )
+   local s = table_or_string or ""
+   local t = type(s)
+   if t == "string" then
+      return s
+   elseif t == "table" then
+      return take_string( s[table_key or 1] )
+   elseif t == "function" then
+      return take_string( s(table_key or 1), table_key )
+   end
+end
+
 -- items is meta structure
-function gfx:list_box(x, y, w, h, items)
+function gfx:list_box(items, x, y, w, h)
    local ctx = gfx.ctx
    local eh = 24 -- element height
+   local h = h or eh * #items
    local ev = floor( h / eh ) -- elements visible
    local h = ev * eh
    local top = items.top or 1
@@ -164,14 +177,7 @@ function gfx:list_box(x, y, w, h, items)
       end
       cr.cairo_move_to(        ctx, x + 8, y + eh * 0.8 )
       cr.cairo_set_source_rgb( ctx, current and 1 or 0, current and 1 or 0, current and 1 or 0 )
-      local type = type(items[i])
-      local text = ""
-      if type == "string" then
-	 text = items[i]
-      elseif type == "table" then
-	 text = items[i][1]
-      end
-      cr.cairo_show_text(      ctx, items[i] )
+      cr.cairo_show_text( ctx, take_string( items[i] ) )
    end
    cr.cairo_reset_clip( ctx )
 end
@@ -181,20 +187,21 @@ function gfx:text_extents( text )
    return gfx_text_extents
 end
 
-function gfx:main_menu(x, y, w, h, items)
+function gfx:main_menu(items, x, y, w, h)
    local ctx = gfx.ctx
    local eh = 24 -- element height
    local ev = floor( h / eh ) -- elements visible
    local h = ev * eh
    local current = items.current or 1
 
-   local hgap = 5
+   local hgap = 8
    local vgap = 5
-   local width = hgap
+   local width = 0
    local height = 0
    for i=1, #items do
-      local te = gfx:text_extents( items[i][1] )
-      width = width + te.width + hgap
+      local item = take_string( items[i] )
+      local te = gfx:text_extents( item )
+      width = width + te.width + hgap*2
       height = math.max(height, te.height)
    end
 
@@ -216,26 +223,48 @@ function gfx:main_menu(x, y, w, h, items)
    cr.cairo_clip( ctx )
    local cx = hgap
    for i=1, #items do
-      local iw = gfx:text_extents( items[i][1] ).width + hgap
+      local iw = gfx:text_extents( items[i][1] ).width + hgap*2
       local y = 0
       local current = (i == current)
+      local opened = items.opened
       if current then
-	 cr.cairo_new_path(       ctx )
-	 cr.cairo_move_to(        ctx,  cx-hgap,  y )
-	 cr.cairo_rel_line_to(    ctx,  iw,  0 )
-	 cr.cairo_rel_line_to(    ctx,   0,  height + vgap*2 )
-	 cr.cairo_rel_line_to(    ctx, -iw,  0 )
-	 cr.cairo_close_path(     ctx )
-	 -- background
-	 cr.cairo_set_source_rgb( ctx, 0, 0, 1 )
-	 cr.cairo_fill_preserve(  ctx )
-	 -- wiring
-	 cr.cairo_set_source_rgb( ctx, 1, 1, 1 )
-	 cr.cairo_stroke(         ctx )
+	 if items.opened then
+	 else
+	    cr.cairo_new_path(       ctx )
+	    cr.cairo_move_to(        ctx,  cx-hgap,  y )
+	    cr.cairo_rel_line_to(    ctx,  iw,  0 )
+	    cr.cairo_rel_line_to(    ctx,   0,  height + vgap*2 )
+	    cr.cairo_rel_line_to(    ctx, -iw,  0 )
+	    cr.cairo_close_path(     ctx )
+	    -- background
+	    cr.cairo_set_source_rgb( ctx, 0, 0, 1 )
+	    cr.cairo_fill_preserve(  ctx )
+	    -- wiring
+	    cr.cairo_set_source_rgb( ctx, 1, 1, 1 )
+	    cr.cairo_stroke(         ctx )
+	 end
       end
       cr.cairo_move_to(        ctx, cx, y + height*1.2  )
-      cr.cairo_set_source_rgb( ctx, current and 1 or 0, current and 1 or 0, current and 1 or 0 )
-      cr.cairo_show_text(      ctx, items[i][1] )
+      if current and not opened then
+	 cr.cairo_set_source_rgb( ctx, 1, 1, 1 )
+      else
+	 if current and opened then
+	    cr.cairo_set_source_rgb( ctx, 0.5, 0.5, 0.5 )
+	 else
+	    cr.cairo_set_source_rgb( ctx, 0, 0, 0 )
+	 end
+      end
+      local item = take_string( items[i] )
+      cr.cairo_show_text( ctx, item )
+      if current and opened then
+	 local items = items[i][2]
+	 if items then
+	    cr.cairo_save( ctx )
+	    cr.cairo_reset_clip( ctx )
+	    gfx:list_box( items, cx, y + height+hgap, 100 )
+	    cr.cairo_restore( ctx )
+	 end
+      end
       cx = cx + iw
    end
    cr.cairo_reset_clip( ctx )
@@ -260,26 +289,58 @@ local items = {
    current = 2,
 }
 
-local main_menu = {
-   { "File",
-     { "Visit New File | C-x C-f" },
-     { "Open File..." },
-  },
-   { "Edit",
-     { "Undo" },
-     { "Cut" },
-     { "Paste" },
-     { "Paste from Kill Menu",
-       { "Clip1" },
-       { "Clip2" },
-       { "Clip3" },
-    },
-  },
-   { "Options" },
+--[[ -*- mode:c -*-
+
+--]]
+
+local main_menu = 
+{
+   {
+      "File",
+      {
+	 "Visit New File | C-x C-f",
+	 "Open File..." 
+      },
+   },
+   { 
+      "Edit",
+      { 
+	 "Undo",
+	 { "Cut" },
+	 "Paste",
+	 { 
+	    "Paste from Kill Menu",
+	    { 
+	       "Clip1",
+	       "Clip2",
+	       "Clip3" 
+	    },
+	 },
+      },
+   },
+   { 
+      "Options",
+      {
+	 "Line Wrapping",
+	 "Smart Word Spacing",
+	 "-------------",
+	 "Show Tabs",
+	 "Show Buffers in new",
+	 "----"
+      },
+   },
    { "Buffers" },
    { "Tools" },
    { "Lua" },
-   { "Help" },
+   { 
+      "Help",
+      {
+	 "Search [|   ]",
+	 "Help on Word",
+	 "Documentation",
+	 "About",
+      },
+   },
    current = 2,
 }
 
@@ -412,16 +473,22 @@ do
 
 	 local current = items.current - 1
 
-	 if wm.kb == 0x40000052 then
+	 if wm.kb == sdl.SDLK_UP then
 	    items.current = (current - 1) % #items + 1
-	 elseif wm.kb == 0x40000051 then
+	 elseif wm.kb == sdl.SDLK_DOWN then
 	    items.current = (current + 1) % #items + 1
+	 elseif wm.kb == sdl.SDLK_LEFT then
+	    main_menu.current = (main_menu.current - 2) % #main_menu + 1
+	 elseif wm.kb == sdl.SDLK_RIGHT then
+	    main_menu.current = main_menu.current % #main_menu + 1
+	 elseif wm.kb == sdl.SDLK_RETURN then
+	    main_menu.opened = not main_menu.opened
 	 end
 	 wm.kb = 0
 
-	 gfx:list_box( 10, wm.height/2-50, 100, 200, items )
-	 gfx:list_box( 70, wm.height/2-25, 175, 300, items )
-	 gfx:main_menu( 0, 0, wm.width, 100, main_menu )
+	 gfx:list_box( items, 10, wm.height/2-50, 100, 200 )
+	 gfx:list_box( items, 70, wm.height/2-25, 175, 300 )
+	 gfx:main_menu( main_menu, 0, 0, wm.width, 100 )
 	 
 	 cr.cairo_move_to(            ctx, x + 22, y + bh * 0.8 )
 	 local p = i %8 + 2
