@@ -6,6 +6,8 @@ local random, floor, pi = math.random, math.floor, math.pi
 
 local lines = {{ x=0, y=0, solid = false }}
 
+-- Preallocate certain ffi structures, to prevent allocations
+local gfx_text_extents = ffi.new( "cairo_text_extents_t" )
 local gfx = {}
 
 -- From the cairo cookbook
@@ -127,8 +129,6 @@ function gfx:list_box(x, y, w, h, items)
 
    items.top, items.bottom = top, bottom
 
-   cr.cairo_set_line_width( ctx, 0.25 )
-
    -- Make the rectangle path
    cr.cairo_new_path( ctx )
    cr.cairo_rectangle( ctx, x, y, w, h )
@@ -140,6 +140,7 @@ function gfx:list_box(x, y, w, h, items)
 
    -- Next stroke it, and preserve the path
    cr.cairo_set_source_rgb( ctx, 0, 0, 0 ) -- listbox "wire" color
+   cr.cairo_set_line_width( ctx, 0.25 )
    cr.cairo_stroke_preserve( ctx )
 
    -- Now set the clip, do not keep the path
@@ -154,14 +155,88 @@ function gfx:list_box(x, y, w, h, items)
 	 cr.cairo_rel_line_to(    ctx,  0, eh )
 	 cr.cairo_rel_line_to(    ctx, -w,  0 )
 	 cr.cairo_close_path(     ctx )
+	 -- background
 	 cr.cairo_set_source_rgb( ctx, 0, 0, 1 )
 	 cr.cairo_fill_preserve(  ctx )
+	 -- wiring
 	 cr.cairo_set_source_rgb( ctx, 1, 1, 1 )
 	 cr.cairo_stroke(         ctx )
       end
       cr.cairo_move_to(        ctx, x + 8, y + eh * 0.8 )
       cr.cairo_set_source_rgb( ctx, current and 1 or 0, current and 1 or 0, current and 1 or 0 )
+      local type = type(items[i])
+      local text = ""
+      if type == "string" then
+	 text = items[i]
+      elseif type == "table" then
+	 text = items[i][1]
+      end
       cr.cairo_show_text(      ctx, items[i] )
+   end
+   cr.cairo_reset_clip( ctx )
+end
+
+function gfx:text_extents( text )
+   cr.cairo_text_extents( self.ctx, text, gfx_text_extents )
+   return gfx_text_extents
+end
+
+function gfx:main_menu(x, y, w, h, items)
+   local ctx = gfx.ctx
+   local eh = 24 -- element height
+   local ev = floor( h / eh ) -- elements visible
+   local h = ev * eh
+   local current = items.current or 1
+
+   local hgap = 5
+   local vgap = 5
+   local width = hgap
+   local height = 0
+   for i=1, #items do
+      local te = gfx:text_extents( items[i][1] )
+      width = width + te.width + hgap
+      height = math.max(height, te.height)
+   end
+
+   -- Make the rectangle path
+   cr.cairo_new_path( ctx )
+   cr.cairo_rectangle( ctx, x, y, width, height + vgap*2 )
+   cr.cairo_close_path( ctx )
+
+   -- Fill it first, but preserve the path
+   cr.cairo_set_source_rgb( ctx, 1, 1, 1 ) -- listbox background color
+   cr.cairo_fill_preserve( ctx )
+
+   -- Next stroke it, and preserve the path
+   cr.cairo_set_source_rgb( ctx, 0, 0, 0 ) -- listbox "wire" color
+   cr.cairo_set_line_width( ctx, 0.25 )
+   cr.cairo_stroke_preserve( ctx )
+
+   -- Now set the clip, do not keep the path
+   cr.cairo_clip( ctx )
+   local cx = hgap
+   for i=1, #items do
+      local iw = gfx:text_extents( items[i][1] ).width + hgap
+      local y = 0
+      local current = (i == current)
+      if current then
+	 cr.cairo_new_path(       ctx )
+	 cr.cairo_move_to(        ctx,  cx-hgap,  y )
+	 cr.cairo_rel_line_to(    ctx,  iw,  0 )
+	 cr.cairo_rel_line_to(    ctx,   0,  height + vgap*2 )
+	 cr.cairo_rel_line_to(    ctx, -iw,  0 )
+	 cr.cairo_close_path(     ctx )
+	 -- background
+	 cr.cairo_set_source_rgb( ctx, 0, 0, 1 )
+	 cr.cairo_fill_preserve(  ctx )
+	 -- wiring
+	 cr.cairo_set_source_rgb( ctx, 1, 1, 1 )
+	 cr.cairo_stroke(         ctx )
+      end
+      cr.cairo_move_to(        ctx, cx, y + height*1.2  )
+      cr.cairo_set_source_rgb( ctx, current and 1 or 0, current and 1 or 0, current and 1 or 0 )
+      cr.cairo_show_text(      ctx, items[i][1] )
+      cx = cx + iw
    end
    cr.cairo_reset_clip( ctx )
 end
@@ -182,6 +257,29 @@ local items = {
    "Fourth Item 8",
    "Fifth Item 9",
    selected = { 3, 5 },
+   current = 2,
+}
+
+local main_menu = {
+   { "File",
+     { "Visit New File | C-x C-f" },
+     { "Open File..." },
+  },
+   { "Edit",
+     { "Undo" },
+     { "Cut" },
+     { "Paste" },
+     { "Paste from Kill Menu",
+       { "Clip1" },
+       { "Clip2" },
+       { "Clip3" },
+    },
+  },
+   { "Options" },
+   { "Buffers" },
+   { "Tools" },
+   { "Lua" },
+   { "Help" },
    current = 2,
 }
 
@@ -222,7 +320,7 @@ do
 	    cr.cairo_format_stride_for_width( format, self.width ),
 	    0,  0,  0,  0
 	 ),
-	 SDL_FreeSurface
+	 sdl.SDL_FreeSurface
       )
       sdl.SDL_WM_SetCaption( "Cairo Testing", nil )
 
@@ -249,7 +347,7 @@ do
 
       cr.cairo_select_font_face(   ctx, "Tahoma", 0, 0 )
       cr.cairo_set_font_size(      ctx, 16 )
-      cr.cairo_move_to(            ctx, 0, 16 )
+      cr.cairo_move_to(            ctx, wm.width - 50, wm.height - 16 )
       cr.cairo_set_source_rgba(    ctx, 1, 1, 1, 1 )
       cr.cairo_show_text(          ctx, tostring( #lines ))
 
@@ -293,7 +391,7 @@ do
       cols, rows = 4, 4
       for i=0, cols*rows - 1 do
 	 local col, row = floor(i / rows), (i % rows)
-	 local x, y = col * bw, row * bh
+	 local x, y = col * bw, row * bh + 50
 	 local inset = 10
 	 local method = (i % 4 + 1) --random(1,4)
 	 cr.cairo_set_source_rgba(    ctx, 1, 1, 1, 1 )
@@ -323,6 +421,7 @@ do
 
 	 gfx:list_box( 10, wm.height/2-50, 100, 200, items )
 	 gfx:list_box( 70, wm.height/2-25, 175, 300, items )
+	 gfx:main_menu( 0, 0, wm.width, 100, main_menu )
 	 
 	 cr.cairo_move_to(            ctx, x + 22, y + bh * 0.8 )
 	 local p = i %8 + 2
