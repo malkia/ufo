@@ -119,7 +119,7 @@ local actor = {
    index   = 0,  -- Child number (can change, if sibling is removed)
    extents = {   -- Rectangle on the screen  (x,y,w,h) 
       0, 0, 0, 0
-   }
+   },
    draw =
       function()
       end,
@@ -147,14 +147,24 @@ local function delete_actor(actor)
 end
 
 local function take_string( table_or_string, table_key )
-   local s = table_or_string or ""
-   local t = type(s)
+   local s = table_or_string or "<nil>"
+   local t, k = type(s), table_key or 1
    if t == "string" then
       return s
+   elseif t == "number" or t == "boolean" then
+      return tostring(s)
    elseif t == "table" then
-      return take_string( s[table_key or 1] )
+      -- The name is either the first element: [1], or .name, or .id
+      return take_string( s[k] or s.label or s.text or s.name or s.id )
    elseif t == "function" then
-      return take_string( s(table_key or 1), table_key )
+      return take_string( s(k), table_key )
+   else
+      -- userdata
+      -- thread
+      -- luajit has more I think
+      --   cdata
+      --
+      return "<"..t..">"
    end
 end
 
@@ -258,7 +268,7 @@ function gfx:main_menu(items, x, y, w, h)
    cr.cairo_clip( ctx )
    local cx = hgap
    for i=1, #items do
-      local iw = gfx:text_extents( items[i][1] ).width + hgap*2
+      local iw = gfx:text_extents( take_string(items[i]) ).width + hgap*2
       local y = 0
       local current = (i == current)
       local opened = items.opened
@@ -324,7 +334,8 @@ local items = {
    current = 2,
 }
 
-local main_menu = {
+local main_menu =
+{
    {
       "File",
       {
@@ -359,7 +370,13 @@ local main_menu = {
 	 "----"
       },
    },
-   { "Buffers" },
+   { "Buffers",
+     { 
+	{ name1 = "One" },
+	{ name = "Two" },
+	{ label = "Treeh" }
+     },
+  },
    { "Tools" },
    { "Lua" },
    { 
@@ -370,6 +387,13 @@ local main_menu = {
 	 "Documentation",
 	 "About",
       },
+   },
+   {
+      function() return os.date( "%X" ) end,
+      {
+	 function() return os.date( "%A" ) end,
+	 function() return os.date( "%d %b %Y" ) end,
+      }
    },
    current = 2,
 }
