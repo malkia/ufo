@@ -2,19 +2,34 @@ local ffi = require( "ffi" )
 local egl = require( "ffi/EGL" )
 local gl  = require( "ffi/OpenGLES2" )
 
+local ww, wh = 512, 512
+
 -- Use SDL for windowing and events
 local function InitSDL()
    local sdl = require( "ffi/SDL" )
-   local screen = sdl.SDL_SetVideoMode( 640, 480, 32, 0 * sdl.SDL_RESIZABLE )
+   local screen = sdl.SDL_SetVideoMode( ww, wh, 32, 0 * sdl.SDL_RESIZABLE )
    local wminfo = ffi.new( "SDL_SysWMinfo" )
    sdl.SDL_GetVersion( wminfo.version )
    sdl.SDL_GetWMInfo( wminfo )
    local systems = { "win", "x11", "dfb", "cocoa", "uikit" }
    local window = wminfo.info[systems[wminfo.subsystem]].window
    local event = ffi.new( "SDL_Event" )
+   local prev_time, curr_time, fps = 0, 0, 0
    return {
       window = window,
       update = function() 
+               -- Calculate the frame rate
+		  prev_time, curr_time = curr_time, os.clock()
+		  local diff = curr_time - prev_time + 0.00001
+		  local real_fps = 1/diff
+		  if math.abs( fps - real_fps ) * 10 > real_fps then
+		     fps = real_fps
+		  end
+		  fps = fps*0.99 + 0.01*real_fps
+	 
+      -- Update the window caption with statistics
+--		  sdl.SDL_WM_SetCaption( string.format("%d %s %dx%d | %.2f fps | %.2f mps", ticks_base, tostring(bounce_mode), screen.w, screen.h, fps, fps * (screen.w * screen.h) / (1024*1024)), nil )
+
 		  while sdl.SDL_PollEvent( event ) ~= 0 do
 		     if event.type == sdl.SDL_QUIT then
 			return false
@@ -38,9 +53,9 @@ end
 local wm = InitSDL()
 
 local vs_src = [[
-      attribute vec4        position;
-      varying mediump vec2  pos;
-      uniform vec4          offset;
+      attribute mediump vec4 position;
+      varying   lowp vec2 pos;
+      uniform   lowp vec4 offset;
       void main()
       {
 	 gl_Position = position + offset;
@@ -49,11 +64,15 @@ local vs_src = [[
 ]]
 
 local fs_src = [[
-      varying mediump vec2  pos;
+      varying lowp vec2  pos;
       uniform mediump float phase;
+      const lowp vec4 one = vec4(1,1,1,1);
+      const mediump float oothirty = 1.0/3.0;
       void  main()
       {
 	 gl_FragColor = vec4( 1., 0.9, 0.7, 1.0 ) * cos( 30.*sqrt(pos.x*pos.x + 1.5*pos.y*pos.y)  + atan(pos.y,pos.x) - phase );
+//	 gl_FragColor = one * cos( thirty * sqrt(pos.x*pos.x + pos.y*pos.y)  + atan(pos.y,pos.x) - phase );
+//	 gl_FragColor = vec4(pos.x*pos.y+phase);
       }                                 
 ]]
 
@@ -91,7 +110,7 @@ local function validate_shader( shader )
    end
    local buffer = ffi.new( "char[?]", length )
    gl.glGetShaderInfoLog( shader, length, int, buffer )
-   assert( int[0] == length )
+--   assert( int[0] == length )
    error( ffi.string(buffer) )
 end
  
@@ -122,7 +141,6 @@ local loc_position = gl.glGetAttribLocation( prog, "position" )
 local loc_phase    = gl.glGetUniformLocation( prog, "phase" )
 local loc_offset   = gl.glGetUniformLocation( prog, "offset" )
 
-local ww, wh = 640, 480
 
 local phasep = 0
 local update_pos = true 
