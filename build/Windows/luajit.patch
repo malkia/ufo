@@ -2,7 +2,7 @@ diff --git a/src/msvcbuild.bat b/src/msvcbuild.bat
 index cd18236..4ea1776 100644
 --- a/src/msvcbuild.bat
 +++ b/src/msvcbuild.bat
-@@ -14,8 +14,8 @@
+@@ -14,1 +14,1 @@
  @if not defined INCLUDE goto :FAIL
 
  @setlocal
