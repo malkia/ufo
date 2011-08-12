@@ -177,6 +177,8 @@ ffi.cdef [[
       const char* TwGetLastError(              );
       void        TwHandleErrors(              TwErrorHandler errorHandler);
       int         TwEventSDL(                  const void *sdlEvent, unsigned char sdlMajorVersion, unsigned char sdlMinorVersion);
+      int         TwEventSDL12(                const void *sdlEvent);
+      int         TwEventSDL13(                const void *sdlEvent);
       int         TwEventMouseButtonGLFW(      int glfwButton, int glfwAction );
       int         TwEventKeyGLFW(              int glfwKey,    int glfwAction );
       int         TwEventCharGLFW(             int glfwChar,   int glfwAction );
