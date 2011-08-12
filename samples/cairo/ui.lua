@@ -417,28 +417,23 @@ local function make_colors(n)
 end
 
 do
-   local format, surf, ctx, sdl_surf = cr.CAIRO_FORMAT_ARGB32
+   local format, surf, ctx, sdl_surf = cr.CAIRO_FORMAT_RGB24
 
    function wm:resized()
-      surf = ffi.gc(
-	 cr.cairo_image_surface_create( format, self.width, self.height ),
-	 cr.cairo_surface_destroy
-      )
-      ctx = ffi.gc(
-	 cr.cairo_create( surf ),
-	 cr.cairo_destroy
-      )
+      surf = ffi.gc( cr.cairo_image_surface_create( format, self.width, self.height ),
+		     cr.cairo_surface_destroy )
+      ctx = ffi.gc( cr.cairo_create( surf ),
+		    cr.cairo_destroy   )
       sdl_surf = ffi.gc(
 	 sdl.SDL_CreateRGBSurfaceFrom(
 	    cr.cairo_image_surface_get_data( surf ),
 	    self.width, self.height, 32,
 	    cr.cairo_format_stride_for_width( format, self.width ),
-	    0,  0,  0,  0
+	    0,  0, 0, 0
 	 ),
 	 sdl.SDL_FreeSurface
       )
       sdl.SDL_WM_SetCaption( "Cairo Testing", nil )
-
       gfx.ctx = ctx
       gfx.surf = surf
    end

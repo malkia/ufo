@@ -69,7 +69,7 @@ local function init(self, width, height)
    self.height = height or self.height or 480
    self.window = sdl.SDL_SetVideoMode(
       self.width, self.height, 32,
-      bit.bor( sdl.SDL_DOUBLEBUF, sdl.SDL_RESIZABLE )
+      bit.bor( sdl.SDL_DOUBLEBUF*0, sdl.SDL_RESIZABLE )
    )
    self.event = ffi.new( "SDL_Event" )
    self.event.type, self.event.resize.w, self.event.resize.h = sdl.SDL_VIDEORESIZE, self.width, self.height
