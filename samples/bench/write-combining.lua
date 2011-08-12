@@ -3,7 +3,7 @@
 local ffi = require( "ffi" )
 local shl, band = bit.lshift, bit.band
 
-local ITERATIONS = 0x80000000 / 64
+local ITERATIONS = 0x80000000
 local ITEMS      = shl( 1, 24 )
 local MASK       = ITEMS - 1
 
@@ -66,5 +66,14 @@ end
 -- 2 SplitLoop  duration (ns) = 6.801
 -- 3 SingleLoop duration (ns) = 17.426
 -- 3 SplitLoop  duration (ns) = 6.852
+
+-- Windows XP on my Mac Book Pro (Jan 2008 bought) (on power)
+-- C:\p\ufo>time -p ./luajit32.cmd samples/bench/write-combining.lua
+-- 1 SingleLoop duration (s) = 24.203
+-- 1 SplitLoop  duration (s) = 10.094
+-- 2 SingleLoop duration (s) = 24.172
+-- 2 SplitLoop  duration (s) = 10.14
+-- 3 SingleLoop duration (s) = 24.188
+-- 3 SplitLoop  duration (s) = 10.094
 
 main()
