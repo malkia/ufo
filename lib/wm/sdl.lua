@@ -71,6 +71,7 @@ local function init(self, width, height)
       self.width, self.height, 32,
       bit.bor( sdl.SDL_DOUBLEBUF*0, sdl.SDL_RESIZABLE )
    )
+   assert(NULL ~= self.window, ffi.string(sdl.SDL_GetError()))
    self.event = ffi.new( "SDL_Event" )
    self.event.type, self.event.resize.w, self.event.resize.h = sdl.SDL_VIDEORESIZE, self.width, self.height
    sdl.SDL_PushEvent( self.event )

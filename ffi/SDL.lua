@@ -1798,6 +1798,10 @@ ffi.cdef[[
    void     SDL_TimerQuit(             );
    int      SDL_HelperWindowCreate(    );
    int      SDL_HelperWindowDestroy(   );
+
+   void     SDL_SetError(const char *fmt, ...);
+   char*    SDL_GetError(void);
+   void     SDL_ClearError(void);
 ]]
 
 return sdl
