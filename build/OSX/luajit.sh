@@ -1,11 +1,11 @@
 LUAJIT=../../../luajit
 rm *.tmp 1>/dev/null 2>/dev/null
-make -C $LUAJIT -j BUILDMODE=dynamic CC="gcc-4.2 -mmacosx-version-min=10.4 -arch i386"   LUAJIT_SO=libluajit.dylib TARGET_DYLIBPATH=libluajit.dylib cleaner
-make -C $LUAJIT -j BUILDMODE=dynamic CC="gcc-4.2 -mmacosx-version-min=10.4 -arch i386"   LUAJIT_SO=libluajit.dylib TARGET_DYLIBPATH=libluajit.dylib amalg
+make -C $LUAJIT -j BUILDMODE=dynamic CC="gcc -mmacosx-version-min=10.4 -arch i386"   LUAJIT_SO=libluajit.dylib TARGET_DYLIBPATH=libluajit.dylib cleaner
+make -C $LUAJIT -j BUILDMODE=dynamic CC="gcc -mmacosx-version-min=10.4 -arch i386"   LUAJIT_SO=libluajit.dylib TARGET_DYLIBPATH=libluajit.dylib amalg
 mv $LUAJIT/src/luajit luajit32.tmp
 mv $LUAJIT/src/libluajit.dylib libluajit32.dylib.tmp
-make -C $LUAJIT -j BUILDMODE=dynamic CC="gcc-4.2 -mmacosx-version-min=10.4 -arch x86_64" LUAJIT_SO=libluajit.dylib TARGET_DYLIBPATH=libluajit.dylib cleaner
-make -C $LUAJIT -j BUILDMODE=dynamic CC="gcc-4.2 -mmacosx-version-min=10.4 -arch x86_64" LUAJIT_SO=libluajit.dylib TARGET_DYLIBPATH=libluajit.dylib amalg
+make -C $LUAJIT -j BUILDMODE=dynamic CC="gcc -mmacosx-version-min=10.4 -arch x86_64" LUAJIT_SO=libluajit.dylib TARGET_DYLIBPATH=libluajit.dylib cleaner
+make -C $LUAJIT -j BUILDMODE=dynamic CC="gcc -mmacosx-version-min=10.4 -arch x86_64" LUAJIT_SO=libluajit.dylib TARGET_DYLIBPATH=libluajit.dylib amalg
 mv $LUAJIT/src/luajit luajit64.tmp
 mv $LUAJIT/src/libluajit.dylib libluajit64.dylib.tmp
 lipo -create ./luajit*.tmp -output luajit
