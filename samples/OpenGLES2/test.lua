@@ -12,11 +12,19 @@ local function InitSDL()
    sdl.SDL_GetVersion( wminfo.version )
    sdl.SDL_GetWMInfo( wminfo )
    local systems = { "win", "x11", "dfb", "cocoa", "uikit" }
-   local window = wminfo.info[systems[wminfo.subsystem]].window
+   local subsystem = wminfo.subsystem
+   local wminfo = wminfo.info[systems[subsystem]]
+   local window = wminfo.window
+   local display = nil
+   if systems[subsystem]=="x11" then
+      display = wminfo.display
+      print('X11', display, window)
+   end			      
    local event = ffi.new( "SDL_Event" )
    local prev_time, curr_time, fps = 0, 0, 0
    return {
       window = window,
+      display = display,
       update = function() 
                -- Calculate the frame rate
 		  prev_time, curr_time = curr_time, os.clock()
@@ -82,8 +90,14 @@ local fs_src = [[
 --      cos( 30.*sqrt(pos.x*pos.x + 1.5*pos.y*pos.y - 1.8*pos.x*pos.y*pos.y)
 --            + atan(pos.y,pos.x) - phase );
 
-local dpy      = egl.eglGetDisplay( egl.EGL_DEFAULT_DISPLAY )
+print('DISPLAY',wm.display)
+if wm.display == nil then
+   wm.display = egl.EGL_DEFAULT_DISPLAY
+end
+local dpy      = egl.eglGetDisplay( ffi.cast("intptr_t", wm.display ))
 local r        = egl.eglInitialize( dpy, nil, nil )
+
+print('wm.display/dpy/r', wm.display, dpy, r)
 
 local cfg_attr = ffi.new( "EGLint[3]", egl.EGL_RENDERABLE_TYPE, egl.EGL_OPENGL_ES2_BIT, egl.EGL_NONE )
 local ctx_attr = ffi.new( "EGLint[3]", egl.EGL_CONTEXT_CLIENT_VERSION, 2, egl.EGL_NONE )
@@ -91,10 +105,22 @@ local ctx_attr = ffi.new( "EGLint[3]", egl.EGL_CONTEXT_CLIENT_VERSION, 2, egl.EG
 local cfg      = ffi.new( "EGLConfig[1]" )
 local n_cfg    = ffi.new( "EGLint[1]"    )
 
-local r        = egl.eglChooseConfig(        dpy, cfg_attr, cfg, 1, n_cfg )
+print('wm.window', wm.window)
+
+local r0       = egl.eglChooseConfig(        dpy, cfg_attr, cfg, 1, n_cfg )
+
+local c = cfg[0]
+
+for i=0,10 do
+    if c[i]==egl.EGL_FALSE then break end
+    print(i,c[i])
+end
+
 local surf     = egl.eglCreateWindowSurface( dpy, cfg[0], wm.window, nil )
-local ctx      = egl.eglCreateContext(       dpy, cfg[0],  nil, ctx_attr )
+local ctx      = egl.eglCreateContext(       dpy, cfg[0], nil, ctx_attr )
 local r        = egl.eglMakeCurrent(         dpy,   surf, surf, ctx )
+
+print('surf/ctx', surf, r0, ctx, r, n_cfg[0])
 
 local function validate_shader( shader )
    local int = ffi.new( "GLint[1]" )
