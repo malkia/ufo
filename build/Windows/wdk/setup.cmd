@@ -12,6 +12,9 @@ rem LB_TARGET_CROSS - x32-64 (default: empty)
 rem LB_WDK_ROOT     - The Windows DDK Root. It's detected by looking at the ftype GraphEdtGraph
 
 
+rem LB_TARGET_OS
+if "%LB_TARGET_OS%"=="" set LB_TARGET_OS=Windows
+
 
 rem LB_ROOT points to the root of the distribution.
 rem    By default that's three directories up from this batch file.
@@ -88,7 +91,7 @@ call %LB_WDK_ROOT%\bin\setenv.bat %LB_WDK_ROOT% fre %LB_TARGET_CROSS% win7 no_oa
 cd /d %~dp0..
 
 set LIB=%BASEDIR%\lib\crt\%LB_TARGET_CPU%;%BASEDIR%\lib\win7\%LB_TARGET_CPU%;%LIB%
-set INCLUDE=%CRT_INC_PATH%;%SDK_INC_PATH%\crt\stl60;%INCLUDE%;
+set INCLUDE=%CRT_INC_PATH%;%SDK_INC_PATH%\crt\stl60;%DDK_INC_PATH%;%INCLUDE%;
 
 if "%LB_TARGET_ARCH%"=="x86" set LB_OBJS=msvcrt_win2000.obj
 if "%LB_TARGET_ARCH%"=="x64" set LB_OBJS=msvcrt_win2003.obj

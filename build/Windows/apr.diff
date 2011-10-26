@@ -1,0 +1,113 @@
+Index: misc/win32/apr_app.c
+===================================================================
+--- misc/win32/apr_app.c	(revision 1188840)
++++ misc/win32/apr_app.c	(working copy)
+@@ -43,6 +43,23 @@
+ #include "apr_private.h"
+ #include "apr_arch_misc.h"
+ 
++static char** the_environ()
++{
++  char** env = 0;
++  _get_environ(&env);
++  return env;
++}
++
++static wchar_t** the_wenviron()
++{
++  wchar_t** env = 0;
++  _get_wenviron(&env);
++  return env;
++}
++
++#define _environ  (the_environ())
++#define _wenviron (the_wenviron())
++
+ #pragma comment(linker,"/ENTRY:wmainCRTStartup")
+ 
+ extern int main(int argc, const char **argv, const char **env);
+Index: misc/win32/start.c
+===================================================================
+--- misc/win32/start.c	(revision 1188840)
++++ misc/win32/start.c	(working copy)
+@@ -26,6 +26,23 @@
+ #include "apr_arch_threadproc.h" /* bring in apr_threadproc_init */
+ #include "assert.h"
+ 
++static char** the_environ()
++{
++  char** env = 0;
++  _get_environ(&env);
++  return env;
++}
++
++static wchar_t** the_wenviron()
++{
++  wchar_t** env = 0;
++  _get_wenviron(&env);
++  return env;
++}
++
++#define _environ  (the_environ())
++#define _wenviron (the_wenviron())
++
+ /* This symbol is _private_, although it must be exported.
+  */
+ int APR_DECLARE_DATA apr_app_init_complete = 0;
+@@ -110,7 +127,7 @@
+ 
+ #if defined(_WIN32_WCE)
+     apr_app_init_complete = 1;
+-#elif APR_HAS_UNICODE_FS
++#elif 0 // APR_HAS_UNICODE_FS
+     IF_WIN_OS_IS_UNICODE
+     {
+         apr_wchar_t **wstrs;
+Index: file_io/win32/dir.c
+===================================================================
+--- file_io/win32/dir.c	(revision 1188840)
++++ file_io/win32/dir.c	(working copy)
+@@ -350,7 +350,7 @@
+      * apr_dir_make being called on existing dir, therefore this check
+      * has to come last.
+      */
+-    if (APR_STATUS_IS_EEXIST(apr_err))
++    if (APR_STATUS_IS_EEXIST(rv))
+         return APR_SUCCESS;
+ 
+     return rv;
+Index: file_io/win32/pipe.c
+===================================================================
+--- file_io/win32/pipe.c	(revision 1188840)
++++ file_io/win32/pipe.c	(working copy)
+@@ -29,9 +29,9 @@
+ #if APR_HAVE_SYS_STAT_H
+ #include <sys/stat.h>
+ #endif
+-#if APR_HAVE_PROCESS_H
+-#include <process.h>            /* for getpid() on Win32 */
+-#endif
++//#if APR_HAVE_PROCESS_H
++//#include <process.h>            /* for getpid() on Win32 */
++//#endif
+ #include "apr_arch_misc.h"
+ 
+ APR_DECLARE(apr_status_t) apr_file_pipe_timeout_set(apr_file_t *thepipe,
+@@ -139,7 +139,7 @@
+ 
+         dwPipeMode = 0;
+ 
+-        sprintf(name, "\\\\.\\pipe\\apr-pipe-%u.%lu", getpid(), id++);
++        sprintf(name, "\\\\.\\pipe\\apr-pipe-%u.%lu", GetCurrentProcessId(), id++);
+ 
+         (*in)->filehand = CreateNamedPipe(name,
+                                           dwOpenMode,
+@@ -256,7 +256,7 @@
+      * so that we know the connection originated
+      * from us.
+      */
+-    uid[0] = getpid();
++    uid[0] = GetCurrentProcessId();
+     uid[1] = id++;
+     if ((ls = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == INVALID_SOCKET) {
+         return apr_get_netos_error();

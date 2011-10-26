@@ -6,9 +6,7 @@ local libs = ffi_cairo_libs or {
    Linux   = { x86 = "cairo", x64 = "cairo", arm = "cairo" },
 }
 
-local lib = ffi_cairo_lib or libs[ ffi.os ][ ffi.arch ]
-
-local cr = ffi.load( lib )
+local cr = ffi.load( ffi_cairo_lib or libs[ ffi.os ][ ffi.arch ] or "cairo" )
 
 CAIRO_MIME_TYPE_JPEG = "image/jpeg"
 CAIRO_MIME_TYPE_PNG  = "image/png"

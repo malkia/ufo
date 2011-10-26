@@ -9,9 +9,7 @@ local libs = ffi_luajit_libs or {
    Other   = { x86 = "bin/luajit32.so",  x64 = "bin/luajit64.so" },
 }
 
-local lib  = ffi_SDL_lib or libs[ ffi.os ][ ffi.arch ]
-
-local sdl  = ffi.load( lib )
+local sdl  = ffi.load( ffi_SDL_lib or ffi_sdl_lib or libs[ ffi.os ][ ffi.arch ]  or "sdl" )
 
 ffi.cdef[[
    extern  uint8_t              SDL_numjoysticks;

@@ -7,7 +7,7 @@ local libs = ffi_AntTweakBar_libs or {
    POSIX   = { },
    Other   = { }, 
 }
-local lib  = ffi_AntTweakBar_lib or libs[ ffi.os ][ ffi.arch ]
+local lib  = ffi_AntTweakBar_lib or libs[ ffi.os ][ ffi.arch ] or "AntTweakBar"
 local tw   = ffi.load( lib )
 
 ffi.cdef [[

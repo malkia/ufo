@@ -6,7 +6,7 @@ local libs = ffi_zmq_libs or {
    Linux   = { x86 = "bin/Linux/x86/libzmq.so", x64 = "bin/Linux/x64/libzmq.so", arm = "bin/Linux/arm/libzmq.so"  },
 }
 
-local zmq = ffi.load( libs[ ffi.os ][ ffi.arch ] )
+local zmq = ffi.load( ffi_zmq_lib or libs[ ffi.os ][ ffi.arch ] or "zmq" )
 
 ffi.cdef([[
    enum {

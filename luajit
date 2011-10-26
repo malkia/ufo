@@ -28,6 +28,13 @@ case `uname -s` in
 	;;
 esac
 
+case `uname -o` in
+    Cygwin)
+	OS=Windows
+	SO=dll
+	;;
+end
+
 # Find OS by operating system
 #case `uname -o` in
 #    Cygwin) OS=Windows;;
@@ -41,6 +48,8 @@ case `uname -m` in
     i386)   ARCH=x86;;
     arm*)   ARCH=arm;;
 esac
+
+echo cygwin uname -s `uname -s`
 
 OSARCH=$OS/$ARCH
 
