@@ -1,6 +1,6 @@
 #!/bin/bash
-progname=$(dirname $0)
-pushd $progname 1>/dev/null 2>/dev/null && absname=$(pwd) && popd 1>/dev/null 2>/dev/null 
+dirname=$(dirname $0)
+pushd $dirname 1>/dev/null 2>/dev/null && absname=$(pwd) && popd 1>/dev/null 2>/dev/null 
 
 # uname <option>, where <option>:
 # -s, --kernel-name        print the kernel name
@@ -9,37 +9,12 @@ pushd $progname 1>/dev/null 2>/dev/null && absname=$(pwd) && popd 1>/dev/null 2>
 # -v, --kernel-version     print the kernel version
 # -m, --machine            print the machine hardware name
 # -p, --processor          print the processor type or "unknown"
-# -i, --hardware-platform  print the hardware platform or "unknown"
-# -o, --operating-system   print the operating system
+# -i, --hardware-platform  print the hardware platform or "unknown" - does not work on OSX
+# -o, --operating-system   print the operating system - does not work on OSX
 
-OS=Other
+OS=Unknown
 ARCH=Unknown
-SO=so
-
-# Find OS by kernel name
-case `uname -s` in
-    Linux)  
-	OS=Linux
-	SO=so
-	;;
-    Darwin) 
-	OS=OSX
-	SO=dylib
-	;;
-esac
-
-case `uname -o` in
-    Cygwin)
-	OS=Windows
-	SO=dll
-	;;
-end
-
-# Find OS by operating system
-#case `uname -o` in
-#    Cygwin) OS=Windows;;
-#
-#	esac
+SO=.Unknown
 
 # Find ARCH by machine
 case `uname -m` in
@@ -49,23 +24,32 @@ case `uname -m` in
     arm*)   ARCH=arm;;
 esac
 
-echo cygwin uname -s `uname -s`
-
-OSARCH=$OS/$ARCH
-
-# OSX and iOS use universal binaries, there is no ARCH folder there
-case $OS in
-    OSX) OSARCH=$OS;;
-    iOS) OSARCH=$OS;;
+# Find OS by kernel name
+case `uname -s` in
+    Linux)
+	OS=Linux
+	OSARCH=$OS/$ARCH
+	SO=.so
+	# this should go away at some point (-Wl,-rpath $ORIGN)
+	export LD_LIBRARY_PATH=$absname/:$absname/bin/$OSARCH/:$LD_LIBRARY_PATH
+	;;
+    Darwin)
+	OS=OSX
+	OSARCH=$OS # universal
+	SO=.dylib
+	# this should go away at some point (install_name_tool with @rpath and @executable path)
+	export DYLD_LIBRARY_PATH=$absname/:$absname/bin/$OSARCH/:$DYLD_LIBRARY_PATH
+	;;
+    *)
+	case `uname -o` in
+	    Cygwin)
+		OS=Windows
+		SO=.dll
+		;;
+	esac
 esac
 
-# TODO: Use -rpath $ORIGIN instead
-case $OS in
-    Linux) export LD_LIBRARY_PATH=$absname/:$absname/bin/$OSARCH/:$LD_LIBRARY_PATH;;
-    OSX) export DYLD_LIBRARY_PATH=$absname/:$absname/bin/$OSARCH/:$DYLD_LIBRARY_PATH;;
-esac
+export LUA_PATH="$absname/?.lua;$LUA_PATH"
+export LUA_CPATH="$absname/?$SO;$LUA_CPATH"
+"$dirname/bin/$OSARCH/luajit" "$@"
 
-
-export LUA_PATH=$absname/?.lua
-export LUA_CPATH=$absname/?.$SO
-"$progname/bin/$OSARCH/luajit" "$@"
