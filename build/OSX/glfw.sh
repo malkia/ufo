@@ -1,20 +1,21 @@
-export GLFW=../../glfw
+GLFW=../../../glfw
 
 pushd $GLFW
+git clean -fdx
 
-rm -rf build
 mkdir build
 pushd build
-cmake -D CMAKE_OSX_DEPLOYMENT_TARGET=10.4 -D CMAKE_OSX_ARCHITECTURES="i386;x86_64" $GLFW
+cmake -D CMAKE_OSX_DEPLOYMENT_TARGET=10.5 -D CMAKE_OSX_ARCHITECTURES="i386;x86_64" ../
 make -j8
 popd
 
-mv build/src/cocoa/libglfw.dylib glfw.dylib
-rm -rf build
-
-git log -1 >> glfw.dylib
-
+git log -1 >> build/src/libglfw.dylib
 popd
 
-mv $GLFW/glfw.dylib ../bin/glfw.dylib
+mv $GLFW/build/src/libglfw.dylib ../../bin/OSX/
+
+install_name_tool -id @rpath/libglfw.dylib ../../bin/OSX/libglfw.dylib
+otool -L ../../bin/OSX/libglfw.dylib
+file ../../bin/OSX/libglfw.dylib
+
 
