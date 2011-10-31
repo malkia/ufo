@@ -1,6 +1,6 @@
 set -e
 
-#export PKG_CONFIG_PATH=/usr/lib/pkgconfig
+export PKG_CONFIG_PATH=/usr/lib/pkgconfig
 
 PROJECT=cairo
 SOURCE=../../../$PROJECT
@@ -24,13 +24,14 @@ CONFIGURATION="\
     --enable-fc=no \
     --enable-ft=no \
 \
-    --enable-quartz-image=yes \
+    --enable-quartz-image=no \
 \
-    --enable-xml=yes \
     --enable-quartz=yes \
     --enable-tee=yes \
     --enable-script=yes \
-    --enable-png=yes \
+    --enable-png=no \
+    --enable-svg=no \
+    --enable-xml=no \
 "
 
 pushd $SOURCE
@@ -43,12 +44,10 @@ echo .PHONY: all > test/Makefile
 echo .PHONY: all > test/pdiff/Makefile
 echo .PHONY: all > doc/Makefile
 echo .PHONY: all > doc/public/Makefile
-make -j
+echo .PHONY: all > boilerplate/Makefile
+make -j -C src
 popd
 mv $SOURCE/$OBJDIR/$DYLIB $TARGET.32.tmp
-install_name_tool -id @rpath/lib$PROJECT.dylib $TARGET.32.tmp
-install_name_tool -change /opt/local/lib/libpixman-1.0.dylib @rpath/libpixman.dylib $TARGET.32.tmp
-#install_name_tool -change /opt/local/lib/libpng14.14.dylib @rpath/
 
 pushd $SOURCE
 git clean -fdx
@@ -60,14 +59,18 @@ echo .PHONY: all > test/Makefile
 echo .PHONY: all > test/pdiff/Makefile
 echo .PHONY: all > doc/Makefile
 echo .PHONY: all > doc/public/Makefile
-make -j
+echo .PHONY: all > boilerplate/Makefile
+make -j -C src
 popd
 mv $SOURCE/$OBJDIR/$DYLIB $TARGET.64.tmp
-install_name_tool -id @rpath/lib$PROJECT.dylib $TARGET.64.tmp
-install_name_tool -change /opt/local/lib/libpixman-1.0.dylib @rpath/libpixman.dylib $TARGET.64.tmp
 
 lipo -create $TARGET.*.tmp -output $TARGET
 rm $TARGET.*.tmp
+
+install_name_tool -id @rpath/lib$PROJECT.dylib $TARGET
+install_name_tool -change /opt/local/lib/libpixman-1.0.dylib @rpath/libpixman.dylib $TARGET
+install_name_tool -change /opt/local/lib/libz.1.dylib /usr/lib/libz.dylib $TARGET
+#install_name_tool -change /opt/local/lib/libpng14.14.dylib /System/Library/Frameworks/ApplicationServices.framework/Frameworks/ImageIO.framework/Versions/Current/Resources/libPng.dylib $TARGET
 
 file $TARGET
 otool -L $TARGET
