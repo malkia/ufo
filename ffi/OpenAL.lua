@@ -1,5 +1,10 @@
+-- The code below was contributed by David Hollander along with OpenALUT.cpp
+-- To run on Windows, there are few choices, easiest one is to download
+-- http://connect.creativelabs.com/openal/Downloads/oalinst.zip
+-- and run the executable from inside of it (I've seen couple of games use it).
+
 ffi = require 'ffi'
-local al = ffi.load "openal"
+local al = ffi.load( ffi.os=="Windows" and "openal32" or "openal" )
 ffi.cdef[[
 typedef char ALboolean;         /** 8-bit boolean */
 typedef char ALchar;            /** character */

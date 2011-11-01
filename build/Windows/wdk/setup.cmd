@@ -101,12 +101,11 @@ if "%LB_CL_ARCH_SSE2%"=="" if "%LB_TARGET_BITS%"=="64" set LB_CL_ARCH_SSE2=
 
 set PATH=%~dp0..\bin;%PATH%
 
-del %~dp0\bin\cl.cmd %~dp0\bin\link.cmd 1>nul 2>nul
+del "%~dp0\..\bin\cl.cmd" "%~dp0\..\bin\link.cmd" 1>nul 2>nul
 
 if "%LB_LINK_SWAPRUN%"=="" set LB_LINK_SWAPRUN=-SWAPRUN:NET,CD
-
-if "%LB_CL_OPTS%"==""   set LB_CL_OPTS=/nologo -MD -GL -O2 -GS- -Zi -Qfast_transcendentals -Fd%LB_PROJECT_NAME%.pdb %LB_CL_ARCH_SSE2% -wd4005
-if "%LB_LINK_OPTS%"=="" set LB_LINK_OPTS=-NOLOGO -DEBUG -OPT:REF -OPT:ICF=9999 -DYNAMICBASE:NO -DLL -LTCG -MACHINE:%LB_TARGET_ARCH% %LB_LINK_SWAPRUN% -PDB:%LB_PROJECT_NAME%.pdb -NXCOMPAT:NO %LB_OBJS%
+if "%LB_CL_OPTS%"==""      set LB_CL_OPTS=/nologo -MD -GL -O2 -GS- -Zi -Qfast_transcendentals -Fd%LB_PROJECT_NAME%.pdb %LB_CL_ARCH_SSE2% -wd4005
+if "%LB_LINK_OPTS%"==""    set LB_LINK_OPTS=-NOLOGO -DEBUG -OPT:REF -OPT:ICF=9999 -DYNAMICBASE:NO -DLL -LTCG -MACHINE:%LB_TARGET_ARCH% %LB_LINK_SWAPRUN% -PDB:%LB_PROJECT_NAME%.pdb -NXCOMPAT:NO %LB_OBJS%
 
 goto :EOF
 

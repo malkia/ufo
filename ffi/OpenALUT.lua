@@ -1,5 +1,4 @@
 local ffi = require 'ffi'
-local al = require 'openal'
 local alut = ffi.load 'alut'
 
 ffi.cdef[[
