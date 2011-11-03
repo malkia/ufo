@@ -11,7 +11,7 @@ copy /y %~dpn0.features build\Makefile.win32.features
 mkdir %LB_PROJECT_ROOT%\..\pixman\pixman\%DEBUG_RELEASE%
 copy /y %LB_ROOT%\bin\Windows\%LB_TARGET_ARCH%\pixman.lib %LB_PROJECT_ROOT%\..\pixman\pixman\%DEBUG_RELEASE%\pixman-1.lib
 copy /y %LB_ROOT%\bin\Windows\%LB_TARGET_ARCH%\zlib.lib   %LB_PROJECT_ROOT%\..\zlib\zdll.lib
-copy /y %LB_ROOT%\bin\Windows\%LB_TARGET_ARCH%\libpng.lib %LB_PROJECT_ROOT%\..\libpng\libpng.lib
+copy /y %LB_ROOT%\bin\Windows\%LB_TARGET_ARCH%\png.lib    %LB_PROJECT_ROOT%\..\libpng\libpng.lib
 mkdir %LB_PROJECT_ROOT%\src\GL
 copy /y %~dp0..\include\GL\glext.h %LB_PROJECT_ROOT%\src\GL
 copy %~dp0maglev.c %LB_PROJECT_ROOT%\src
