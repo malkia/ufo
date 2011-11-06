@@ -2,7 +2,7 @@ local ffi = require( "ffi" )
 
 local libs = ffi_cairo_libs or {
    Windows = { x86 = "bin/Windows/x86/cairo.dll", x64 = "bin/Windows/x64/cairo.dll" },
-   OSX     = { x86 = "bin/OSX/libcairo.dylib", x64 = "bin/OSX/libcairo.dylib" },
+   OSX     = { x86 = "bin/OSX/cairo.dylib", x64 = "bin/OSX/cairo.dylib" },
    Linux   = { x86 = "cairo", x64 = "cairo", arm = "cairo" },
 }
 

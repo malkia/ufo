@@ -2,7 +2,7 @@
 --  Based on: http://sol.gfxile.net/imgui/ch02.cpp
 
 local ffi = require( "ffi" )
-local sdl = require( "ffi/SDL" )
+local sdl = require( "ffi/sdl" )
 local shl = bit.lshift
 
 local screen = sdl.SDL_SetVideoMode( 640, 480, 32, 0 )

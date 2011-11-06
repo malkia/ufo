@@ -1,7 +1,7 @@
 local ffi  = require( "ffi" )
 
 local libs = ffi_pixman_libs or {
-   OSX     = { x86 = "bin/OSX/libpixman.dylib", x64 = "bin/OSX/libpixman.dylib" },
+   OSX     = { x86 = "bin/OSX/pixman.dylib", x64 = "bin/OSX/pixman.dylib" },
    Windows = { x86 = "bin/Windows/x86/pixman.dll", x64 = "bin/Windows/x64/pixman.dll" },
    Linux   = { x86 = "bin/Linux/x86/libpixman.so",  x64 = "bin/Linux/x64/libpixman.so", 
 	       arm = "bin/Linux/arm/libpixman.so" },

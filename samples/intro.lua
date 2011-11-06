@@ -1,5 +1,5 @@
 local ffi = require( "ffi" )
-local sdl = require( "ffi/SDL" )
+local sdl = require( "ffi/sdl" )
 local wm = require( "lib/wm/sdl" )
 local uint32ptr = ffi.typeof( "uint32_t*" )
 local cos, sin, abs, sqrt, band, bor, bxor, shl, shr, rol, ror = math.cos, math.sin, math.abs, math.sqrt, bit.band, bit.bor, bit.bxor, bit.lshift, bit.rshift, bit.rol, bit.ror

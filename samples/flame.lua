@@ -9,7 +9,7 @@
 -- FFI
 --
 local ffi = require( "ffi" )
-local sdl = require( "ffi/SDL" )
+local sdl = require( "ffi/sdl" )
 local uint32ptr = ffi.typeof( "uint32_t*" )
 
 ffi.cdef[[

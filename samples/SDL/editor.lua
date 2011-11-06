@@ -1,7 +1,7 @@
 -- Small Text Editor
 
 local ffi = require( "ffi" )
-local sdl = require( "ffi/SDL" )
+local sdl = require( "ffi/sdl" )
 
 local shl, shr, bor, band = bit.lshift, bit.rshift, bit.bor, bit.band, math.min, math.max
 local min, max = math.min, math.max

@@ -1,5 +1,5 @@
 local ffi = require( "ffi" )
-local sdl = require( "ffi/SDL" )
+local sdl = require( "ffi/sdl" )
 local cr  = require( "ffi/cairo" )
 local wm  = require( "lib/wm/sdl" )
 local random, floor, pi = math.random, math.floor, math.pi

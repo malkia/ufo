@@ -2,7 +2,7 @@
 --  Based on: http://sol.gfxile.net/imgui/ch01.cpp
 
 local ffi = require( "ffi" )
-local sdl = require( "ffi/SDL" )
+local sdl = require( "ffi/sdl" )
 
 local screen = sdl.SDL_SetVideoMode( 640, 480, 32, 0 )
 local event, rect = ffi.new( "SDL_Event" ), ffi.new( "SDL_Rect" )

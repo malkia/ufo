@@ -1,6 +1,6 @@
 -- http://cairographics.org/operators/
 local ffi = require( "ffi" )
-local sdl = require( "ffi/SDL" )
+local sdl = require( "ffi/sdl" )
 local cr  = require( "ffi/cairo" )
 local wm  = require( "lib/wm/sdl" )
 
@@ -47,10 +47,10 @@ do
    }
 
    while wm:update() do
-      if wm.kb == 32 or wm.kb == sdl.SDLK_DOWN then
+      if wm.kb == 32 or wm.kb == sdl.SDLK_DOWN or wm.kb == sdl.SDLK_RIGHT then
 	 operator = (operator + 1) % #operators
       end
-      if wm.kb == sdl.SDLK_UP then
+      if wm.kb == sdl.SDLK_UP or wm.kb == sdl.SDLK_LEFT then
 	 operator = (operator - 1) % #operators
       end
       wm.kb = 0

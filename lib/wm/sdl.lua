@@ -1,5 +1,5 @@
 local ffi = require( "ffi" )
-local sdl = require( "ffi/SDL" )
+local sdl = require( "ffi/sdl" )
 
 local function handle(type, handlers)
    local handler = handlers[type]

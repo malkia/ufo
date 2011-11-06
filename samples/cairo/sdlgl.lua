@@ -1,5 +1,5 @@
 local ffi = require( "ffi" )
-local sdl = require( "ffi/SDL" )
+local sdl = require( "ffi/sdl" )
 local cr  = require( "ffi/cairo" )
 local gl  = require( "ffi/OpenGL" )
 local shl, shr, bor, band, min, max = bit.lshift, bit.rshift, bit.bor, bit.band, math.min, math.max

@@ -2,7 +2,7 @@
 --  Based on: http://sol.gfxile.net/imgui/ch06.cpp
 
 local ffi = require( "ffi" )
-local sdl = require( "ffi/SDL" )
+local sdl = require( "ffi/sdl" )
 local shl, shr, bor, band, min, max = bit.lshift, bit.rshift, bit.bor, bit.band, math.min, math.max
 
 local screen = sdl.SDL_SetVideoMode( 640, 480, 32, 0 )

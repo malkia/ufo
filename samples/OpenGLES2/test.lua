@@ -6,7 +6,7 @@ local ww, wh = 512, 512
 
 -- Use SDL for windowing and events
 local function InitSDL()
-   local sdl = require( "ffi/SDL" )
+   local sdl = require( "ffi/sdl" )
    local screen = sdl.SDL_SetVideoMode( ww, wh, 32, 0 * sdl.SDL_RESIZABLE )
    local wminfo = ffi.new( "SDL_SysWMinfo" )
    sdl.SDL_GetVersion( wminfo.version )
