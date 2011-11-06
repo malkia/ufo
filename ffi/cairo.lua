@@ -848,7 +848,6 @@ typedef void* XRenderPictFormat;
 
 cairo_surface_t*    cairo_gl_surface_create(                cairo_device_t*, cairo_content_t, int w, int h );
 cairo_surface_t*    cairo_gl_surface_create_for_texture(    cairo_device_t*, cairo_content_t,
-
                                                             unsigned int texture, int width, int height );
 void                cairo_gl_surface_set_size(              cairo_surface_t*, int w, int h );
 int                 cairo_gl_surface_get_width(             cairo_surface_t* );
