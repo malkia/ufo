@@ -12,10 +12,10 @@ popd
 git log -1 >> build/src/libglfw.dylib
 popd
 
-mv $GLFW/build/src/libglfw.dylib ../../bin/OSX/
+mv $GLFW/build/src/libglfw.dylib ../../bin/OSX/glfw.dylib
 
-install_name_tool -id @rpath/libglfw.dylib ../../bin/OSX/libglfw.dylib
-otool -L ../../bin/OSX/libglfw.dylib
-file ../../bin/OSX/libglfw.dylib
+install_name_tool -id @rpath/glfw.dylib ../../bin/OSX/glfw.dylib
+otool -L ../../bin/OSX/glfw.dylib
+file ../../bin/OSX/glfw.dylib
 
 
