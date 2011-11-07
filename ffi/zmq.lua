@@ -1,7 +1,7 @@
 local ffi = require( "ffi" )
 
 local libs = ffi_zmq_libs or {
-   OSX     = { x86 = "bin/OSX/libzmq.dylib", x64 = "bin/OSX/libzmq.dylib" },
+   OSX     = { x86 = "bin/OSX/zmq.dylib", x64 = "bin/OSX/zmq.dylib" },
    Windows = { x86 = "bin/Windows/x86/libzmq.dll", x64 = "bin/Windows/x64/libzmq.dll" },
    Linux   = { x86 = "bin/Linux/x86/libzmq.so", x64 = "bin/Linux/x64/libzmq.so", arm = "bin/Linux/arm/libzmq.so"  },
 }
@@ -10,8 +10,8 @@ local zmq = ffi.load( ffi_zmq_lib or libs[ ffi.os ][ ffi.arch ] or "zmq" )
 
 ffi.cdef([[
    enum {
-      ZMQ_VERSION_MAJOR     = 4,
-      ZMQ_VERSION_MINOR     = 0,
+      ZMQ_VERSION_MAJOR     = 3,
+      ZMQ_VERSION_MINOR     = 1,
       ZMQ_VERSION_PATCH     = 0,
       ZMQ_VERSION           = ZMQ_VERSION_MAJOR * 10000 + ZMQ_VERSION_MINOR * 100 + ZMQ_VERSION_PATCH,
       
@@ -30,6 +30,8 @@ ffi.cdef([[
       ZMQ_XPUB              = 9,
       ZMQ_XSUB              = 10,
       ZMQ_GENERIC           = 13,
+      ZMQ_ROUTER            = ZMQ_XREP,
+      ZMQ_DEALER            = ZMQ_XREQ,
 
       // Socket options
       ZMQ_AFFINITY          = 4,
@@ -53,14 +55,14 @@ ffi.cdef([[
       ZMQ_MULTICAST_HOPS    = 25,
       ZMQ_RCVTIMEO          = 27,
       ZMQ_SNDTIMEO          = 28,
-      ZMQ_RCVLABEL          = 29,
-      ZMQ_RCVCMD            = 30,
+      ZMQ_IPV4ONLY          = 31,
+
+      // Message options
+      ZMQ_MORE              = 1,
     
       // Send/recv options
       ZMQ_DONTWAIT          = 1,
       ZMQ_SNDMORE           = 2,
-      ZMQ_SNDLABEL          = 4,
-      ZMQ_SNDCMD            = 8,
 
       // I/O multiplexing
       ZMQ_POLLIN            = 1,
@@ -75,8 +77,10 @@ ffi.cdef([[
       short revents;
    } zmq_pollitem_t;
 
-   typedef unsigned char zmq_msg_t[32];
-   
+   typedef struct zmq_msg_t {
+      unsigned char _ [32];
+   } zmq_msg_t;
+
    typedef void (zmq_free_fn)(        void *data, void *hint );
 
    void          zmq_version(         int* major, int* minor, int* patch );
@@ -92,7 +96,8 @@ ffi.cdef([[
    int           zmq_msg_copy(        zmq_msg_t* dest, zmq_msg_t* src );
    void*         zmq_msg_data(        zmq_msg_t* msg );
    size_t        zmq_msg_size(        zmq_msg_t* msg );
-   
+   int           zmq_getmsgopt(       zmq_msg_t* msg, int option, void *optval, size_t* optvallen );
+
    void*         zmq_init(            int io_threads );
    int           zmq_term(            void* context );
    

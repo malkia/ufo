@@ -1,3 +1,4 @@
+set -e
 pushd ${0%/*}
 LIBZMQ=../../../libzmq
 pushd $LIBZMQ
@@ -27,6 +28,6 @@ make -j
 git log -1 >> src/.libs/libzmq.1.dylib
 
 popd
-mv $LIBZMQ/src/.libs/libzmq.1.dylib ../../bin/OSX/libzmq.dylib
-install_name_tool -id @rpath/libzmq.dylib ../../bin/OSX/libzmq.dylib
+mv $LIBZMQ/src/.libs/libzmq.1.dylib ../../bin/OSX/zmq.dylib
+install_name_tool -id @rpath/zmq.dylib ../../bin/OSX/zmq.dylib
 popd
