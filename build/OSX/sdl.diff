@@ -1,0 +1,26 @@
+diff -r cb1f941ce38e build-scripts/fatbuild.sh
+--- a/build-scripts/fatbuild.sh	Sun Nov 06 17:05:48 2011 -0500
++++ b/build-scripts/fatbuild.sh	Sun Nov 06 21:41:07 2011 -0800
+@@ -24,19 +24,19 @@
+ CONFIG_PPC="--host=powerpc-apple-darwin"
+ CC_PPC="gcc-4.0"
+ CXX_PPC="g++-4.0"
+-BUILD_FLAGS_PPC="-arch ppc -mmacosx-version-min=10.4"
++BUILD_FLAGS_PPC="-arch ppc -mmacosx-version-min=10.5"
+ 
+ # Intel 32-bit compiler flags
+ CONFIG_X86="--host=i386-apple-darwin"
+ CC_X86="gcc"
+ CXX_X86="g++"
+-BUILD_FLAGS_X86="-arch i386 -mmacosx-version-min=10.4"
++BUILD_FLAGS_X86="-arch i386 -mmacosx-version-min=10.5"
+ 
+ # Intel 64-bit compiler flags
+ CONFIG_X64="--host=x86_64-apple-darwin"
+ CC_X64="gcc"
+ CXX_X64="g++"
+-BUILD_FLAGS_X64="-arch x86_64 -mmacosx-version-min=10.6"
++BUILD_FLAGS_X64="-arch x86_64 -mmacosx-version-min=10.5"
+ 
+ #
+ # Find the configure script
