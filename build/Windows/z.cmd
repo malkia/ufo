@@ -1,7 +1,8 @@
 @echo off
-call %~dp0/wdk/setup %~n0 %*
+call %~dp0/wdk/setup zlib %*
 pushd %LB_PROJECT_ROOT%
 setlocal
+set NAME=z
 
 rem ZLIB usually comes precompiled as tarball
 rem I put it at ../../../zlib, and did this in it:
@@ -17,11 +18,14 @@ if "%LB_TARGET_ARCH%"=="x86" set OBJA=inffas32.obj match686.obj
 if "%LB_TARGET_ARCH%"=="x86" set AS=ml
 if "%LB_TARGET_ARCH%"=="x64" set OBJA=inffasx64.obj gvmat64.obj inffas8664.obj
 if "%LB_TARGET_ARCH%"=="x64" set AS=ml64
-set NAME=%LB_PROJECT_NAME%
+set NAME=z
 
 nmake -f win32/Makefile.msc^
       CC="cl -I. %LB_CL_OPTS%"^
-      SHAREDLIB="zlib.dll" OBJA="%OBJA%" AS="%AS%" LOC="-DASMV -DASMINF"^
+      SHAREDLIB="%NAME%.dll"^
+      OBJA="%OBJA%"^
+      AS="%AS%"^
+      LOC="-DASMV -DASMINF"^
       AR="link /LIB"^
       LD="link %LB_LINK_OPTS%"
 

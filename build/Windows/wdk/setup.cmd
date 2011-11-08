@@ -4,6 +4,7 @@ rem LB -- Lua Build helper for Windows DDK
 rem
 rem LB_ROOT         - The root of the distribution (default: <this-batch-file-directory>/../../../)
 rem LB_PROJECT_NAME - Name of a project that we want to compile
+rem LB_PROJECT_REPO - If the name of the directory holding the project is different than the preffered name, REPO has the name of the repo dir
 rem LB_PROJECT_ROOT - The root of the project above that we want to compile (default: %LB_ROOT%/../%LB_PROJECT_NAME%)
 rem LB_TARGET_BITS  - 32 or 64 (default: 32)
 rem LB_TARGET_ARCH  - x86, x64, arm (default: x86)
@@ -32,6 +33,10 @@ rem    anything as first parameter
 rem                 
 if "%LB_PROJECT_NAME%"=="" set LB_PROJECT_NAME=%1
 
+rem LB_PROJECT_REPO is the actual name of the directory where the project is
+rem                 
+if "%LB_PROJECT_REPO%"=="" set LB_PROJECT_REPO=%LB_PROJECT_NAME%
+
 rem LB_PROJECT_ROOT points to the root of the project to be build.
 rem    By default the root is set to be a sibling of the distribution root,
 rem    named with value provided by LB_PROJECT_NAME
@@ -39,7 +44,7 @@ rem    If the name is the same as the distribution, it might simply be used
 rem    to recompile internal to the disribution project
 rem    To override it, set it before calling this batch file.
 rem
-if "%LB_PROJECT_ROOT%"=="" set LB_PROJECT_ROOT=%LB_ROOT%\..\%LB_PROJECT_NAME%
+if "%LB_PROJECT_ROOT%"=="" set LB_PROJECT_ROOT=%LB_ROOT%\..\%LB_PROJECT_REPO%
 for %%i in ("%LB_PROJECT_ROOT%/") do set LB_PROJECT_ROOT=%%~dpi
 
 
@@ -105,7 +110,7 @@ del "%~dp0\..\bin\cl.cmd" "%~dp0\..\bin\link.cmd" 1>nul 2>nul
 
 if "%LB_LINK_SWAPRUN%"=="" set LB_LINK_SWAPRUN=-SWAPRUN:NET,CD
 if "%LB_CL_OPTS%"==""      set LB_CL_OPTS=/nologo -MD -GL -O2 -GS- -Zi -Qfast_transcendentals -Fd%LB_PROJECT_NAME%.pdb %LB_CL_ARCH_SSE2% -wd4005
-if "%LB_LINK_OPTS%"==""    set LB_LINK_OPTS=-NOLOGO -DEBUG -OPT:REF -OPT:ICF=9999 -DYNAMICBASE:NO -DLL -LTCG -MACHINE:%LB_TARGET_ARCH% %LB_LINK_SWAPRUN% -PDB:%LB_PROJECT_NAME%.pdb -NXCOMPAT:NO %LB_OBJS%
+if "%LB_LINK_OPTS%"==""    set LB_LINK_OPTS=-NOLOGO -LTCG -DEBUG -OPT:REF -OPT:ICF=9999 -DYNAMICBASE:NO -DLL -LTCG -MACHINE:%LB_TARGET_ARCH% %LB_LINK_SWAPRUN% -PDB:%LB_PROJECT_NAME%.pdb -NXCOMPAT:NO %LB_OBJS%
 
 goto :EOF
 

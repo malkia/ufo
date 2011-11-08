@@ -1,5 +1,5 @@
 @echo off
-call %~dp0/wdk/setup %~n0 %*
+call %~dp0/wdk/setup libpng %*
 pushd %LB_PROJECT_ROOT%
 git clean -fdx
 setlocal
