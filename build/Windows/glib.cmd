@@ -18,6 +18,8 @@ rem if "%%j"=="glib_binary_age" set BINARY_AGE=%%k
 )
 
 set /A BINARY_AGE=100*%MINOR_VERSION% + %MICRO_VERSION%
+echo GLIB VERSION %MAJOR_VERSION%.%MINOR_VERSION%.%MICRO_VERSION% (%BINARY_AGE%)
+rem goto :EOF
 
 set NAME=%LB_PROJECT_NAME%
 
