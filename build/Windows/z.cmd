@@ -1,5 +1,6 @@
 @echo off
-call %~dp0/wdk/setup zlib %*
+set LB_PROJECT_REPO=zlib
+call %~dp0/wdk/setup %~n0 %*
 pushd %LB_PROJECT_ROOT%
 setlocal
 set NAME=z

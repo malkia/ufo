@@ -96,7 +96,7 @@ call %LB_WDK_ROOT%\bin\setenv.bat %LB_WDK_ROOT% fre %LB_TARGET_CROSS% win7 no_oa
 cd /d %~dp0..
 
 set LIB=%BASEDIR%\lib\crt\%LB_TARGET_CPU%;%BASEDIR%\lib\win7\%LB_TARGET_CPU%;%LIB%
-set INCLUDE=%CRT_INC_PATH%;%SDK_INC_PATH%\crt\stl60;%DDK_INC_PATH%;%INCLUDE%;
+set INCLUDE=%CRT_INC_PATH%;%SDK_INC_PATH%\crt\stl70;%DDK_INC_PATH%;%INCLUDE%;
 
 if "%LB_TARGET_ARCH%"=="x86" set LB_OBJS=msvcrt_win2000.obj
 if "%LB_TARGET_ARCH%"=="x64" set LB_OBJS=msvcrt_win2003.obj
@@ -109,8 +109,8 @@ set PATH=%~dp0..\bin;%PATH%
 del "%~dp0\..\bin\cl.cmd" "%~dp0\..\bin\link.cmd" 1>nul 2>nul
 
 if "%LB_LINK_SWAPRUN%"=="" set LB_LINK_SWAPRUN=-SWAPRUN:NET,CD
-if "%LB_CL_OPTS%"==""      set LB_CL_OPTS=/nologo -MD -GL -O2 -GS- -Zi -Qfast_transcendentals -Fd%LB_PROJECT_NAME%.pdb %LB_CL_ARCH_SSE2% -wd4005
-if "%LB_LINK_OPTS%"==""    set LB_LINK_OPTS=-NOLOGO -LTCG -DEBUG -OPT:REF -OPT:ICF=9999 -DYNAMICBASE:NO -DLL -LTCG -MACHINE:%LB_TARGET_ARCH% %LB_LINK_SWAPRUN% -PDB:%LB_PROJECT_NAME%.pdb -NXCOMPAT:NO %LB_OBJS%
+if "%LB_CL_OPTS%"==""      set LB_CL_OPTS=/nologo -MD -GL -O2 -GS- -Zi -Qfast_transcendentals -Fd%LB_PROJECT_NAME%.pdb %LB_CL_ARCH_SSE2% -wd4005 -D_STL70_=1 -D_STATIC_CPPLIB=1
+if "%LB_LINK_OPTS%"==""    set LB_LINK_OPTS=-NOLOGO -LTCG -DEBUG -OPT:REF -OPT:ICF=9999 -DYNAMICBASE:NO -DLL -LTCG -MACHINE:%LB_TARGET_ARCH% %LB_LINK_SWAPRUN% -PDB:%LB_PROJECT_NAME%.pdb -NXCOMPAT:NO %LB_OBJS% ntstc_msvcrt.lib
 
 goto :EOF
 
