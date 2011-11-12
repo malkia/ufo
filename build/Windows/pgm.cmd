@@ -26,6 +26,7 @@ for /F "usebackq tokens=1" %%i in (sources0.tmp) do (
 
 cl -c %LB_CL_OPTS%^
    -DWIN32^
+   -D_WIN32_WINNT=0x5FF^
    -D_CRT_SECURE_NO_WARNINGS^
    -DHAVE_FTIME^
    -DHAVE_ISO_VARARGS^

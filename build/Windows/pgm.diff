@@ -1,40 +1,49 @@
-Index: atomic.h
+Index: pgm/include/impl/security.h
 ===================================================================
---- atomic.h	(revision 1457)
-+++ atomic.h	(working copy)
-@@ -75,7 +75,7 @@
- 	return __sync_fetch_and_add (atomic, val);
- #elif defined( _WIN32 )
- /* Windows intrinsic */
--	return _InterlockedExchangeAdd ((volatile LONG*)atomic, val);
-+	return InterlockedExchangeAdd ((volatile LONG*)atomic, val);
- #else
- #	error "No supported atomic operations for this platform."
- #endif
-@@ -109,7 +109,7 @@
- /* interchangable with __sync_fetch_and_add () */
- 	__sync_add_and_fetch (atomic, val);
- #elif defined( _WIN32 )
--	_InterlockedExchangeAdd ((volatile LONG*)atomic, val);
-+	InterlockedExchangeAdd ((volatile LONG*)atomic, val);
- #endif
- }
+--- pgm/include/impl/security.h	(revision 1457)
++++ pgm/include/impl/security.h	(working copy)
+@@ -58,7 +58,7 @@
+ /* MinGW does not export a 32-bit or 64-bit specific API */
+ 	_ftime (timeptr);
+ 	return 0;
+-#	elif  defined( _CRT_SECURE_NO_WARNINGS )
++#	elif  0 // WDK 7.1 // defined( _CRT_SECURE_NO_WARNINGS )
+ /* validates timeptr is not NULL, otherwise returns EINVAL */
+ 	return _ftime64_s (timeptr);
+ #	else
+@@ -162,7 +162,7 @@
+ char*
+ pgm_strerror_s (char *buffer, size_t size, int errnum)
+ {
+-#if   defined( _CRT_SECURE_NO_WARNINGS )
++#if   0 // WDK 7.1 // defined( _CRT_SECURE_NO_WARNINGS )
+ 	if (0 != strerror_s (buffer, size, errnum))
+ 		pgm_snprintf_s (buffer, size, _TRUNCATE, _("Unknown error %d"), errnum);
+ 	return buffer;
+@@ -184,7 +184,7 @@
+ errno_t
+ pgm_fopen_s (FILE **pFile, const char *filename, const char *mode)
+ {
+-#ifndef _CRT_SECURE_NO_WARNINGS
++#if 1 // WDK 7.1 // ifndef _CRT_SECURE_NO_WARNINGS
+ 	FILE* stream;
  
-@@ -139,7 +139,7 @@
- #elif defined( __GNUC__ ) && ( __GNUC__ * 100 + __GNUC_MINOR__ >= 401 )
- 	pgm_atomic_add32 (atomic, 1);
- #elif defined( _WIN32 )
--	_InterlockedIncrement ((volatile LONG*)atomic);
-+	InterlockedIncrement ((volatile LONG*)atomic);
- #endif
- }
- 
-@@ -170,7 +170,7 @@
- #elif defined( __GNUC__ ) && ( __GNUC__ * 100 + __GNUC_MINOR__ >= 401 )
- 	pgm_atomic_add32 (atomic, (uint32_t)-1);
- #elif defined( _WIN32 )
--	_InterlockedDecrement ((volatile LONG*)atomic);
-+	InterlockedDecrement ((volatile LONG*)atomic);
- #endif
- }
- 
+ 	if (NULL == (stream = fopen (filename, mode)))
+@@ -202,7 +202,7 @@
+ errno_t
+ pgm_dupenv_s (char **buffer, size_t *count, const char* name)
+ {
+-#ifndef _CRT_SECURE_NO_WARNINGS
++#if 1 // WDK 7.1 // ifndef_CRT_SECURE_NO_WARNINGS
+ 	const char *val = getenv (name);
+ /* not found */
+ 	if (NULL == val) {
+@@ -236,7 +236,7 @@
+ errno_t
+ pgm_wcstombs_s (size_t *retval, char *dest, size_t size, const wchar_t *src, size_t count)
+ {
+-#	ifndef _CRT_SECURE_NO_WARNINGS
++#if	1 // WDK 7.1 // ifndef _CRT_SECURE_NO_WARNINGS
+ 	size_t characters;
+ 	if (_TRUNCATE == count) {
+ 		characters = wcstombs (dest, src, size);
