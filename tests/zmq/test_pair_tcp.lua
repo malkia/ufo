@@ -17,19 +17,19 @@
 --  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 local zmq = require( "ffi/zmq" )
-local testutil = require( "samples/zmq/tests/testutil" )
+local testutil = require( "tests/zmq/testutil" )
 
 local ctx = zmq.zmq_init( 1 )
 assert( ctx )
 
 local sb = zmq.zmq_socket( ctx, zmq.ZMQ_PAIR )
 assert( sb )
-local rc = zmq.zmq_bind( sb, "inproc://a" )
+local rc = zmq.zmq_bind( sb, "tcp://127.0.0.1:5560" )
 assert( rc == 0 )
 
 local sc = zmq.zmq_socket( ctx, zmq.ZMQ_PAIR )
 assert( sc )
-local rc = zmq.zmq_connect( sc, "inproc://a" )
+local rc = zmq.zmq_connect( sc, "tcp://127.0.0.1:5560" )
 assert( rc == 0 )
 
 testutil.bounce( sb, sc )

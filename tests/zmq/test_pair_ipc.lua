@@ -17,7 +17,7 @@
 --  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 local zmq = require( "ffi/zmq" )
-local testutil = require( "samples/zmq/tests/testutil" )
+local testutil = require( "tests/zmq/testutil" )
 
 local ctx = zmq.zmq_init( 1 )
 assert( ctx )

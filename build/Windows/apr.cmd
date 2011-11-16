@@ -7,7 +7,7 @@ set NAME=%LB_PROJECT_NAME%
 
 (for /f "usebackq tokens=1,2,3* delims==" %%i in (`findstr /B SOURCE= libapr.dsp`) do if /I "%%~xj"==".c" if /I NOT "%%~nj"=="apr_app" echo %%j) > sources.tmp
 
-copy include\apr.hw include\apr.h
+sed "s/type __stdcall/type/g" < include\apr.hw > include\apr.h
 copy include\apu_want.hw include\apu_want.h
 copy include\private\apu_select_dbm.hw include\private\apu_select_dbm.h
 

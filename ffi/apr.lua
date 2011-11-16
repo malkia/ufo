@@ -6,7 +6,7 @@ local libs = ffi_apr_libs or {
    Linux   = { x86 = "apr", x64 = "apr", arm = "apr" },
 }
 
-local ffi_apr_lib = "/opt/local/lib/libapr-1.dylib"
+--local ffi_apr_lib = "/opt/local/lib/libapr-1.dylib"
 
 local lib = ffi_apr_lib or libs[ ffi.os ][ ffi.arch ]
 local apr = ffi.load( lib )
@@ -20,11 +20,13 @@ typedef uint32_t apr_gid_t;
 typedef uint32_t apr_ino_t;
 typedef uint64_t apr_off_t;
 typedef uint64_t apr_time_t;
-
-typedef struct apr_pool_t      apr_pool_t;
-typedef struct apr_file_t      apr_file_t;
-typedef struct apr_allocator_t apr_allocator_t;
-typedef struct apr_memnode_t   apr_memnode_t;
+typedef struct   apr_pool_t         apr_pool_t;
+typedef struct   ap_dir_t           apr_dir_t;
+typedef struct   apr_file_t         apr_file_t;
+typedef struct   apr_allocator_t    apr_allocator_t;
+typedef struct   apr_memnode_t      apr_memnode_t;
+typedef struct   apr_array_header_t apr_array_header_t;
+typedef struct   apr_thread_mutex_t apr_thread_mutex_t;
 
 typedef int (* apr_abortfunc_t)( int retcode );
 
@@ -127,6 +129,11 @@ typedef struct apr_finfo_t {
     apr_file_t*     filehand;   // The file's handle, if accessed (can be submitted to apr_duphandle)
 } apr_finfo_t;
 
+apr_status_t        apr_initialize();
+apr_status_t        apr_app_initialize( int *argc, char const* const** argv, char const* const** env );
+void                apr_terminate(void);
+void                apr_terminate2(void);
+
 apr_status_t        apr_pool_initialize();
 void                apr_pool_terminate();
 apr_status_t        apr_pool_create_ex(       apr_pool_t**, apr_pool_t*, apr_abortfunc_t, apr_allocator_t* );
@@ -158,7 +165,7 @@ void*               apr_pcalloc_debug( apr_pool_t*, size_t size, const char* fil
 
 apr_status_t        apr_allocator_create(       apr_allocator_t** allocator );
 void                apr_allocator_destroy(      apr_allocator_t*  allocator );
-apr_memnode_t*      apr_allocator_alloc(        apr_allocator_t*  allocator, apr_size_t size );
+apr_memnode_t*      apr_allocator_alloc(        apr_allocator_t*  allocator, size_t size );
 void                apr_allocator_free(         apr_allocator_t*  allocator, apr_memnode_t* memnode );
 void                apr_allocator_owner_set(    apr_allocator_t*  allocator, apr_pool_t *pool);
 apr_pool_t*         apr_allocator_owner_get(    apr_allocator_t*  allocator);

@@ -18,7 +18,7 @@
 
 local ffi = require( "ffi" )
 local zmq = require( "ffi/zmq" )
-local testutil = require( "samples/zmq/tests/testutil" )
+local testutil = require( "tests/zmq/testutil" )
 local errno = require( "ffi/errno" )
 
 local ctx = zmq.zmq_init( 1 )
