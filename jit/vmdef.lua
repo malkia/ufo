@@ -305,6 +305,8 @@ ffnames = {
 "ffi.clib.__index",
 "ffi.clib.__newindex",
 "ffi.clib.__gc",
+"ffi.callback.free",
+"ffi.callback.set",
 "ffi.cdef",
 "ffi.new",
 "ffi.cast",
