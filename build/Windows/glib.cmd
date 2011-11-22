@@ -44,7 +44,8 @@ copy dummy.lib intl.lib
 copy dummy.lib glib\pcre\pcre.lib
 copy dummy.lib build\win32\dirent\dirent.lib
 
-nmake -f Makefile.msc INTL=".."
+echo nmake -f Makefile.msc INTL=".."
+cmd.exe
 
 rem make MMX=%MMX% CC="cl -DPIXMAN_NO_TLS=1 %LB_CL_OPTS%" -f Makefile.win32 CFG=release
 rem echo EXPORTS > %NAME%.def

@@ -8,7 +8,7 @@ irnames = "LT    GE    LE    GT    ULT   UGE   ULE   UGT   EQ    NE    ABC   RET
 
 irfpm = { [0]="floor", "ceil", "trunc", "sqrt", "exp", "exp2", "log", "log2", "log10", "sin", "cos", "tan", "other", }
 
-irfield = { [0]="str.len", "func.env", "tab.meta", "tab.array", "tab.node", "tab.asize", "tab.hmask", "tab.nomm", "udata.meta", "udata.udtype", "udata.file", "cdata.typeid", "cdata.ptr", "cdata.int64", "cdata.int64_4", }
+irfield = { [0]="str.len", "func.env", "func.pc", "tab.meta", "tab.array", "tab.node", "tab.asize", "tab.hmask", "tab.nomm", "udata.meta", "udata.udtype", "udata.file", "cdata.typeid", "cdata.ptr", "cdata.int64", "cdata.int64_4", }
 
 ircall = {
 [0]="lj_str_cmp",
