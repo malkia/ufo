@@ -2,7 +2,8 @@ local ffi = require( "ffi" )
 
 local libs = ffi_apr_libs or {
    Windows = { x86 = "bin/Windows/x86/apr.dll", x64 = "bin/Windows/x64/apr.dll" },
-   OSX     = { x86 = "bin/OSX/libapr.dylib", x64 = "bin/OSX/libapr.dylib" },
+-- OSX     = { x86 = "bin/OSX/libapr.dylib", x64 = "bin/OSX/libapr.dylib" },
+   OSX     = { x86 = "/usr/lib/libapr-1.dylib", x64 = "/usr/lib/libapr-1.dylib" },
    Linux   = { x86 = "apr", x64 = "apr", arm = "apr" },
 }
 

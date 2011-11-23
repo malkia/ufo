@@ -10,6 +10,8 @@ local lines = {{ x=0, y=0, solid = false }}
 local gfx_text_extents = ffi.new( "cairo_text_extents_t" )
 local gfx = {}
 
+local ui = {}
+
 -- From the cairo cookbook
 -- http://cairographics.org/cookbook/roundedrectangles/
 function gfx:round_rect_a(x,y,width,height,radius)
@@ -314,6 +316,43 @@ function gfx:main_menu(items, x, y, w, h)
    end
    cr.cairo_reset_clip( ctx )
 end
+
+function ui:list_box(state)
+   -- Draws a list_box
+end
+
+function my_ui()
+   -- Let's sa we need tree view of the objects
+   ui:tree( 
+      { -- Menu contents, array of string elements, or other arrays
+	 "Blah",  -- 1
+	 { -- 2
+	    "Duh",  -- 2.1
+	    { 
+	       "Even more deper", -- 2.1.1
+	       "Deep",            -- 2.1.2
+	       "Purple",          -- 2.1.3
+	    },
+	    "Guh"   -- 2.3
+	 }, 
+	 "Gah" -- 3
+      },
+      { 
+	 one_selection = {
+	 }
+      -- Menu selection state
+      }
+   )
+end
+
+-- Think about more complex controls
+-- TreeView with Detailed ListBox
+function my_something()
+   -- current item
+   -- item selection
+   -- tree expansion
+end
+
 
 local items = {
    "First Item",
