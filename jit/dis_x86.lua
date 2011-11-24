@@ -403,7 +403,7 @@ local function putop(ctx, text, operands)
     local sym = ctx.symtab[imm]
     if sym then text = text.."\t->"..sym end
   end
-  ctx.out(format("%08x  %s%s\n", ctx.addr+ctx.start, hex, text))
+  ctx.out(format((ctx.x64 and "%016x" or "%08x").."  %s%s\n", ctx.addr+ctx.start, hex, text))
   ctx.mrm = false
   ctx.start = pos
   ctx.imm = nil
