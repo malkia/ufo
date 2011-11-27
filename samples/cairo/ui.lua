@@ -7,9 +7,7 @@ local random, floor, pi = math.random, math.floor, math.pi
 local lines = {{ x=0, y=0, solid = false }}
 
 -- Preallocate certain ffi structures, to prevent allocations
-local gfx_text_extents = ffi.new( "cairo_text_extents_t" )
 local gfx = {}
-
 local ui = {}
 
 -- From the cairo cookbook
@@ -40,7 +38,7 @@ function gfx:round_rect_a(x,y,width,height,radius)
    else
       if height < double_radius then
 	 cr.cairo_move_to(  ctx, x0, (y0 + y1)/2 )
-	 cr.cairo_curve_to( ctx, x0 , y0, x0 , y0, x0 + radius, y0 )
+	 cr.cairo_curve_to( ctx, x0 , y0, x0, y0, x0 + radius, y0 )
 	 cr.cairo_line_to(  ctx, x1 - radius, y0 )
 	 cr.cairo_curve_to( ctx, x1, y0, x1, y0, x1, (y0 + y1)/2 )
 	 cr.cairo_curve_to( ctx, x1, y1, x1, y1, x1 - radius, y1 )
@@ -90,62 +88,24 @@ function gfx:round_rect_b(x,y,w,h,radius_x,radius_y)
 end
 
 function gfx:round_rect_c(x, y, w, h, r)
-   local r = r or 5
-   local ctx = self.ctx
-   cr.cairo_move_to(  ctx, x  +r, y                            )                  
-   cr.cairo_line_to(  ctx, x+w-r, y                            )                
-   cr.cairo_curve_to( ctx, x+w,   y,    x+w, y,   x+w,   y  +r ) 
-   cr.cairo_line_to(  ctx, x+w,   y+h-r                        )           
-   cr.cairo_curve_to( ctx, x+w,   y+h,  x+w, y+h, x+w-r, y+h   )
-   cr.cairo_line_to(  ctx, x  +r, y+h                          )                   
-   cr.cairo_curve_to( ctx, x,     y+h,  x,   y+h, x,     y+h-r )      
-   cr.cairo_line_to(  ctx, x,     y  +r                        )                     
-   cr.cairo_curve_to( ctx, x,     y,    x,   y,   x  +r, y     )            
+   local ctx, r = self.ctx, r or 5
+   cr.cairo_move_to(  ctx, x  +r, y                                )                  
+   cr.cairo_line_to(  ctx, x+w-r, y                                )                
+   cr.cairo_curve_to( ctx, x+w,   y,    x+w, y,   x+w,   y     + r ) 
+   cr.cairo_line_to(  ctx, x+w,   y+h-r                            )           
+   cr.cairo_curve_to( ctx, x+w,   y+h,  x+w, y+h, x+w-r, y + h     )
+   cr.cairo_line_to(  ctx, x  +r, y+h                              )                   
+   cr.cairo_curve_to( ctx, x,     y+h,  x,   y+h, x,     y + h - r )      
+   cr.cairo_line_to(  ctx, x,     y  +r                            )                     
+   cr.cairo_curve_to( ctx, x,     y,    x,   y,   x  +r, y         )            
 end
 
 function gfx:round_rect_d(x, y, w, h, r)
-   local r = r or 5
-   local half_pi = pi * 0.5
-   local ctx = gfx.ctx
+   local ctx, r, half_pi = gfx.ctx, r or 5, pi * 0.5
    cr.cairo_arc( ctx, x     + r, y     + r, r, 2*half_pi, 3*half_pi )
    cr.cairo_arc( ctx, x + w - r, y     + r, r, 3*half_pi, 4*half_pi )
    cr.cairo_arc( ctx, x + w - r, y + h - r, r, 0*half_pi, 1*half_pi )
    cr.cairo_arc( ctx, x     + r, y + h - r, r, 1*half_pi, 2*half_pi )
-end
-
-local actors = {{}}
-local actor = {
-   name    = "Blah",
-   root    = {}, -- The grand-daddy!
-   parent  = {}, -- Direct parent
-   index   = 0,  -- Child number (can change, if sibling is removed)
-   extents = {   -- Rectangle on the screen  (x,y,w,h) 
-      0, 0, 0, 0
-   },
-   draw =
-      function()
-      end,
-   action =
-      function()
-      end
-}
-
-local function new_actor(actor, parent)
-   local parent = parent or actors
-   local index = #parent + 1
-   assert( type(actor.parent)==nil )
-   assert( type(actor.index)==nil )
-   actor.parent = parent
-   actor.index = index
-   actor.root = parent.root or parent
-   parent[ index ] = actor
-end
-
-local function delete_actor(actor)
-   local parent, index = actor.parent, actor.index
-   parent[ index ] = parent[ #parent ]
-   parent[ index ].index = index
-   parent[ #parent ] = nil
 end
 
 local function take_string( table_or_string, table_key )
@@ -229,6 +189,7 @@ function gfx:list_box(items, x, y, w, h)
    cr.cairo_reset_clip( ctx )
 end
 
+local gfx_text_extents = ffi.new( "cairo_text_extents_t" )
 function gfx:text_extents( text )
    cr.cairo_text_extents( self.ctx, text, gfx_text_extents )
    return gfx_text_extents
@@ -320,39 +281,6 @@ end
 function ui:list_box(state)
    -- Draws a list_box
 end
-
-function my_ui()
-   -- Let's sa we need tree view of the objects
-   ui:tree( 
-      { -- Menu contents, array of string elements, or other arrays
-	 "Blah",  -- 1
-	 { -- 2
-	    "Duh",  -- 2.1
-	    { 
-	       "Even more deper", -- 2.1.1
-	       "Deep",            -- 2.1.2
-	       "Purple",          -- 2.1.3
-	    },
-	    "Guh"   -- 2.3
-	 }, 
-	 "Gah" -- 3
-      },
-      { 
-	 one_selection = {
-	 }
-      -- Menu selection state
-      }
-   )
-end
-
--- Think about more complex controls
--- TreeView with Detailed ListBox
-function my_something()
-   -- current item
-   -- item selection
-   -- tree expansion
-end
-
 
 local items = {
    "First Item",
@@ -459,10 +387,14 @@ do
    local format, surf, ctx, sdl_surf = cr.CAIRO_FORMAT_RGB24
 
    function wm:resized()
-      surf = ffi.gc( cr.cairo_image_surface_create( format, self.width, self.height ),
-		     cr.cairo_surface_destroy )
-      ctx = ffi.gc( cr.cairo_create( surf ),
-		    cr.cairo_destroy   )
+      surf = ffi.gc(
+	 cr.cairo_image_surface_create( format, self.width, self.height ),
+	 cr.cairo_surface_destroy 
+      )
+      ctx = ffi.gc(
+	 cr.cairo_create( surf ),
+	 cr.cairo_destroy  
+      )
       sdl_surf = ffi.gc(
 	 sdl.SDL_CreateRGBSurfaceFrom(
 	    cr.cairo_image_surface_get_data( surf ),
@@ -554,38 +486,28 @@ do
 	 else
 	    cr.cairo_set_source_rgba( ctx, 0.25, 0.5, 1, 1 )
 	 end
-	 cr.cairo_fill_preserve( gfx.ctx )
-	 local a, b, c, d = random(#colors), random(#colors),random(#colors),random(#colors),
+
+	 cr.cairo_fill_preserve(   ctx  )
 	 cr.cairo_set_source_rgba( ctx, 0, 0, 0, 1 )
-	 cr.cairo_stroke( gfx.ctx )
-
-	 local current = items.current - 1
-
-	 if wm.kb == sdl.SDLK_UP then
-	    items.current = (current - 1) % #items + 1
-	 elseif wm.kb == sdl.SDLK_DOWN then
-	    items.current = (current + 1) % #items + 1
-	 elseif wm.kb == sdl.SDLK_LEFT then
-	    main_menu.current = (main_menu.current - 2) % #main_menu + 1
-	 elseif wm.kb == sdl.SDLK_RIGHT then
-	    main_menu.current = main_menu.current % #main_menu + 1
-	 elseif wm.kb == sdl.SDLK_RETURN then
-	    main_menu.opened = not main_menu.opened
-	 end
-	 wm.kb = 0
-
-	 gfx:list_box( items, 10, wm.height/2-50, 100, 200 )
-	 gfx:list_box( items, 70, wm.height/2-25, 175, 300 )
-	 gfx:main_menu( main_menu, 0, 0, wm.width, 100 )
-	 
-	 cr.cairo_move_to(            ctx, x + 22, y + bh * 0.8 )
-	 local p = i %8 + 2
-	 cr.cairo_set_font_size(      ctx, (bh * 0.5) )
-	 cr.cairo_show_text(          ctx, "Aa" )
+	 cr.cairo_stroke(          ctx  )
+	 cr.cairo_move_to(         ctx, x + 22, y + bh * 0.8 )
+	 cr.cairo_set_font_size(   ctx, bh * 0.5 )
+	 cr.cairo_show_text(       ctx, "Aa" )
       end
 
+      local current = items.current - 1
+      
+      if     wm.kb == sdl.SDLK_UP     then items.current = (current - 1) % #items + 1
+      elseif wm.kb == sdl.SDLK_DOWN   then items.current = (current + 1) % #items + 1
+      elseif wm.kb == sdl.SDLK_LEFT   then main_menu.current = (main_menu.current - 2) % #main_menu + 1
+      elseif wm.kb == sdl.SDLK_RIGHT  then main_menu.current = main_menu.current % #main_menu + 1
+      elseif wm.kb == sdl.SDLK_RETURN then main_menu.opened = not main_menu.opened end
+      wm.kb = 0
+      
+      gfx:list_box( items, 10, wm.height/2-50, 100, 200 )
+      gfx:list_box( items, 170, wm.height/2-25, 175, 300 )
+      gfx:main_menu( main_menu, 0, 0, wm.width, 100 )
+      
       sdl.SDL_UpperBlit( sdl_surf, nil, wm.window, nil )
-
---      frame = frame + 0.01 -- + 0.025
    end
 end
