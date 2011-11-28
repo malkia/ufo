@@ -2,6 +2,7 @@ set -e
 pushd ${0%/*}
 LIBZMQ=../../../libzmq
 pushd $LIBZMQ
+git clean -fdx
 
 # http://www.cybergarage.org/twiki/bin/view/Main/IPhoneDevTips
 
@@ -21,13 +22,15 @@ pushd $LIBZMQ
 FLAGS="-arch i386 -arch x86_64 -mmacosx-version-min=10.4"
 CXX="g++ $FLAGS"
 CC="gcc $FLAGS"
-make clean
+#make clean
+./autogen.sh
 ./configure CXX="$CXX" CC="$CC" CPP=/usr/bin/cpp CXXCPP=/usr/bin/cpp #--with-pgm
 make -j
 
-git log -1 >> src/.libs/libzmq.1.dylib
+git log -1 >> src/.libs/libzmq.3.dylib
 
 popd
-mv $LIBZMQ/src/.libs/libzmq.1.dylib ../../bin/OSX/zmq.dylib
+mv $LIBZMQ/src/.libs/libzmq.3.dylib ../../bin/OSX/zmq.dylib
 install_name_tool -id @rpath/zmq.dylib ../../bin/OSX/zmq.dylib
 popd
+
