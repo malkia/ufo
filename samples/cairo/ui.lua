@@ -383,17 +383,27 @@ local function make_colors(n)
    return colors
 end
 
+local key2cmd = {
+   --sdl.SDLK_UP    = "up",
+   --sdl.SDLK_DOWN  = "down",
+   --sdl.SDLK_LEFT  = "left",
+   --sdl.SDLK_RIGHT = "right",
+   --sdl.SDLK_SPACE = "select",
+   --sdl.SDLK_ENTER = "accept",
+}
+
 do
-   local format, surf, ctx, sdl_surf = cr.CAIRO_FORMAT_RGB24
+   local surf, ctx, sdl_surf
 
    function wm:resized()
+      local format = cr.CAIRO_FORMAT_RGB24
       surf = ffi.gc(
 	 cr.cairo_image_surface_create( format, self.width, self.height ),
 	 cr.cairo_surface_destroy 
       )
       ctx = ffi.gc(
 	 cr.cairo_create( surf ),
-	 cr.cairo_destroy  
+	 cr.cairo_destroy
       )
       sdl_surf = ffi.gc(
 	 sdl.SDL_CreateRGBSurfaceFrom(
@@ -404,7 +414,7 @@ do
 	 ),
 	 sdl.SDL_FreeSurface
       )
-      sdl.SDL_WM_SetCaption( "Cairo Testing", nil )
+      sdl.SDL_WM_SetCaption( "GUI Demo", nil )
       gfx.ctx = ctx
       gfx.surf = surf
    end
@@ -511,3 +521,5 @@ do
       sdl.SDL_UpperBlit( sdl_surf, nil, wm.window, nil )
    end
 end
+
+
