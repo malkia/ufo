@@ -1,8 +1,8 @@
 local ffi = require( "ffi" )
 local zmq = require( "ffi/zmq" )
 
---local bind_addr    = "tcp://*:5555"
---local connect_addr = "tcp://localhost:5555"
+local bind_addr    = "tcp://*:5555"
+local connect_addr = "tcp://localhost:5555"
 
 local bind_addr = "ipc://zmq_forked_lua"
 local connect_addr = bind_addr
