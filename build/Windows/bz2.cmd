@@ -15,6 +15,9 @@ link /DEF:%NAME%.def /OUT:%NAME%.dll %LB_LINK_OPTS% lib%NAME%.lib
 call %~dp0/wdk/install %NAME%.dll
 call %~dp0/wdk/install %NAME%.lib
 call %~dp0/wdk/install %NAME%.pdb
+
+copy bzlib.h %~dp0\..\include
+
 endlocal
 popd
 
