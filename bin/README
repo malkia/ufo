@@ -13,6 +13,7 @@ organized per operating system ($OS), then architecture ($ARCH), like this:
 		- iOS     (Universal binaries for armv6, armv7 and the simulator i386. Tested with 5.00)
 		- Linux   (i386, x864_64, armv7l. Tested with 11.04 (x86), and Ubuntu 10.10 (arvm7l - efika mx))
 		- Android (arm) - Compiler right now using android-ndk-r6 for Android 2.2 (platform-8)
+		- webOS   HP TouchPad for now
 		
 	Architecutures:
 		- x86     (i386)

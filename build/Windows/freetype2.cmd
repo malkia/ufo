@@ -10,7 +10,7 @@ set NAME=%LB_PROJECT_NAME%
 echo ..\..\..\src\bzip2\ftbzip2.c >> sources.tmp
 
 cl -c %LB_CL_OPTS% -Fe%NAME%.dll -DNDEBUG=1 -DWIN32 -DFT2_BUILD_LIBRARY^
-   -I%LB_ROOT%\..\bzip2\^
+   -I%~dp0\..\include^
    -I%~dp0%NAME% -I..\..\..\include @sources.tmp
 
 move %NAME%.lib %NAME%_static.lib
