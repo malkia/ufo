@@ -109,8 +109,8 @@ ffi.cdef([[
    int           zmq_connect(         void *s, const char *addr );
    int           zmq_send(            void *s, const void* buf, int len, int flags );
    int           zmq_recv(            void *s, void* buf, int len, int flags );
-   int           zmq_sendmsg(         void *s, zmq_msg_t *msg, int len, int flags );
-   int           zmq_recvmsg(         void *s, zmq_msg_t *msg, int len, int flags );
+   int           zmq_sendmsg(         void *s, zmq_msg_t *msg, int flags );
+   int           zmq_recvmsg(         void *s, zmq_msg_t *msg, int flags );
    
    int           zmq_poll(            zmq_pollitem_t* items, int nitems, long timeout );
 
