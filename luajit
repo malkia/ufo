@@ -38,7 +38,7 @@ case `uname -s` in
 	OSARCH=$OS # universal
 	SO=.dylib
 	# this should go away at some point (install_name_tool with @rpath and @executable path)
-	export DYLD_LIBRARY_PATH=$absname/:$absname/bin/$OSARCH/:$DYLD_LIBRARY_PATH
+	export DYLD_LIBRARY_PATH=$absname/bin/$OSARCH:$DYLD_LIBRARY_PATH
 	;;
     *)
 	case `uname -o` in
@@ -50,6 +50,5 @@ case `uname -s` in
 esac
 
 export LUA_PATH="$absname/?.lua;$LUA_PATH"
-export LUA_CPATH="$absname/?$SO;$LUA_CPATH"
 "$dirname/bin/$OSARCH/luajit" "$@"
 

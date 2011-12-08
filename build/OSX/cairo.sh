@@ -45,7 +45,8 @@ CONFIGURATION="\
 pushd $SRCDIR
 git clean -fdx
 NOCONFIGURE=1 ./autogen.sh
-./configure CPP="cpp" CC="cc -mmacosx-version-min=10.5 -arch i386 -D__LP64__=1" $CONFIGURATION
+# ./configure CPP="cpp" CC="cc -mmacosx-version-min=10.5 -arch i386 -D__LP64__=1" $CONFIGURATION
+./configure CPP="cpp" CC="cc -mmacosx-version-min=10.5 -arch i386" $CONFIGURATION
 echo .PHONY: all > perf/Makefile
 echo .PHONY: all > perf/micro/Makefile
 echo .PHONY: all > test/Makefile
