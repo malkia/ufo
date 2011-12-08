@@ -16,7 +16,8 @@ export png_LIBS="-Wl,$absdir/../../bin/OSX/png.dylib"
 export png_CFLAGS="-I$absdir/../../../libpng"
 
 export gl_LIBS=" -framework OpenGL "
-export gl_CFLAGS="-I$absdir/include -framework OpenGL"
+export gl_CFLAGS="-I$absdir/include "
+# -framework OpenGL"
 
 CONFIGURATION="\
     --enable-static=no \
@@ -31,7 +32,8 @@ CONFIGURATION="\
     --enable-fc=no \
     --enable-ft=no \
 \
-    --enable-quartz-image=no \
+    --enable-quartz-font=yes \
+    --enable-quartz-image=yes \
 \
     --enable-gl=yes \
     --enable-quartz=yes \
