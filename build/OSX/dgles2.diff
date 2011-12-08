@@ -1,19 +1,16 @@
-diff --git a/dgles2/src/EGL/hcocoa.h b/dgles2/src/EGL/hcocoa.h
-index b3a5b50..f383961 100644
---- a/dgles2/src/EGL/hcocoa.h
-+++ b/dgles2/src/EGL/hcocoa.h
-@@ -23,9 +23,9 @@
- 
- #include "common.h"
- 
--#if(CONFIG_OSMESA == 1)
-+//#if(CONFIG_OSMESA == 1)
- #define GL_TEXTURE_RECTANGLE_EXT          0x84F5
--#endif
-+//#endif
- 
- #include <ApplicationServices/ApplicationServices.h>
- #include <OpenGL/OpenGL.h>
+diff --git a/dgles2/src/EGL/degl.c b/dgles2/src/EGL/degl.c
+index 66decd3..27d5ca8 100644
+--- a/dgles2/src/EGL/degl.c
++++ b/dgles2/src/EGL/degl.c
+@@ -268,7 +268,7 @@ void deglActivateClientAPI(DEGLContext *context)
+ #			if(defined _WIN32)
+ 				"GLESv2.dll";
+ #				elif(defined __APPLE__)
+-				"libGLESv2.dylib";
++			        "@loader_path/gles2.dylib"; //"libGLESv2.dylib";
+ #				else
+ 				"libGLESv2.so";
+ #				endif // !def _WIN32
 diff --git a/dgles2/src/EGL/hcocoa.m b/dgles2/src/EGL/hcocoa.m
 index 69563f2..c9e1fc4 100644
 --- a/dgles2/src/EGL/hcocoa.m

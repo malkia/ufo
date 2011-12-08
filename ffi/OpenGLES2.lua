@@ -1,6 +1,6 @@
 local ffi   = require( "ffi" )
 local libs  = ffi_gles2_libs or {
-   OSX     = { x86 = "bin/OSX/libGLESv2.dylib", x64 = "bin/OSX/libGLESv2.dylib" },
+   OSX     = { x86 = "bin/OSX/gles2.dylib", x64 = "bin/OSX/gles2.dylib" },
    Windows  = { x86 = "bin/Windows/x86/libGLESv2.dll", x64 = "bin/Windows/x64/libGLESv2.dll" },
    Linux    = { x86 = "bin/Linux/x86/libGLESv2.so", x64 = "bin/Linux/x64/libGLESv2.so", arm = "GLESv2" }
 }

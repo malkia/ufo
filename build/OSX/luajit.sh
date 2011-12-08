@@ -12,11 +12,12 @@ mv $LUAJIT/src/luajit.dylib luajit64.dylib.tmp
 lipo -create ./luajit*.exe.tmp -output luajit
 lipo -create ./luajit*.dylib.tmp -output luajit.dylib
 # rm *.tmp 1>/dev/null 2>/dev/null
-install_name_tool -id @rpath/luajit.dylib luajit.dylib
+install_name_tool -id @loader_path/luajit.dylib luajit.dylib
 install_name_tool -change luajit.dylib @executable_path/luajit.dylib luajit
 git --git-dir=$LUAJIT/.git log -1 >> luajit
 git --git-dir=$LUAJIT/.git log -1 >> luajit.dylib
 mv luajit ../../bin/OSX
 mv luajit.dylib ../../bin/OSX/luajit.dylib
+rm *.tmp
 echo Done
 

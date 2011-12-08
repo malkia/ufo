@@ -12,7 +12,7 @@ make -j
 popd
 mv $SOURCE $TARGET
 
-install_name_tool -id @rpath/$PROJECT.dylib $TARGET
+install_name_tool -id @loader_path/$PROJECT.dylib $TARGET
 file $TARGET
 otool -L $TARGET
 size $TARGET

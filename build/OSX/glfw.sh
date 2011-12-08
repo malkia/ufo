@@ -6,7 +6,7 @@ git clean -fdx
 mkdir build
 pushd build
 cmake -D CMAKE_OSX_DEPLOYMENT_TARGET=10.5 -D CMAKE_OSX_ARCHITECTURES="i386;x86_64" ../
-make -j8
+make -j
 popd
 
 git log -1 >> build/src/libglfw.dylib
@@ -14,7 +14,7 @@ popd
 
 mv $GLFW/build/src/libglfw.dylib ../../bin/OSX/glfw.dylib
 
-install_name_tool -id @rpath/glfw.dylib ../../bin/OSX/glfw.dylib
+install_name_tool -id @loader_path/glfw.dylib ../../bin/OSX/glfw.dylib
 otool -L ../../bin/OSX/glfw.dylib
 file ../../bin/OSX/glfw.dylib
 

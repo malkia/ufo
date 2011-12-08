@@ -11,7 +11,7 @@ make -j
 popd
 mv $SRCDIR/$PROJECT/.libs/lib$PROJECT-1.0.dylib $TARGET
 
-install_name_tool -id @rpath/$PROJECT.dylib $TARGET
+install_name_tool -id @loader_path/$PROJECT.dylib $TARGET
 file $TARGET
 otool -L $TARGET
 size $TARGET

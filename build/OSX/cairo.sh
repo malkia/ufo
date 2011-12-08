@@ -75,10 +75,7 @@ mv $SRCDIR/$OBJDIR/$DYLIB $TARGET.64.tmp
 lipo -create $TARGET.*.tmp -output $TARGET
 rm $TARGET.*.tmp
 
-install_name_tool -id @rpath/$PROJECT.dylib $TARGET
-#install_name_tool -change /opt/local/lib/libpixman-1.0.dylib @rpath/pixman.dylib $TARGET
-#install_name_tool -change /opt/local/lib/libz.1.dylib /usr/lib/libz.dylib $TARGET
-#install_name_tool -change /opt/local/lib/libpng14.14.dylib @rpath/libpng.dylib $TARGET
+install_name_tool -id @loader_path/$PROJECT.dylib $TARGET
 
 file $TARGET
 otool -L $TARGET

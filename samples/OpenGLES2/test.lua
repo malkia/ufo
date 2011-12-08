@@ -112,8 +112,8 @@ local r0       = egl.eglChooseConfig(        dpy, cfg_attr, cfg, 1, n_cfg )
 local c = cfg[0]
 
 for i=0,10 do
-    if c[i]==egl.EGL_FALSE then break end
-    print(i,c[i])
+--    if c[i]==egl.EGL_FALSE then break end
+--    print(i,c[i])
 end
 
 local surf     = egl.eglCreateWindowSurface( dpy, cfg[0], wm.window, nil )
