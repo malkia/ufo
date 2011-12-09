@@ -9,7 +9,7 @@ organized per operating system ($OS), then architecture ($ARCH), like this:
 
 	Operating systems:
 		- Windows (Linked with MSVCRT.DLL, MSVCP60.DLL, should work on Windows 2000+. Tested on XP, Windows 7)
-		- OSX     (Universal binaries for i386, x86_64. Should work on 10.5. Tested on 10.7)
+		- OSX     (i386, x86_64, should work on Mac OS X 10.4. Tested on 10.7)
 		- iOS     (Universal binaries for armv6, armv7 and the simulator i386. Tested with 5.00)
 		- Linux   (i386, x864_64, armv7l. Tested with 11.04 (x86), and Ubuntu 10.10 (arvm7l - efika mx))
 		- Android (arm) - Compiler right now using android-ndk-r6 for Android 2.2 (platform-8)
