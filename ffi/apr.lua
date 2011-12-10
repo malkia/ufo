@@ -2,12 +2,9 @@ local ffi = require( "ffi" )
 
 local libs = ffi_apr_libs or {
    Windows = { x86 = "bin/Windows/x86/apr.dll", x64 = "bin/Windows/x64/apr.dll" },
--- OSX     = { x86 = "bin/OSX/libapr.dylib", x64 = "bin/OSX/libapr.dylib" },
    OSX     = { x86 = "/usr/lib/libapr-1.dylib", x64 = "/usr/lib/libapr-1.dylib" },
    Linux   = { x86 = "apr", x64 = "apr", arm = "apr" },
 }
-
---local ffi_apr_lib = "/opt/local/lib/libapr-1.dylib"
 
 local lib = ffi_apr_lib or libs[ ffi.os ][ ffi.arch ]
 local apr = ffi.load( lib )
@@ -16,8 +13,8 @@ ffi.cdef [[
 typedef int      apr_status_t;
 typedef int32_t  apr_fileperms_t;
 typedef int32_t  apr_dev_t;
-typedef uint32_t apr_uid_t;
-typedef uint32_t apr_gid_t;
+typedef void*    apr_uid_t;
+typedef void*    apr_gid_t;
 typedef uint32_t apr_ino_t;
 typedef uint64_t apr_off_t;
 typedef uint64_t apr_time_t;
@@ -91,11 +88,10 @@ enum {
     APR_FILEPATH_TRUENAME       =       0x20, // Resolve the true case of existing directories and file 
                                               // elements of addpath, (resolving any aliases on Win32)
                                               // and append a proper trailing slash if a directory
-    APR_FILEPATH_ENCODING_UNKNOWN =        0, // The FilePath character encoding is unknown 
-    APR_FILEPATH_ENCODING_LOCALE =         1, // The FilePath character encoding is locale-dependent
-    APR_FILEPATH_ENCODING_UTF8   =         2, // The FilePath character encoding is UTF-8
+    APR_FILEPATH_ENCODING_UNKNOWN    =     0, // The FilePath character encoding is unknown 
+    APR_FILEPATH_ENCODING_LOCALE     =     1, // The FilePath character encoding is locale-dependent
+    APR_FILEPATH_ENCODING_UTF8       =     2, // The FilePath character encoding is UTF-8
     APR_ALLOCATOR_MAX_FREE_UNLIMITED =     0, // Symbolic constant
-
 };
 
 typedef struct apr_memnode_t {
