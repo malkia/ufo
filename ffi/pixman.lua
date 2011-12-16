@@ -3,7 +3,7 @@ local ffi  = require( "ffi" )
 local libs = ffi_pixman_libs or {
    OSX     = { x86 = "bin/OSX/pixman.dylib", x64 = "bin/OSX/pixman.dylib" },
    Windows = { x86 = "bin/Windows/x86/pixman.dll", x64 = "bin/Windows/x64/pixman.dll" },
-   Linux   = { x86 = "bin/Linux/x86/libpixman.so",  x64 = "bin/Linux/x64/libpixman.so", 
+   Linux   = { x86 = "bin/Linux/x86/libpixman.so",  x64 = "bin/Linux/x64/libpixman.so",
 	       arm = "bin/Linux/arm/libpixman.so" },
 }
 
@@ -40,7 +40,7 @@ ffi1.cdef[[
 	 PIXMAN_REPEAT_PAD,
 	 PIXMAN_REPEAT_REFLECT
       } pixman_repeat_t;
-	 
+
       typedef enum {
          PIXMAN_FILTER_FAST,
          PIXMAN_FILTER_GOOD,
@@ -62,7 +62,7 @@ ffi1.cdef[[
 	 PIXMAN_TYPE_BGRA,
 	 PIXMAN_TYPE_RGBA,
       } pixman_type_t;
-	 
+
       typedef enum {
          PIXMAN_OP_CLEAR                = 0x00,
          PIXMAN_OP_SRC                  = 0x01,
@@ -151,13 +151,13 @@ ffi1.cdef[[
 	 pixman_fixed_t x;
 	 pixman_color_t color;
       } pixman_gradient_stop_t;
-      
+
       typedef struct pixman_indexed {
 	 pixman_bool_t       color;
 	 uint32_t            rgba[PIXMAN_MAX_INDEXED];
 	 pixman_index_type   ent[32768];
       } pixman_indexed_t;
-      
+
 
       typedef struct pixman_point_fixed {
          pixman_fixed_t x;
@@ -180,7 +180,7 @@ ffi1.cdef[[
       typedef struct pixman_f_vector {
 	 double  v[3];
       } pixman_f_vector_t;
-      
+
       typedef struct pixman_f_transform {
 	 double  m[3][3];
       } pixman_f_transform_t;
@@ -214,16 +214,16 @@ ffi1.cdef[[
 	 long                numRects;
 	 pixman_box32_t      rects[0]; //[size]
       } pixman_region32_data_t;
-      
+
       typedef struct pixman_rectangle32 {
 	 int32_t x, y;
 	 uint32_t width, height;
       } pixman_rectangle32_t;
-      
+
       typedef struct pixman_box32 {
 	 int32_t x1, y1, x2, y2;
       } pixman_box32;
-      
+
       typedef struct pixman_region32 {
 	 pixman_box32_t          extents;
 	 pixman_region32_data_t  *data;
@@ -331,13 +331,13 @@ ffi1.cdef( replicate( [[
 							   struct pixman_box16             *b);
    void          pixman_<A>_transform_init_identity         (struct pixman_f_transform       *t);
 ]],
-	  { 
-	     A = "pixman_transform",   
-	     S = "pixman_fixed_t" 
+	  {
+	     A = "pixman_transform",
+	     S = "pixman_fixed_t"
 	  },
-	  { 
-	     A = "pixman_f_transform", 
-	     S = "double" 
+	  {
+	     A = "pixman_f_transform",
+	     S = "double"
 	  }
 ))
 
@@ -346,11 +346,11 @@ ffi1.cdef[[
 							      const struct pixman_f_transform *ft);
    void          pixman_f_transform_from_pixman_transform (struct pixman_f_transform       *ft,
 							   const struct pixman_transform   *t);
-  
+
       void pixman_region_set_static_pointers (pixman_box16_t         *empty_box,
 					      pixman_region16_data_t *empty_data,
 					      pixman_region16_data_t *broken_data);
-      
+
       void                    pixman_region_init               (pixman_region16_t *region);
       void                    pixman_region_init_rect          (pixman_region16_t *region,
 								int                x,
@@ -426,8 +426,8 @@ ffi1.cdef[[
       void                    pixman_region32_init_from_image    (pixman_region32_t *region,
 								  pixman_image_t    *image);
       void                    pixman_region32_fini               (pixman_region32_t *region);
-      
-      
+
+
       void                    pixman_region32_translate          (pixman_region32_t *region,
 								  int                x,
 								  int                y);
@@ -494,7 +494,7 @@ ffi1.cdef[[
 					       int                 width,
 					       int                 height,
 					       uint32_t            _xor);
-      
+
 typedef uint32_t (* pixman_read_memory_func_t) (const void *src, int size);
 typedef void     (* pixman_write_memory_func_t) (void *dst, uint32_t value, int size);
 typedef void     (* pixman_image_destroy_func_t) (pixman_image_t *image, void *data);
@@ -917,7 +917,7 @@ ffi.cdef[[
       pixman_bool_t pixman_f_transform_bounds (const struct pixman_f_transform *t,
 					       struct pixman_box16 *b);
       void pixman_f_transform_init_identity (struct pixman_f_transform *t);
-      
+
       typedef enum {
 	 PIXMAN_REPEAT_NONE,
 	 PIXMAN_REPEAT_NORMAL,
@@ -992,7 +992,7 @@ ffi.cdef[[
 	 PIXMAN_OP_HSL_COLOR = 0x3d,
 	 PIXMAN_OP_HSL_LUMINOSITY = 0x3e
       } pixman_op_t;
-      
+
       typedef struct pixman_region16_data pixman_region16_data_t;
       typedef struct pixman_box16         pixman_box16_t;
       typedef struct pixman_rectangle16   pixman_rectangle16_t;
@@ -1104,7 +1104,7 @@ ffi.cdef[[
       struct pixman_box32 {
 	 int32_t x1, y1, x2, y2;
       };
-      
+
       struct pixman_region32 {
 	 pixman_box32_t extents;
 	 pixman_region32_data_t *data;
@@ -1193,7 +1193,7 @@ ffi.cdef[[
 				 uint32_t _xor);
       int pixman_version (void);
       const char* pixman_version_string (void);
-      
+
       typedef struct pixman_indexed pixman_indexed_t;
       typedef struct pixman_gradient_stop pixman_gradient_stop_t;
       typedef uint32_t (* pixman_read_memory_func_t) (const void *src, int size);
@@ -1206,7 +1206,7 @@ ffi.cdef[[
       };
 
       typedef uint8_t pixman_index_type;
-      
+
       struct pixman_indexed {
 	 pixman_bool_t color;
 	 uint32_t rgba[256];
@@ -1248,7 +1248,7 @@ ffi.cdef[[
 	 PIXMAN_b2g3r3 = (((8) << 24) | ((3) << 16) | ((0) << 12) | ((3) << 8) | ((3) << 4) | ((2))),
 	 PIXMAN_a2r2g2b2 = (((8) << 24) | ((2) << 16) | ((2) << 12) | ((2) << 8) | ((2) << 4) | ((2))),
 	 PIXMAN_a2b2g2r2 = (((8) << 24) | ((3) << 16) | ((2) << 12) | ((2) << 8) | ((2) << 4) | ((2))),
-	 
+
 	 PIXMAN_c8 = (((8) << 24) | ((4) << 16) | ((0) << 12) | ((0) << 8) | ((0) << 4) | ((0))),
 	 PIXMAN_g8 = (((8) << 24) | ((5) << 16) | ((0) << 12) | ((0) << 8) | ((0) << 4) | ((0))),
 
@@ -1305,8 +1305,8 @@ ffi.cdef[[
 					      pixman_image_destroy_func_t function_,
 					      void *data);
       void * pixman_image_get_destroy_data (pixman_image_t *image);
-      
-      
+
+
       pixman_bool_t pixman_image_set_clip_region (pixman_image_t *image,
 						  pixman_region16_t *region);
       pixman_bool_t pixman_image_set_clip_region32 (pixman_image_t *image,

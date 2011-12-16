@@ -60,7 +60,7 @@ enum { // languageID for STBTT_PLATFORM_ID_MAC
 	 uint16_t x0, y0, x1, y1;
 	 float    xoff, yoff, xadvance;
       } ttf_bakedchar;
-      
+
       typedef struct _ttf_aligned_quad {
 	 float x0, y0, s0, t0;
 	 float x1, y1, s1, t1;
@@ -70,7 +70,7 @@ enum { // languageID for STBTT_PLATFORM_ID_MAC
 	 void*    userdata;
 	 uint8_t* data;
 	 uint32_t fontstart;
-	 uint32_t n_glyphs; 
+	 uint32_t n_glyphs;
 	 uint32_t loca, head, glyf, hhea, hmtx;
 	 uint32_t index_map;
 	 uint32_t index_to_loc_format;
@@ -80,7 +80,7 @@ enum { // languageID for STBTT_PLATFORM_ID_MAC
 	 int16_t x, y, cx, cy;
 	 uint8_t type, padding;
       } ttf_vertex;
-      
+
       typedef struct _ttf_bitmap {
 	 int w, h, stride;
 	 uint8_t* pixels;
@@ -154,7 +154,7 @@ end
 local function initfont( info, data, fontstart )
    info.data = data
    info.fontstart = fontstart
-   
+
    for _, v in ipairs{ "cmap", "loca", "head", "glyf", "hhea", "hmtx" } do
       local offs = find_table( data, fontstart, v )
       if not offs then
@@ -171,7 +171,7 @@ local function initfont( info, data, fontstart )
    end
 
    local n_tables = read_uint16( data + cmap + 2 )
-   local index_map 
+   local index_map
    for i = 0, n_tables - 1 do
       local offs = cmap + 4 + 8 * i
       local plat = read_uint16( data, offs )
@@ -269,15 +269,15 @@ local function get_glyph_offset( info, index )
 
    if info.index_to_loc_format == 0 then
       g1 = info.glyph + read_uint16( data, info.loca + index * 2 ) * 2
-      g2 = info.glyph + 10 
+      g2 = info.glyph + 10
    else
-      
+
    end
 
    if g1 == g2 then
       return nil
    end
-     
+
    return info.glyph + g1
 end
 
@@ -292,10 +292,10 @@ end
 local function get_glyph_shape( info, index )
    local g = get_glyph_offset( info, index )
    if not g then return nil end
-   
+
    local n_contours = read_uint16( data, g )
    if n_contours > 0 then
-      
+
    end
 end
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env luajit 
+#!/usr/bin/env luajit
 
 local ffi = require( "ffi" )
 local cl  = require( "ffi/OpenCL"  )
@@ -19,7 +19,7 @@ local function dump( value )
 end
 
 local function main()
-   for platform_index, platform in pairs( clx.GetPlatforms() ) 
+   for platform_index, platform in pairs( clx.GetPlatforms() )
    do
       for k, v in pairs( platform ) do
 	 print( "Platform "..tostring( platform_index )..": "..tostring( k ).." = "..tostring( v ) )
@@ -40,4 +40,3 @@ end
 
 main()
 
-	

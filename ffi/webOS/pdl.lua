@@ -21,11 +21,11 @@ ffi.cdef[[
 	 PDL_HARDWARE_TOUCHPAD    = 601,
 	 PDL_CALLBACK_PAYLOAD_MAX = 1024,
 	 PDL_GPS_UPDATE           = 0xE100,
-	 PDL_GPS_FAILURE          = 0xE101, 
+	 PDL_GPS_FAILURE          = 0xE101,
 	 PDL_COMPASS              = 0xE110,
 	 PDL_PENDING_JS           = 0xE120,
       };
-      
+
       typedef enum PDL_Err {
 	 PDL_NOERROR,
 	 PDL_EMEMORY,
@@ -41,53 +41,53 @@ ffi.cdef[[
 	 PDL_APPINFO,
 	 PDL_ESTATE
       } PDL_Err;
-      
+
       typedef enum PDL_Orientation {
 	 PDL_ORIENTATION_0,
 	 PDL_ORIENTATION_90,
 	 PDL_ORIENTATION_180,
-	 PDL_ORIENTATION_270 
+	 PDL_ORIENTATION_270
       } PDL_Orientation;
-      
+
       enum {
 	 PDLK_GESTURE_AREA             = 231,
 	 PDLK_GESTURE_BACK             = 27,
 	 PDLK_GESTURE_FORWARD          = 229,
 	 PDLK_GESTURE_DISMISS_KEYBOARD = 24
       };
-      
+
       typedef enum PDL_TouchAggression {
 	 PDL_AGGRESSION_LESSTOUCHES,
-	 PDL_AGGRESSION_MORETOUCHES 
+	 PDL_AGGRESSION_MORETOUCHES
       } PDL_TouchAggression;
-      
+
       typedef enum PDL_OGLVersion {
 	 PDL_OGL_1_1,
 	 PDL_OGL_2_0
       } PDL_OGLVersion;
-      
+
       typedef struct PDL_NetInfo {
 	 uint32_t ipaddress;
 	 uint32_t netmask;
 	 uint32_t broadcast;
       } PDL_NetInfo;
-      
+
       typedef struct PDL_Location {
 	 double latitude;
 	 double longitude;
-	 double altitude; 
+	 double altitude;
 	 double horizontalAccuracy;
 	 double verticalAccuracy;
 	 double heading;
 	 double velocity;
       } PDL_Location;
-      
+
       typedef struct PDL_Compass {
 	 int confidence;
 	 double magneticBearing;
 	 double trueBearing;
       } PDL_Compass;
-      
+
       typedef struct PDL_ScreenMetrics {
 	 int horizontalPixels;
 	 int verticalPixels;
@@ -95,23 +95,23 @@ ffi.cdef[[
 	 int verticalDPI;
 	 double aspectRatio;
       } PDL_ScreenMetrics;
-      
+
       typedef struct PDL_OSVersion {
 	 int majorVersion;
 	 int minorVersion;
 	 int revision;
 	 char versionStr[ 256 ];
       } PDL_OSVersion;
-      
+
       typedef struct      PDL_ServiceParameters          PDL_ServiceParameters;
       typedef struct      PDL_JSParameters               PDL_JSParameters;
       typedef struct      PDL_ItemInfo                   PDL_ItemInfo;
       typedef struct      PDL_ItemReceipt                PDL_ItemReceipt;
       typedef struct      PDL_ItemCollection             PDL_ItemCollection;
-      
+
       typedef PDL_bool (* PDL_ServiceCallbackFunc     )( PDL_ServiceParameters* params, void *user );
-      typedef PDL_bool (* PDL_JSHandlerFunc           )( PDL_JSParameters*      params ); 
-      
+      typedef PDL_bool (* PDL_JSHandlerFunc           )( PDL_JSParameters*      params );
+
       PDL_Err             PDL_Init(                      unsigned int flags );
       PDL_Err             PDL_LaunchEmail(               const char* Subject, const char* Body );
       PDL_Err             PDL_LaunchEmailTo(             const char* Subject, const char* Body, int numRecipients, const char** recipients );
@@ -164,7 +164,7 @@ ffi.cdef[[
       PDL_Err             PDL_CallJS(                    const char* functionName, const char **params, int numParams );
       SDL_Surface*        PDL_SetFullscreen(             int width, int height, int bpp, Uint32 flags );
       PDL_Err             PDL_DismissFullscreen(         );
-      PDL_bool            PDL_IsFullscreenPlugin(        ); 
+      PDL_bool            PDL_IsFullscreenPlugin(        );
       PDL_Err             PDL_ServiceCall(               const char* uri, const char* payload );
       PDL_Err             PDL_ServiceCallWithCallback(   const char *uri, const char *payload, PDL_ServiceCallbackFunc callback, void *user, PDL_bool removeAfterResponse );
       PDL_Err             PDL_UnregisterServiceCallback( PDL_ServiceCallbackFunc callback )

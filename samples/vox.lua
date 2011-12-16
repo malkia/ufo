@@ -17,7 +17,7 @@ local function calc_light( x1, y1, x2, y2 )
    for c = 0, 1 do
       for i = y1, y2 do
 	 for j = x1, x2 do
-	    local h00 = hmap[ band(i * map_size ) j 
+	    local h00 = hmap[ band(i * map_size ) j
 	 end
       end
    end
@@ -25,7 +25,7 @@ end
 
     void CalculateLight( int x1, int y1, int x2, int y2 )
     {
-       local 
+       local
         enum {
             C =  0,
             D = +1,
@@ -100,23 +100,23 @@ end
             int v0 = y0 >> 16;
             
             int isInside = options.WrapAround || ((unsigned)u0 <= (unsigned)(MapSize - 2) && (unsigned)v0 <= (unsigned)(MapSize - 2));
-            
+
             if( isInside )
             {
                 u0 &= (MapSize - 1);
                 v0 &= (MapSize - 1);
-                
+
                 int u1 = (u0  +  1) & (MapSize - 1);
                 int v1 = (v0  +  1) & (MapSize - 1);
                 
                 v0  <<= MapShift;
                 v1  <<= MapShift;
-    
+
                 int h0 = HMap[u0+v0];
                 int h2 = HMap[u0+v1];
                 int h1 = HMap[u1+v0];
                 int h3 = HMap[u1+v1];
-    
+
                 // Perform bilinear filtering
                 h0 = (h0 << 8) + a * (h1 - h0);
                 h2 = (h2 << 8) + a * (h3 - h2);
@@ -128,7 +128,7 @@ end
                 h2 = LMap[u0+v1];
                 h1 = LMap[u1+v0];
                 h3 = LMap[u1+v1];
-    
+
                 // Perform bilinear filtering
                 h0 = ( (h0 << 8) ) + a * (h1 - h0);
                 h2 = ( (h2 << 8)  ) + a * (h3 - h2);
@@ -152,20 +152,20 @@ end
                         glTexCoord2f( last[i-1].x / Texel, last[i-1].y / Texel );
                         glColor4ub( last[i-1].l, 255-last[i-1].l, 0, 255-last[i-1].h/2 );
                         glVertex3f(  ip - options.ColumnsToSkip,  last[i-1].z,  -Distance );
-    
+
                         stats.polyCount ++;
                         State = 1;
                     }
                     stats.polyCount += 2;
-    
+
                     glTexCoord2f( (float)x0 / Texel, (float)y0 / Texel );
                     glColor4ub( l, 255-l, 0, 255-h/2 );
                     glVertex3f( ip, z, -Distance);
-    
+
                     glTexCoord2f( last[i].x / Texel, last[i].y / Texel);
                     glColor4ub( last[i].l, 255-l, 0, 255-last[i].h/2 );
                     glVertex3f( ip, last[i].z, -Distance);
-    
+
                     last[i].z = z;
                 }
                 else if( State == 1 )
@@ -200,7 +200,7 @@ end
         
         if( pStats )
            *pStats = &stats;
-        
+
         options.WireFrame     = 0;
         options.FreeFly       = 1;
         options.FieldOfView   = 3.14159256f / 6;
@@ -219,7 +219,7 @@ end
         dragPitch      = 0.0f;
 
         HMap           = (unsigned char*)data_terrain_raw;
-        
+
         image = ImageFileFormat::loadFrom( data_terrain_png, data_terrain_png_size );
         textureHandle = 0;
 
@@ -250,7 +250,7 @@ end
             glEnable( GL_TEXTURE_2D );
             glEnable(GL_FOG);
             startTimer( 1000 / 60 );
-            
+
             glBindTexture(GL_TEXTURE_2D,  textureHandle);
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -282,7 +282,7 @@ end
         glBindTexture(GL_TEXTURE_2D,  textureHandle);
 
         float realYaw = options.Yaw + dragYaw;
-        
+
         options.Xo += options.Speed * cosf(realYaw) * 65536.0f;
         options.Yo += options.Speed * sinf(realYaw) * 65536.0f;
 

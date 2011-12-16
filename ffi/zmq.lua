@@ -14,9 +14,9 @@ ffi.cdef([[
       ZMQ_VERSION_MINOR     = 1,
       ZMQ_VERSION_PATCH     = 0,
       ZMQ_VERSION           = ZMQ_VERSION_MAJOR * 10000 + ZMQ_VERSION_MINOR * 100 + ZMQ_VERSION_PATCH,
-      
+
       ZMQ_HAUSNUMERO        = 156384712,
-      
+
       // Socket types
       ZMQ_PAIR              = 0,
       ZMQ_PUB               = 1,
@@ -59,14 +59,14 @@ ffi.cdef([[
 
       // Message options
       ZMQ_MORE              = 1,
-    
+
       // Send/recv options
       ZMQ_DONTWAIT          = 1,
       ZMQ_SNDMORE           = 2,
 
       // I/O multiplexing
       ZMQ_POLLIN            = 1,
-      ZMQ_POLLOUT           = 2, 
+      ZMQ_POLLOUT           = 2,
       ZMQ_POLLERR           = 4,
    }
 
@@ -87,7 +87,7 @@ ffi.cdef([[
 
    int           zmq_errno(           void );
    const char*   zmq_strerror(        int errnum );
-   
+
    int           zmq_msg_init(        zmq_msg_t* msg );
    int           zmq_msg_init_size(   zmq_msg_t* msg, size_t size );
    int           zmq_msg_init_data(   zmq_msg_t* msg, void* data, size_t size, zmq_free_fn*, void* hint );
@@ -100,10 +100,10 @@ ffi.cdef([[
 
    void*         zmq_init(            int io_threads );
    int           zmq_term(            void* context );
-   
+
    void*         zmq_socket(          void *context, int type );
    int           zmq_close(           void *s  );
-   int           zmq_setsockopt(      void *s, int option, const void *optval, size_t optvallen ); 
+   int           zmq_setsockopt(      void *s, int option, const void *optval, size_t optvallen );
    int           zmq_getsockopt(      void *s, int option, void *optval, size_t *optvallen );
    int           zmq_bind(            void *s, const char *addr );
    int           zmq_connect(         void *s, const char *addr );
@@ -111,12 +111,12 @@ ffi.cdef([[
    int           zmq_recv(            void *s, void* buf, int len, int flags );
    int           zmq_sendmsg(         void *s, zmq_msg_t *msg, int flags );
    int           zmq_recvmsg(         void *s, zmq_msg_t *msg, int flags );
-   
+
    int           zmq_poll(            zmq_pollitem_t* items, int nitems, long timeout );
 
    void*         zmq_stopwatch_start( void );
    unsigned long zmq_stopwatch_stop(  void *watch );
-   
+
    void          zmq_sleep(           int seconds );
 ]])
 

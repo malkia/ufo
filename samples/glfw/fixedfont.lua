@@ -1,5 +1,5 @@
 local ffi  = require( "ffi" )
-local gl   = require( "ffi/OpenGL" ) 
+local gl   = require( "ffi/OpenGL" )
 local glfw = require( "ffi/glfw" )
 
 local font = require( "lib/fonts/pearl8x8" )
@@ -34,7 +34,7 @@ local function draw_string(x,y,s)
    for i=1,#s do
       local c = s:byte(i)
       if c == 10 or c == 13 then
-	 y = y + 10 
+	 y = y + 10
 	 if y > height then
 	    break
 	 end
@@ -50,7 +50,7 @@ end
 
 local text = debug.getinfo(1, "S").source
 if text:byte(1)==64 then
-   text = io.input(text:sub(2)):read("*all")   
+   text = io.input(text:sub(2)):read("*all")
 end
 
 local function main()
@@ -73,7 +73,7 @@ local function main()
    gl.glMatrixMode(gl.GL_PROJECTION);
    gl.glLoadIdentity();
    gl.glOrtho(0, width, height, 0, 0, 1)
-   
+
    gl.glMatrixMode( gl.GL_MODELVIEW );
    gl.glLoadIdentity();
 
@@ -93,24 +93,24 @@ local function main()
    local glfwGetKey = glfw.glfwGetKey
    local GLFW_KEY_ESCAPE = glfw.GLFW_KEY_ESCAPE
    local GLFW_PRESS = glfw.GLFW_PRESS
-   
+
    local curr_time = glfw.glfwGetTime()
    local prev_time = glfw.glfwGetTime()
-   while glfwIsWindow(window) and glfwGetKey(window, GLFW_KEY_ESCAPE) ~= GLFW_PRESS 
+   while glfwIsWindow(window) and glfwGetKey(window, GLFW_KEY_ESCAPE) ~= GLFW_PRESS
    do
       prev_time, curr_time = curr_time, glfwGetTime()
-      
+
       glClear( GL_COLOR_BUFFER_BIT )
 
       draw_string( 0, 0, tostring( curr_time - prev_time ) .. " fps, vbo_index = " .. tostring(prev_vbo_index) )
       draw_string( 0, 10, text )
 
-      glEnableClientState( GL_VERTEX_ARRAY ) 
+      glEnableClientState( GL_VERTEX_ARRAY )
       glVertexPointer( 2, GL_FLOAT, 0, vbo )
       glDrawArrays( GL_POINTS, 0, vbo_index )
       glDisableClientState( GL_VERTEX_ARRAY )
-      prev_vbo_index, vbo_index = vbo_index, 0 
-      
+      prev_vbo_index, vbo_index = vbo_index, 0
+
       glfwSwapBuffers();
       glfwPollEvents();
    end

@@ -22,7 +22,7 @@ local function generate_font( bm, bw, bh )
 	 elseif hh <= 0 then
 	    break
 	 end
-	 hh = 0 
+	 hh = 0
 	 rows = rows + 1
       else
 	 hh = hh + 1
@@ -56,7 +56,7 @@ local function generate_font( bm, bw, bh )
 	 end
       end
    end
-      
+
    for x = ch - 32, 223 do
       x0[ ch ] = 0
       x1[ ch ] = 0
@@ -100,14 +100,14 @@ local function generate_font( bm, bw, bh )
 	    u0[ ch + 32 ] = ootw * xx
 	    xx = xx + x1[ch] - x0[ch] + 1
 	    u1[ ch + 32 ] = ootw * xx
-	    v0[ ch + 32 ] = ooth * ( r * (h + margin_y) ) 
+	    v0[ ch + 32 ] = ooth * ( r * (h + margin_y) )
 	    v1[ ch + 32 ] = ooth * ( r * (h + margin_y) + h )
 	    cw[ ch + 32 ] = x1[ ch ] - x0[ ch ] + 1
 	    xx = xx + margin_x
 	 end
       end
    end
-   
+
    local undef = 127
    for ch = 0, 31 do
       u0[ch] = u0[undef]

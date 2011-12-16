@@ -39,16 +39,16 @@ ffi.cdef[[
       ILboolean  ilutGLSubTex(GLuint TexID, ILuint XOff, ILuint YOff);
       ILboolean	 ilutGLSetTex(GLuint TexID);  // Deprecated - use ilutGLSetTex2D.
       ILboolean  ilutGLSubTex(GLuint TexID, ILuint XOff, ILuint YOff);  // Use ilutGLSubTex2D.
-      
+
       BITMAP*    ilutAllegLoadImage(ILstring FileName);
       BITMAP*    ilutConvertToAlleg(PALETTE Pal);
-      
+
       struct SDL_Surface* ilutConvertToSDLSurface(unsigned int flags);
       struct SDL_Surface* ilutSDLSurfaceLoadImage(ILstring FileName);
       ILboolean           ilutSDLSurfaceFromBitmap(struct SDL_Surface *Bitmap);
 
       BBitmap             ilutConvertToBBitmap(void);
-      
+
       HBITMAP	 ilutConvertToHBitmap(HDC hDC);
       HBITMAP	 ilutConvertSliceToHBitmap(HDC hDC, ILuint slice);
       void	 ilutFreePaddedData(ILubyte *Data);

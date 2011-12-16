@@ -6,24 +6,24 @@ local fw  = require( "ffi/glfw" )
 local min, max, abs, sqrt, log, floor = math.min, math.max, math.abs, math.sqrt, math.log, math.floor
 
 local function cairo_test()
-   local surface = ffi.gc( 
-      cr.cairo_image_surface_create( 
-	 cr.CAIRO_FORMAT_ARGB32, 
-	 240, 
-	 80 
+   local surface = ffi.gc(
+      cr.cairo_image_surface_create(
+	 cr.CAIRO_FORMAT_ARGB32,
+	 240,
+	 80
       ),
-      cr.cairo_surface_destroy 
+      cr.cairo_surface_destroy
    )
 
-   local c = ffi.gc( 
-      cr.cairo_create( surface ), 
-      cr.cairo_destroy 
+   local c = ffi.gc(
+      cr.cairo_create( surface ),
+      cr.cairo_destroy
    )
 
    cr.cairo_select_font_face(
-      c, "bizarre", 
-      cr.CAIRO_FONT_SLANT_OBLIQUE, 
-      cr.CAIRO_FONT_WEIGHT_BOLD 
+      c, "bizarre",
+      cr.CAIRO_FONT_SLANT_OBLIQUE,
+      cr.CAIRO_FONT_WEIGHT_BOLD
    )
 
    local font_face = cr.cairo_font_face_reference( cr.cairo_get_font_face( c ))
@@ -34,7 +34,7 @@ local function cairo_test()
    assert( cr.cairo_toy_font_face_get_weight( font_face ) == cr.CAIRO_FONT_WEIGHT_BOLD   )
    assert( cr.cairo_font_face_status(         font_face ) == cr.CAIRO_STATUS_SUCCESS     )
    cr.cairo_font_face_destroy (font_face);
-   
+
    print( 'font_face 1', font_face )
 
    font_face = cr.cairo_toy_font_face_create(
@@ -109,9 +109,9 @@ local function cairo_image_surface_blur( surface, horzRadius, vertRadius )
    local width = cr.cairo_image_surface_get_width( surface )
    local height = cr.cairo_image_surface_get_height( surface )
    local format = cr.cairo_image_surface_get_format( surface )
-   local chanmap = { 
-      [cr.CAIRO_FORMAT_ARGB32] = 4, 
-      [cr.CAIRO_FORMAT_RGB24]  = 3 
+   local chanmap = {
+      [cr.CAIRO_FORMAT_ARGB32] = 4,
+      [cr.CAIRO_FORMAT_RGB24]  = 3
    }
    local channels = chanmap[ format ]
    assert( channels )
@@ -120,8 +120,8 @@ local function cairo_image_surface_blur( surface, horzRadius, vertRadius )
    local vertBlur = ffi.new( "double[?]", height * stride )
    local horzKernel = kernel_1d_new( horzRadius, 0 )
    local vertKernel = kernel_1d_new( vertRadius, 0 )
-   local process = { 
-      { src,      horzKernel, horzBlur }, 
+   local process = {
+      { src,      horzKernel, horzBlur },
       { horzBlur, vertKernel, verbBlur },
    }
    for p = 1, #process do
@@ -179,15 +179,15 @@ local function main()
 
    gl.glClearColor( 0, 0, 0, 0 )
    gl.glDisable( gl.GL_DEPTH_TEST )
-   gl.glEnable( gl.GL_BLEND )	
+   gl.glEnable( gl.GL_BLEND )
    gl.glBlendFunc( gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA )
    gl.glEnable( gl.GL_TEXTURE_RECTANGLE_ARB )
 
    local texture_id = ffi.new( "GLuint[1]" )
 
    local int1, int2 = ffi.new( "int[1]" ), ffi.new( "int[1]" )
-   while fw.glfwIsWindow(window) 
-   and fw.glfwGetKey(window, fw.GLFW_KEY_ESCAPE) ~= fw.GLFW_PRESS 
+   while fw.glfwIsWindow(window)
+   and fw.glfwGetKey(window, fw.GLFW_KEY_ESCAPE) ~= fw.GLFW_PRESS
    do
       fw.glfwGetWindowSize( window, int1, int2 )
       if width ~= int1[0] or height ~= int2[0] then

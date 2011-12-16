@@ -10,10 +10,10 @@ local event, rect = ffi.new( "SDL_Event" ), ffi.new( "SDL_Rect" )
 
 local should_exit = false
 
-local ui_state = { 
-   mouse_down = false, 
-   mouse_x = 0, mouse_y = 0, 
-   hot_item = 0, active_item = 0 
+local ui_state = {
+   mouse_down = false,
+   mouse_x = 0, mouse_y = 0,
+   hot_item = 0, active_item = 0
 }
 
 local function CURRENT_LINE()
@@ -79,18 +79,18 @@ local function render()
 
    imgui_prepare() do
       button( GEN_ID(), 50, 50 )
-      
+
       button( GEN_ID(), 150, 50 )
-      
+
       if button( GEN_ID(), 50, 150 ) then
 	 bg_color = bor( sdl.SDL_GetTicks() * 0xc0cac01a, 0x77 )
       end
-      
+
       if button( GEN_ID(), 150, 150 ) then
 	 should_exit = true
       end
    end imgui_finish()
-   
+
    sdl.SDL_UpdateRect( screen, 0, 0, 640, 480 )
    sdl.SDL_Delay( 10 )
 end

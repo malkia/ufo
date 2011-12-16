@@ -27,7 +27,7 @@ ffi.cdef[[
 	 BZ_OUTBUFF_FULL      = -8,
 	 BZ_CONFIG_ERROR      = -9,
       };
-      
+
       typedef struct  bz_stream {
 	 char*        next_in;
 	 unsigned int avail_in;
@@ -42,9 +42,9 @@ ffi.cdef[[
 	 void      (* bzfree  )( void *, void* );
 	 void*        opaque;
       } bz_stream;
-      
+
       typedef void BZFILE;
-      
+
       const char* BZ2_bzlibVersion(           );
       int         BZ2_bzCompressInit(         bz_stream*, int blockSize100k, int verbosity, int workFactor );
       int         BZ2_bzCompress(             bz_stream*, int action );

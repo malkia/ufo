@@ -52,7 +52,7 @@ function M.bounce( sb, sc )
    assert( rc == 32 )
    local rc = zmq.zmq_send( sb, buf1, 32, 0 )
    assert( rc == 32 )
-   
+
    --  Receive the bounced message.
    local rc = zmq.zmq_recv( sc, buf2, 32, 0 )
    assert( rc == 32 )
@@ -64,7 +64,7 @@ function M.bounce( sb, sc )
    local rc = zmq.zmq_getsockopt( sc, zmq.ZMQ_RCVMORE, rcvmore, sz )
    assert( rc == 0 )
    assert( rcvmore[0] == 0)
-   
+
    --  Check whether the message is still the same.
    assert( ffi.C.memcmp( buf2, content, 32 ) == 0 )
 end

@@ -1,6 +1,6 @@
 #!/bin/bash
 dirname=$(dirname $0)
-pushd $dirname 1>/dev/null 2>/dev/null && absname=$(pwd) && popd 1>/dev/null 2>/dev/null 
+pushd $dirname 1>/dev/null 2>/dev/null && absname=$(pwd) && popd 1>/dev/null 2>/dev/null
 
 # uname <option>, where <option>:
 # -s, --kernel-name        print the kernel name

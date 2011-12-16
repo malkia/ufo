@@ -70,19 +70,19 @@ ffi.cdef[[
 	 KD_EIO,
 	 KD_EILSEQ,
 	 KD_EISCONN,
-	 KD_EISDIR, 
-	 KD_EMFILE, 
-	 KD_ENAMETOOLONG, 
-	 KD_ENOENT, 
-	 KD_ENOMEM, 
-	 KD_ENOSPC, 
-	 KD_ENOSYS, 
-	 KD_ENOTCONN, 
-	 KD_ENO_DATA, 
+	 KD_EISDIR,
+	 KD_EMFILE,
+	 KD_ENAMETOOLONG,
+	 KD_ENOENT,
+	 KD_ENOMEM,
+	 KD_ENOSPC,
+	 KD_ENOSYS,
+	 KD_ENOTCONN,
+	 KD_ENO_DATA,
 	 KD_ENO_RECOVERY,
 	 KD_EOPNOTSUPP,
 	 KD_EOVERFLOW,
-	 KD_EPERM, 
+	 KD_EPERM,
 	 KD_EPIPE,
 	 KD_ERANGE,
 	 KD_ETIMEDOUT,
@@ -96,7 +96,7 @@ ffi.cdef[[
 	 KD_EVENT_WINDOW_CLOSE,
 	 KD_EVENT_PAUSE,
 	 KD_EVENT_RESUME,
-	 KD_EVENT_WINDOWPROPERTY_CHANGE, 
+	 KD_EVENT_WINDOWPROPERTY_CHANGE,
 	 KD_EVENT_ORIENTATION,
 	 KD_EVENT_SOCKET_READABLE,
 	 KD_EVENT_SOCKET_WRITABLE,
@@ -147,14 +147,14 @@ ffi.cdef[[
          KD_IOGROUP_GAMEKEYS = 0x1000,
 	 KD_STATE_GAMEKEYS_AVAILABILITY,
 	 KD_INPUT_GAMEKEYS_UP,
-	 KD_INPUT_GAMEKEYS_LEFT,        
-	 KD_INPUT_GAMEKEYS_RIGHT,       
-	 KD_INPUT_GAMEKEYS_DOWN,        
-	 KD_INPUT_GAMEKEYS_FIRE,        
-	 KD_INPUT_GAMEKEYS_A,           
-	 KD_INPUT_GAMEKEYS_B,           
-	 KD_INPUT_GAMEKEYS_C,           
-	 KD_INPUT_GAMEKEYS_D,           
+	 KD_INPUT_GAMEKEYS_LEFT,
+	 KD_INPUT_GAMEKEYS_RIGHT,
+	 KD_INPUT_GAMEKEYS_DOWN,
+	 KD_INPUT_GAMEKEYS_FIRE,
+	 KD_INPUT_GAMEKEYS_A,
+	 KD_INPUT_GAMEKEYS_B,
+	 KD_INPUT_GAMEKEYS_C,
+	 KD_INPUT_GAMEKEYS_D,
 
 	 KD_IOGROUP_GAMEKEYSNC = 0x1100,
 	 KD_STATE_GAMEKEYSNC_AVAILABILITY,
@@ -249,7 +249,7 @@ ffi.cdef[[
       typedef struct KDFile        KDFile;
       typedef struct KDWindow      KDWindow;
       typedef struct KDSocket      KDSocket;
-      
+
       typedef struct KDThreadOnce {
 	 void *impl;
       } KDThreadOnce;
@@ -266,11 +266,11 @@ ffi.cdef[[
       };
 
       typedef enum {
-	 KD_SEEK_SET = 0, 
-	 KD_SEEK_CUR = 1, 
+	 KD_SEEK_SET = 0,
+	 KD_SEEK_CUR = 1,
 	 KD_SEEK_END = 2
       } KDfileSeekOrigin;
-      
+
       enum {
 	 KD_ISREG_MASK = 0x8000,
 	 KD_ISDIR_MASK = 0x4000,
@@ -338,31 +338,31 @@ ffi.cdef[[
       typedef struct KDInAddr {
 	 KDuint32 s_addr;
       } KDInAddr;
-      
+
       typedef struct KDEventSocketReadable {
 	 KDSocket *socket;
       } KDEventSocketReadable;
-      
+
       typedef struct KDEventSocketWritable {
 	 KDSocket *socket;
       } KDEventSocketWritable;
-      
+
       typedef struct KDEventSocketConnect {
 	 KDSocket *socket;
 	 KDint32 error;
       } KDEventSocketConnect;
-      
+
       typedef struct KDEventSocketIncoming {
 	 KDSocket *socket;
       } KDEventSocketIncoming;
-      
+
       typedef struct KDEventNameLookup {
 	 KDint32 error;
 	 KDint32 resultlen;
 	 const KDSockaddr *result;
 	 KDboolean more;
       } KDEventNameLookup;
-      
+
       typedef struct KDEventState {
 	 KDint32 index;
 	 union {
@@ -371,7 +371,7 @@ ffi.cdef[[
 	    KDfloat32 f;
 	 } value;
       } KDEventState;
-      
+
       typedef struct KDEventInput {
 	 KDint32 index;
 	 union {
@@ -380,19 +380,19 @@ ffi.cdef[[
 	    KDfloat32 f;
 	 } value;
       } KDEventInput;
-      
+
       typedef struct KDEventInputJog {
 	 KDint32 index;
 	 KDint32 count;
       } KDEventInputJog;
-      
+
       typedef struct KDEventInputPointer {
 	 KDint32 index;
 	 KDint32 select;
 	 KDint32 x;
 	 KDint32 y;
       } KDEventInputPointer;
-      
+
       typedef struct KDEventInputStick {
 	 KDint32 index;
 	 KDint32 x;
@@ -403,11 +403,11 @@ ffi.cdef[[
       typedef struct KDEventWindowProperty {
 	 KDint32 pname;
       } KDEventWindowProperty;
-      
+
       typedef struct KDEventWindowFocus {
 	 KDint32 focusstate;
       } KDEventWindowFocus;
-      
+
       typedef struct KDEvent {
 	 KDust timestamp;
 	 KDint32 type;
@@ -428,7 +428,7 @@ ffi.cdef[[
 	    KDEventUser user;
 	 } data;
       } KDEvent;
-      
+
       typedef void ( KDCallbackFunc )(const KDEvent *event);
 
       KDint          kdGetError(void);
@@ -527,7 +527,7 @@ ffi.cdef[[
       KDTm*          kdGmtime_r(const KDtime *timep, KDTm *result);
       KDTm*          kdLocaltime_r(const KDtime *timep, KDTm *result);
       KDust          kdUSTAtEpoch(void);
-      
+
       KDTimer*       kdSetTimer(KDint64 interval, KDint periodic, void *eventuserptr);
       KDint          kdCancelTimer(KDTimer *timer);
 
@@ -576,13 +576,13 @@ ffi.cdef[[
       KDuint16       kdNtohs(KDuint16 netshort);
       KDint          kdInetAton(const KDchar *cp, KDuint32 *inp);
       const KDchar*  kdInetNtop(KDuint af, const void *src, KDchar *dst, KDsize cnt);
-      
+
       KDint          kdStateGeti(KDint startidx, KDuint numidxs, KDint32 *buffer);
       KDint          kdStateGetl(KDint startidx, KDuint numidxs, KDint64 *buffer);
       KDint          kdStateGetf(KDint startidx, KDuint numidxs, KDfloat32 *buffer);
       KDint          kdOutputSeti(KDint startidx, KDuint numidxs, const KDint32 *buffer);
       KDint          kdOutputSetf(KDint startidx, KDuint numidxs, const KDfloat32 *buffer);
-      
+
       KDWindow*      kdCreateWindow(void* EGLDisplay, void* EGLConfig, void *eventuserptr);
       KDint          kdDestroyWindow(KDWindow *window);
       KDint          kdSetWindowPropertybv(KDWindow *window, KDint pname, const KDboolean *param);
@@ -595,7 +595,7 @@ ffi.cdef[[
 
       void           kdHandleAssertion(const KDchar *condition, const KDchar *filename, KDint linenumber);
       void           kdLogMessage(const KDchar *string);
-      
+
 ]]
 
 --[==[

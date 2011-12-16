@@ -78,7 +78,7 @@ local function gear( inner_radius, outer_radius, width, teeth, tooth_depth )
       end
    end
    gl.glEnd()
-   
+
    gl.glBegin( gl.GL_QUADS )
    local da = 2 * pi / teeth / 4
    for i = 0, teeth - 1 do
@@ -86,10 +86,10 @@ local function gear( inner_radius, outer_radius, width, teeth, tooth_depth )
       gl.glVertex3d( r1*cos(angle + 3*da), r1*sin(angle + 3*da), -width * 0.5 )
       gl.glVertex3d( r2*cos(angle + 2*da), r2*sin(angle + 2*da), -width * 0.5 )
       gl.glVertex3d( r2*cos(angle +   da), r2*sin(angle +   da), -width * 0.5 )
-      gl.glVertex3d( r1*cos(angle),        r1*sin(angle),        -width * 0.5 ) 
+      gl.glVertex3d( r1*cos(angle),        r1*sin(angle),        -width * 0.5 )
    end
    gl.glEnd()
-   
+
    gl.glBegin( gl.GL_QUAD_STRIP )
    for i = 0, teeth - 1 do
       local angle = i * 2 * pi / teeth
@@ -140,7 +140,7 @@ local function draw()
       gl.glRotated( view_rotx, 1, 0, 0 )
       gl.glRotated( view_roty, 0, 1, 0 )
       gl.glRotated( view_rotz, 0, 0, 1 )
-      
+
       gl.glPushMatrix()
       do
 	 gl.glTranslatef( -3, -2, 0 )
@@ -203,19 +203,19 @@ local function init()
    gl.glMaterialfv( gl.GL_FRONT, gl.GL_AMBIENT_AND_DIFFUSE, red )
    gear( 1, 4, 1, 20, 0.7 )
    gl.glEndList()
-   
+
    gear2 = gl.glGenLists(1)
    gl.glNewList( gear2, gl.GL_COMPILE )
    gl.glMaterialfv( gl.GL_FRONT, gl.GL_AMBIENT_AND_DIFFUSE, green )
    gear( 0.5, 2, 2, 10, 0.7 )
    gl.glEndList()
-   
+
    gear3 = gl.glGenLists(1)
    gl.glNewList( gear3, gl.GL_COMPILE )
    gl.glMaterialfv( gl.GL_FRONT, gl.GL_AMBIENT_AND_DIFFUSE, blue )
    gear( 1.3, 2, 0.5, 10, 0.7 )
    gl.glEndList()
-   
+
    gl.glEnable( gl.GL_NORMALIZE )
 end
 
@@ -266,9 +266,9 @@ local function main()
 	 view_roty = view_roty - 5
       end
    end
-   
+
    glfw.glfwTerminate();
-end    
+end
 
 main()
 

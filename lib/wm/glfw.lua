@@ -29,7 +29,7 @@ local function update(self)
       self.mx, self.my = mx, my
       notify(self, "mouse_moved")
    end
-   
+
    -- Detecting window size changes
    glfw.glfwGetWindowSize(window, int1, int2)
    local width, height = int1[0], int2[0]
@@ -83,7 +83,7 @@ local function new()
    }
 end
 
-if ... then 
+if ... then
    return new()
 end
 

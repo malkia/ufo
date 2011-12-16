@@ -29,7 +29,7 @@ local function main()
    glfw.glfwSetWindowPos( window, window_x, window_y )
 
    glfw.glfwSwapInterval( 1 ) -- 60fps
-   
+
    tw.TwInit( tw.TW_OPENGL, nil )
    local bar      = tw.TwNewBar( "Blah" )
    local var1data = ffi.new( "double[1]" )
@@ -37,7 +37,7 @@ local function main()
    local var2data = ffi.new( "int32_t[1]" )
    local var2     = tw.TwAddVarRO( bar, "Var2", tw.TW_TYPE_INT32, var2data, nil)
 
-   local mouse = { 
+   local mouse = {
       x = 0, y = 0, wheel = 0,
       buttons = { {}, {}, {} },
    }
@@ -46,20 +46,20 @@ local function main()
    gl.glCreateShader = fun
    print(fun(gl.GL_VERTEX_SHADER))
 --   print(ffi.C.pglCreateShader)
-   
+
    local int1, int2 = ffi.new( "int[1]" ), ffi.new( "int[1]" )
-   while glfw.glfwIsWindow(window) 
-   and   glfw.glfwGetKey(window, glfw.GLFW_KEY_ESCAPE) ~= glfw.GLFW_PRESS 
+   while glfw.glfwIsWindow(window)
+   and   glfw.glfwGetKey(window, glfw.GLFW_KEY_ESCAPE) ~= glfw.GLFW_PRESS
    do
       glfw.glfwGetWindowSize(window, int1, int2)
       width, height = int1[0], int2[0]
-      
+
       gl.glClear(gl.GL_COLOR_BUFFER_BIT)
       gl.glMatrixMode(gl.GL_PROJECTION)
       gl.glLoadIdentity()
       gl.glMatrixMode( gl.GL_MODELVIEW )
       gl.glLoadIdentity()
- 
+
       glfw.glfwGetMousePos(window, int1, int2)
       mouse.x, mouse.y = int1[0], int2[0]
 

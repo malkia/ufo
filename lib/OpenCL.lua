@@ -11,7 +11,7 @@ function ext.GetPlatforms()
 	 local size = ffi.new( "size_t[1]" )
 	 for i = 0, n_platforms - 1 do
 	    local prop = { id = platform_ids[i] }
-	    for _, key in ipairs { "name", "vendor", "version", "profile", "extensions" } do 
+	    for _, key in ipairs { "name", "vendor", "version", "profile", "extensions" } do
 	       local info_key = cl[ "CL_PLATFORM_" .. key:upper() ]
 	       if cl.clGetPlatformInfo( prop.id, info_key, 0, nil, size ) == cl.CL_SUCCESS then
 		  local value_size = size[0]
@@ -109,7 +109,7 @@ function ext.GetDevices(platform_id)
 			end
 			prop[k] = value
 		     else
-		        if value_count > 1 
+		        if value_count > 1
 			then
 			  prop[k] = {}
 			  for i = 0, value_count - 1 do
@@ -157,7 +157,7 @@ end
 function ext.GetContextInfo(context)
    local plist = {}
    for key, type in pairs {
-      reference_count = "cl_uint",  
+      reference_count = "cl_uint",
       num_devices     = "cl_uint",
       devices         = "cl_device_id",
       properties      = "cl_context_properties"
@@ -172,7 +172,7 @@ function ext.GetContextInfo(context)
 	 local value = ffi.new( type.."[?]", value_count )
 	 if cl.clGetContextInfo( context, value_enum, value_size, value, nil ) == cl.CL_SUCCESS
 	 then
-	    if value_count > 1 
+	    if value_count > 1
 	    then
 	       plist[key] = {}
 	       for i = 0, value_count - 1 do
@@ -208,7 +208,7 @@ function ext.GetKernelWorkGroupInfo(kernel, device)
 	 local value = ffi.new( type.."[?]", value_count )
 	 if cl.clGetKernelWorkGroupInfo( context, device, value_enum, value_size, value, nil ) == cl.CL_SUCCESS
 	 then
-	    if value_count > 1 
+	    if value_count > 1
 	    then
 	       plist[key] = {}
 	       for i = 0, value_count - 1 do

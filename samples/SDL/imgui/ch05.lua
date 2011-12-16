@@ -10,10 +10,10 @@ local event, rect = ffi.new( "SDL_Event" ), ffi.new( "SDL_Rect" )
 
 local should_exit = false
 
-local ui_state = { 
-   mouse_down = false, 
-   mouse_x = 0, mouse_y = 0, 
-   hot_item = 0, active_item = 0 
+local ui_state = {
+   mouse_down = false,
+   mouse_x = 0, mouse_y = 0,
+   hot_item = 0, active_item = 0
 }
 
 local function CURRENT_LINE()
@@ -72,13 +72,13 @@ local function slider( id, x, y, max_value, value )
    end
 
    draw_rect( x, y, 32, 256+16, 0x777777 )
-  
+
    if ui_state.active_item == id or ui_state.hot_item == id then
       draw_rect( x+8, y+8 + ypos, 16, 16, 0xffffff )
    else
       draw_rect( x+8, y+8 + ypos, 16, 16, 0xaaaaaa )
    end
-   
+
    if ui_state.active_item == id then
       local mouse_pos = ui_state.mouse_y - (y + 8)
       mouse_pos = max( mouse_pos, 0 )
@@ -110,13 +110,13 @@ local function render()
 
    imgui_prepare() do
       button( GEN_ID(), 50, 50 )
-      
+
       button( GEN_ID(), 150, 50 )
-      
+
       if button( GEN_ID(), 50, 150 ) then
 	 bg_color = bor( sdl.SDL_GetTicks() * 0xc0cac01a, 0x77 )
       end
-      
+
       if button( GEN_ID(), 150, 150 ) then
 	 should_exit = true
       end
@@ -130,13 +130,13 @@ local function render()
       if changed then
 	 bg_color = bor( band( bg_color, 0xff00ff ), shl( slider_value, 10 ) )
       end
-      
+
       local changed, slider_value = slider( GEN_ID(), 600, 40, 15, band( shr( bg_color, 20 ), 0xF ) )
       if changed then
 	 bg_color = bor( band( bg_color, 0x00ffff), shl( slider_value, 20 ) )
       end
    end imgui_finish()
-   
+
    sdl.SDL_UpdateRect( screen, 0, 0, 640, 480 )
    sdl.SDL_Delay( 10 )
 end

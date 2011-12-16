@@ -7,28 +7,28 @@ diff -r 07fb0ac6886a build-scripts/fatbuild.sh
  CXX_PPC="g++-4.0"
 -BUILD_FLAGS_PPC="-arch ppc -mmacosx-version-min=10.4"
 +BUILD_FLAGS_PPC="-arch ppc -mmacosx-version-min=10.5"
- 
+
  # Intel 32-bit compiler flags
  CONFIG_X86="--host=i386-apple-darwin"
  CC_X86="gcc"
  CXX_X86="g++"
 -BUILD_FLAGS_X86="-arch i386 -mmacosx-version-min=10.4"
 +BUILD_FLAGS_X86="-arch i386 -mmacosx-version-min=10.5"
- 
+
  # Intel 64-bit compiler flags
  CONFIG_X64="--host=x86_64-apple-darwin"
  CC_X64="gcc"
  CXX_X64="g++"
 -BUILD_FLAGS_X64="-arch x86_64 -mmacosx-version-min=10.6"
 +BUILD_FLAGS_X64="-arch x86_64 -mmacosx-version-min=10.5"
- 
+
  #
  # Find the configure script
 diff -r 07fb0ac6886a src/video/cocoa/SDL_cocoawindow.m
 --- a/src/video/cocoa/SDL_cocoawindow.m	Wed Dec 07 20:34:43 2011 -0500
 +++ b/src/video/cocoa/SDL_cocoawindow.m	Thu Dec 08 10:00:13 2011 -0800
 @@ -70,7 +70,9 @@
- 
+
      [view setNextResponder:self];
  #if MAC_OS_X_VERSION_MAX_ALLOWED >= 1060
 -    [view setAcceptsTouchEvents:YES];
@@ -37,4 +37,4 @@ diff -r 07fb0ac6886a src/video/cocoa/SDL_cocoawindow.m
 +    }
  #endif
  }
- 
+

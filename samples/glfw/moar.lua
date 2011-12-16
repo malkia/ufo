@@ -45,10 +45,10 @@ local function bind_font( font )
    testGL( gl.glGenTextures( 1, tid ) )
    local tid = tid[0]
    testGL( gl.glBindTexture( gl.GL_TEXTURE_2D, tid ) )
-   withGL{ gl.glPixelStorei, "GL_UNPACK_", SWAP_BYTES="FALSE", LSB_FIRST="FALSE", 
+   withGL{ gl.glPixelStorei, "GL_UNPACK_", SWAP_BYTES="FALSE", LSB_FIRST="FALSE",
            ROW_LENGTH=0, SKIP_ROWS=0, SKIP_PIXELS=0, ALIGNMENT=1 }
    withGL{ gl.glPixelTransferf, "GL_", ALPHA_SCALE=1, ALPHA_BIAS=0 }
-   testGL( gl.glTexImage2D( gl.GL_TEXTURE_2D, 0, gl.GL_ALPHA, font.tw, font.th, 0, 
+   testGL( gl.glTexImage2D( gl.GL_TEXTURE_2D, 0, gl.GL_ALPHA, font.tw, font.th, 0,
                             gl.GL_ALPHA, gl.GL_UNSIGNED_BYTE, font.td ) )
    withGL{ function(p,v) gl.glTexParameterf( gl.GL_TEXTURE_2D, p, v ) end, "GL_TEXTURE_",
            WRAP_S="REPEAT", WRAP_T="REPEAT", MAG_FILTER="LINEAR", MIN_FILTER="LINEAR" }
@@ -69,7 +69,7 @@ local function build_text( font, lines, top, bottom )
    local lines = type(lines)=="string" and { lines } or lines
    local top = top or 1
    local bottom = bottom or #lines
-   
+
    assert( 1 <= top and top <= bottom and bottom <= #lines,
 	   "top="..tostring(top).." "..
 	   "bottom="..tostring(bottom).." "..
@@ -78,7 +78,7 @@ local function build_text( font, lines, top, bottom )
 
    local chars = 0
    for y = top, bottom do
-      chars = chars + #lines[ y ] 
+      chars = chars + #lines[ y ]
    end
 
    local v = ffi.new( "float[?]", chars * 12 )
@@ -117,7 +117,7 @@ local function build_text( font, lines, top, bottom )
       y0 = y1
    end
    h = max(h, y0)
-   
+
    return {
       tid = tid,
       n_verts = chars * 6,
@@ -204,9 +204,9 @@ local function main()
    local font = bind_font( fonts[4] )
    local font2 = bind_font( fonts[1] )
 
-   local mx, my = ffi.new( "int[1]" ), ffi.new( "int[1]" ) -- mouse x, y 
+   local mx, my = ffi.new( "int[1]" ), ffi.new( "int[1]" ) -- mouse x, y
    local ww, wh = ffi.new( "int[1]" ), ffi.new( "int[1]" ) -- window width, height
-   local sx, sy = ffi.new( "int[1]" ), ffi.new( "int[1]" ) -- mouse scroll x, y 
+   local sx, sy = ffi.new( "int[1]" ), ffi.new( "int[1]" ) -- mouse scroll x, y
    local px, py, pdx, pdy = 0, 0, 0, 0
    local s1 = 10
    local s2 = 100
@@ -241,7 +241,7 @@ local function main()
 
       testGL( gl.glMatrixMode(gl.GL_PROJECTION) )
       testGL( gl.glLoadIdentity() )
-      
+
       testGL( gl.glOrtho(0, ww, wh, 0, -1, 1 ) )
 
       local top = max(1,min(#source,math.floor(-py / font.font.ch) + 1))

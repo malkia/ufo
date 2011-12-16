@@ -17,7 +17,7 @@ local function perlin_init(B)
    local g1 = ffi.new( "double[?]",    B + B + 2 )
    local g2 = ffi.new( "double[?]", (B + B + 2)*2 )
    local g3 = ffi.new( "double[?][3]", B + B + 2 )
-  
+
    for i = 0, B-1 do
       p[i] = i
       g1[i] = random()*2-1
@@ -58,7 +58,7 @@ local function s_curve(t)
 end
 
 local function setup(t)
-   local ft = floor( t ) 
+   local ft = floor( t )
    local b0 = band(255, ft)
    local r0 = t - ft
    local b1 = band(255, b0 + 1)
@@ -67,7 +67,7 @@ local function setup(t)
 end
 
 local function setup2(t)
-   local ft = floor( t ) 
+   local ft = floor( t )
    local b0 = band(255, ft)
    return b0, band(255, b0 + 1), t - ft
 end
@@ -96,13 +96,13 @@ local function noise2( arg0, arg1 )
    local b00, b10 = p[i + by0]*2, p[j + by0]*2
    local b01, b11 = p[i + by1]*2, p[j + by1]*2
    local sx = rx*rx*(3-2*rx)
-   local a = lerp( 
-      sx, 
+   local a = lerp(
+      sx,
        rx   *g2[b00] + ry*g2[b00+1],
       (rx-1)*g2[b10] + ry*g2[b10+1]
    )
-   local b = lerp( 
-      sx, 
+   local b = lerp(
+      sx,
        rx   *g2[b01] + (ry-1)*g2[b01+1],
       (rx-1)*g2[b11] + (ry-1)*g2[b11+1]
    )

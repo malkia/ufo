@@ -20,16 +20,16 @@ ffi.cdef[[
 	 GLFW_VERSION_MAJOR         =  3,
 	 GLFW_VERSION_MINOR         =  0,
 	 GLFW_VERSION_REVISION      =  0,
-	 
+
 	 GLFW_RELEASE               =  0,
 	 GLFW_PRESS                 =  1,
-	 
+
 	 GLFW_KEY_SPACE             = 32,
-	 GLFW_KEY_APOSTROPHE        = 39, 
-	 GLFW_KEY_COMMA             = 44, 
-	 GLFW_KEY_MINUS             = 45, 
-	 GLFW_KEY_PERIOD            = 46, 
-	 GLFW_KEY_SLASH             = 47, 
+	 GLFW_KEY_APOSTROPHE        = 39,
+	 GLFW_KEY_COMMA             = 44,
+	 GLFW_KEY_MINUS             = 45,
+	 GLFW_KEY_PERIOD            = 46,
+	 GLFW_KEY_SLASH             = 47,
 	 GLFW_KEY_0                 = 48,
 	 GLFW_KEY_1                 = 49,
 	 GLFW_KEY_2                 = 50,
@@ -40,8 +40,8 @@ ffi.cdef[[
 	 GLFW_KEY_7                 = 55,
 	 GLFW_KEY_8                 = 56,
 	 GLFW_KEY_9                 = 57,
-	 GLFW_KEY_SEMICOLON         = 59, 
-	 GLFW_KEY_EQUAL             = 61, 
+	 GLFW_KEY_SEMICOLON         = 59,
+	 GLFW_KEY_EQUAL             = 61,
 	 GLFW_KEY_A                 = 65,
 	 GLFW_KEY_B                 = 66,
 	 GLFW_KEY_C                 = 67,
@@ -68,9 +68,9 @@ ffi.cdef[[
 	 GLFW_KEY_X                 = 88,
 	 GLFW_KEY_Y                 = 89,
 	 GLFW_KEY_Z                 = 90,
-	 GLFW_KEY_LEFT_BRACKET      = 91, 
+	 GLFW_KEY_LEFT_BRACKET      = 91,
 	 GLFW_KEY_BACKSLASH         = 92,
-	 GLFW_KEY_RIGHT_BRACKET     = 93, 
+	 GLFW_KEY_RIGHT_BRACKET     = 93,
 	 GLFW_KEY_GRAVE_ACCENT      = 96,
 	 GLFW_KEY_WORLD_1           = 161,
 	 GLFW_KEY_WORLD_2           = 162,
@@ -199,7 +199,7 @@ ffi.cdef[[
 	 GLFW_OPENGL_FORWARD_COMPAT = 0x00020015,
 	 GLFW_OPENGL_DEBUG_CONTEXT  = 0x00020016,
 	 GLFW_OPENGL_PROFILE        = 0x00020017,
-	 GLFW_OPENGL_ROBUSTNESS     = 0x00020018, 
+	 GLFW_OPENGL_ROBUSTNESS     = 0x00020018,
 	 GLFW_OPENGL_CORE_PROFILE   = 0x00000001,
 	 GLFW_OPENGL_COMPAT_PROFILE = 0x00000002,
 	 GLFW_OPENGL_ES2_PROFILE    = 0x00000004,
@@ -234,7 +234,7 @@ ffi.cdef[[
 	 int blueBits;
 	 int greenBits;
       } GLFWvidmode;
-      
+
       typedef struct _GLFWgammaramp {
 	 unsigned short red[GLFW_GAMMA_RAMP_SIZE];
 	 unsigned short green[GLFW_GAMMA_RAMP_SIZE];
@@ -263,7 +263,7 @@ ffi.cdef[[
       typedef struct _GLFWthreadmodel {
 	 int dummy;
       } GLFWthreadmodel;
-      
+
       int         glfwInit(                     void );
       int         glfwInitWithModels(           GLFWthreadmodel* threading, GLFWallocator* allocator );
       void        glfwTerminate(                void );

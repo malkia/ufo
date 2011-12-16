@@ -50,7 +50,7 @@ local V = {
   function(x,y)
     local r2=x^2+y^2
     return x/r2, y/r2 end,
-  function(x,y) 
+  function(x,y)
     local r2=x^2+y^2
     local co, si = cos(r2),sin(r2)
     return x*si-y*co, x*co+y*si
