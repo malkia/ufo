@@ -1,6 +1,6 @@
 local ffi = require( "ffi" )
 
-ffi.cdef[[ 
+ffi.cdef[[
       typedef unsigned int           ILenum;
       typedef unsigned char          ILboolean;
       typedef unsigned int           ILbitfield;

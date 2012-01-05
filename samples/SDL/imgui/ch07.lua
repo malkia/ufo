@@ -38,11 +38,11 @@ local font = require_font( "font14x24" )
 
 local should_exit = false
 
-local ui_state = { 
-   mouse_down = false, 
-   mouse_x = 0, mouse_y = 0, 
+local ui_state = {
+   mouse_down = false,
+   mouse_x = 0, mouse_y = 0,
    hot_item = 0, active_item = 0,
-   kbd_item = 0, key_entered = 0,  key_mod = false, 
+   kbd_item = 0, key_entered = 0,  key_mod = false,
    last_widget = 0
 }
 
@@ -91,13 +91,13 @@ local function button( id, x, y )
    if ui_state.kbd_item == 0 then
       ui_state.kbd_item = id
    end
-   
+
    if ui_state.kbd_item == id then
       draw_rect( x-6, y-6, 84, 68, 0xff0000 )
    end
-   
+
    draw_rect( x+8, y+8, 64, 48, 0 )
-   
+
    if ui_state.hot_item == id then
       if ui_state.active_item == id then
 	 draw_rect( x+2, y+2, 64, 48, 0xffffff )
@@ -107,7 +107,7 @@ local function button( id, x, y )
    else
       draw_rect( x, y, 64, 48, 0xaaaaaa )
    end
-   
+
    if ui_state.kbd_item == id then
       if ui_state.key_entered == sdl.SDLK_TAB then
 	 ui_state.kbd_item = 0
@@ -119,9 +119,9 @@ local function button( id, x, y )
 	 return true
       end
    end
-   
+
    ui_state.last_widget = id;
-   
+
    return ( not ui_state.mouse_down
 	    and ui_state.hot_item == id
 	    and ui_state.active_item == id )
@@ -146,7 +146,7 @@ local function slider( id, x, y, max_value, value )
    end
 
    draw_rect( x, y, 32, 256+16, 0x777777 )
-  
+
    if ui_state.active_item == id or ui_state.hot_item == id then
       draw_rect( x+8, y+8 + ypos, 16, 16, 0xffffff )
    else
@@ -174,7 +174,7 @@ local function slider( id, x, y, max_value, value )
    end
 
    ui_state.last_widget = id
-   
+
    if ui_state.active_item == id then
       local mouse_pos = ui_state.mouse_y - (y + 8)
       mouse_pos = max( mouse_pos, 0 )
@@ -198,7 +198,7 @@ local function imgui_finish()
    elseif ui_state.active_item == 0 then
       ui_state.active_item = -1
    end
-   
+
    if ui_state.key_entered == SDLK_TAB then
       ui_state.kbditem = 0
    end
@@ -211,13 +211,13 @@ local function render()
 
    imgui_prepare() do
       button( GEN_ID(), 50, 50 )
-      
+
       button( GEN_ID(), 150, 50 )
-      
+
       if button( GEN_ID(), 50, 150 ) then
 	 bg_color = bor( sdl.SDL_GetTicks() * 0xc0cac01a, 0x77 )
       end
-      
+
       if button( GEN_ID(), 150, 150 ) then
 	 should_exit = true
       end
@@ -231,7 +231,7 @@ local function render()
       if changed then
 	 bg_color = bor( band( bg_color, 0xff00ff ), shl( slider_value, 10 ) )
       end
-      
+
       local changed, slider_value = slider( GEN_ID(), 600, 40, 15, band( shr( bg_color, 20 ), 0xF ) )
       if changed then
 	 bg_color = bor( band( bg_color, 0x00ffff), shl( slider_value, 20 ) )
@@ -239,7 +239,7 @@ local function render()
    end imgui_finish()
 
    draw_string( "Test1238919283891289319823123", 10, 10 )
-   
+
    sdl.SDL_UpdateRect( screen, 0, 0, 640, 480 )
    sdl.SDL_Delay( 10 )
 end

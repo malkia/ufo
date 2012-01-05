@@ -340,7 +340,7 @@ int         uv_write2(          uv_write_t* req, uv_stream_t* handle, uv_buf_t b
 int         uv_tcp_init(        uv_loop_t*, uv_tcp_t* handle );
 int         uv_tcp_nodelay(     uv_tcp_t* handle, int enable );
 int         uv_tcp_keepalive(   uv_tcp_t* handle, int enable, unsigned int delay );
-int         uv_tcp_simultaneous_accepts( 
+int         uv_tcp_simultaneous_accepts(
                                 uv_tcp_t* handle, int enable );
 int         uv_tcp_bind(        uv_tcp_t* handle, struct sockaddr_in );
 int         uv_tcp_bind6(       uv_tcp_t* handle, struct sockaddr_in6 );
@@ -369,7 +369,7 @@ void        uv_pipe_open(       uv_pipe_t*, uv_file file );
 int         uv_pipe_bind(       uv_pipe_t* handle, const char* name );
 void        uv_pipe_connect(    uv_connect_t* req, uv_pipe_t* handle, const char* name, uv_connect_cb cb);
 void        uv_pipe_pending_instances(
-                                uv_pipe_t* handle, int count ); 
+                                uv_pipe_t* handle, int count );
 int         uv_prepare_init(    uv_loop_t*, uv_prepare_t* prepare );
 int         uv_prepare_start(   uv_prepare_t* prepare, uv_prepare_cb cb );
 int         uv_prepare_stop(    uv_prepare_t* prepare );

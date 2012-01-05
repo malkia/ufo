@@ -5,7 +5,7 @@ Index: misc/win32/apr_app.c
 @@ -43,6 +43,23 @@
  #include "apr_private.h"
  #include "apr_arch_misc.h"
- 
+
 +static char** the_environ()
 +{
 +  char** env = 0;
@@ -24,7 +24,7 @@ Index: misc/win32/apr_app.c
 +#define _wenviron (the_wenviron())
 +
  #pragma comment(linker,"/ENTRY:wmainCRTStartup")
- 
+
  extern int main(int argc, const char **argv, const char **env);
 Index: misc/win32/start.c
 ===================================================================
@@ -33,7 +33,7 @@ Index: misc/win32/start.c
 @@ -26,6 +26,23 @@
  #include "apr_arch_threadproc.h" /* bring in apr_threadproc_init */
  #include "assert.h"
- 
+
 +static char** the_environ()
 +{
 +  char** env = 0;
@@ -55,7 +55,7 @@ Index: misc/win32/start.c
   */
  int APR_DECLARE_DATA apr_app_init_complete = 0;
 @@ -110,7 +127,7 @@
- 
+
  #if defined(_WIN32_WCE)
      apr_app_init_complete = 1;
 -#elif APR_HAS_UNICODE_FS
@@ -74,7 +74,7 @@ Index: file_io/win32/dir.c
 -    if (APR_STATUS_IS_EEXIST(apr_err))
 +    if (APR_STATUS_IS_EEXIST(rv))
          return APR_SUCCESS;
- 
+
      return rv;
 Index: file_io/win32/pipe.c
 ===================================================================
@@ -91,15 +91,15 @@ Index: file_io/win32/pipe.c
 +//#include <process.h>            /* for getpid() on Win32 */
 +//#endif
  #include "apr_arch_misc.h"
- 
+
  APR_DECLARE(apr_status_t) apr_file_pipe_timeout_set(apr_file_t *thepipe,
 @@ -139,7 +139,7 @@
- 
+
          dwPipeMode = 0;
- 
+
 -        sprintf(name, "\\\\.\\pipe\\apr-pipe-%u.%lu", getpid(), id++);
 +        sprintf(name, "\\\\.\\pipe\\apr-pipe-%u.%lu", GetCurrentProcessId(), id++);
- 
+
          (*in)->filehand = CreateNamedPipe(name,
                                            dwOpenMode,
 @@ -256,7 +256,7 @@

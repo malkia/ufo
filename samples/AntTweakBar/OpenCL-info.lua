@@ -1,4 +1,4 @@
-#!/usr/bin/env luajit 
+#!/usr/bin/env luajit
 
 local ffi  = require( "ffi" )
 local cl   = require( "ffi/OpenCL" )
@@ -32,8 +32,8 @@ local function main()
    assert( window, "Failed to open GLFW window")
    glfw.glfwSetWindowPos( window, (desktop_width - width)/2, (desktop_height - height)/2 )
    glfw.glfwSwapInterval( 1 ) -- 60fps
- 
-   local mouse = { 
+
+   local mouse = {
       x = 0, y = 0, wheel = 0,
       buttons = { {}, {}, {} },
    }
@@ -41,9 +41,9 @@ local function main()
    -- We have to keep references to the FFI allocated data
    local bars = {}
    local strings = {}
-   
+
    tw.TwInit( tw.TW_OPENGL, nil )
-   for platform_index, platform in pairs( clx.GetPlatforms() ) 
+   for platform_index, platform in pairs( clx.GetPlatforms() )
    do
       for device_index, device in pairs( clx.GetDevices( platform.id ) )
       do
@@ -77,12 +77,12 @@ local function main()
          bars[ #bars + 1 ] = bar
       end
    end
-   
+
    width, height = nil, nil
-   
+
    local int1, int2 = ffi.new( "int[1]" ), ffi.new( "int[1]" )
-   while glfw.glfwIsWindow(window) 
-   and   glfw.glfwGetKey(window, glfw.GLFW_KEY_ESCAPE) ~= glfw.GLFW_PRESS 
+   while glfw.glfwIsWindow(window)
+   and   glfw.glfwGetKey(window, glfw.GLFW_KEY_ESCAPE) ~= glfw.GLFW_PRESS
    do
       glfw.glfwGetWindowSize(window, int1, int2)
       if width ~= int1[0] or height ~= int2[0] then
@@ -100,13 +100,13 @@ local function main()
 	   tw.TwSetParam(bar, nil, "valueswidth", tw.TW_PARAM_INT32, 1, fit_width )
 	 end
       end
-      
+
       gl.glClear(gl.GL_COLOR_BUFFER_BIT)
       gl.glMatrixMode(gl.GL_PROJECTION)
       gl.glLoadIdentity()
       gl.glMatrixMode( gl.GL_MODELVIEW )
       gl.glLoadIdentity()
- 
+
       glfw.glfwGetMousePos(window, int1, int2)
       mouse.x, mouse.y = int1[0], int2[0]
 

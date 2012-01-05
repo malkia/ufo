@@ -3,21 +3,21 @@ index 8845b75..4eca556 100644
 --- a/src/input.c
 +++ b/src/input.c
 @@ -191,6 +191,7 @@ GLFWAPI void glfwGetScrollOffset(GLFWwindow handle, int* xoffset, int* yoffset)
- 
+
  GLFWAPI void glfwSetCursorMode(GLFWwindow handle, int mode)
  {
 +    int centerPosX, centerPosY;
      _GLFWwindow* window = (_GLFWwindow*) handle;
- 
+
      if (!_glfwInitialized)
 @@ -210,8 +211,8 @@ GLFWAPI void glfwSetCursorMode(GLFWwindow handle, int mode)
      if (window->cursorMode == mode)
          return;
- 
+
 -    int centerPosX = window->width / 2;
 -    int centerPosY = window->height / 2;
 +    centerPosX = window->width / 2;
 +    centerPosY = window->height / 2;
- 
+
      if (mode == GLFW_CURSOR_CAPTURED)
      {

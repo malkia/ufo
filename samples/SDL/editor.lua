@@ -46,11 +46,11 @@ local font = require_font( "font"..tostring(fw).."x"..tostring(fh) )
 
 local should_exit = false
 
-local ui_state = { 
-   mouse_down = false, 
-   mouse_x = 0, mouse_y = 0, 
+local ui_state = {
+   mouse_down = false,
+   mouse_x = 0, mouse_y = 0,
    hot_item = 0, active_item = 0,
-   kbd_item = 0, key_entered = 0,  key_mod = false, 
+   kbd_item = 0, key_entered = 0,  key_mod = false,
    last_widget = 0
 }
 
@@ -127,7 +127,7 @@ local function slider( id, x, y, w, h, max_value, value )
    end
 
    draw_rect( x, y, 32, h, 0x777777 )
-  
+
    if ui_state.active_item == id or ui_state.hot_item == id then
       draw_rect( x+8, y+8 + ypos, 16, 16, 0xffffff )
    else
@@ -155,7 +155,7 @@ local function slider( id, x, y, w, h, max_value, value )
    end
 
    ui_state.last_widget = id
-   
+
    if ui_state.active_item == id then
       local mouse_pos = ui_state.mouse_y - (y + 8)
       mouse_pos = max( mouse_pos, 0 )
@@ -179,7 +179,7 @@ local function imgui_finish()
    elseif ui_state.active_item == 0 then
       ui_state.active_item = -1
    end
-   
+
    if ui_state.key_entered == SDLK_TAB then
       ui_state.kbditem = 0
    end
@@ -193,7 +193,7 @@ local function render(screen)
    draw_text( 10, (some_y -1) % fh - fh, source, math.floor(-some_y / fh), math.floor(sh / fh)+1 )
    some_y = some_y - 1
 
-   imgui_prepare() 
+   imgui_prepare()
    do
       local changed, slider_value = slider( GEN_ID(), sw - 32, 0, 32, sh, #source, -some_y / fh)
       if changed then
@@ -231,33 +231,33 @@ do
 	       function()
 		  should_exit = true
 	       end,
-	       
+
 	       [sdl.SDL_MOUSEMOTION]=
 	       function()
 		  ui_state.mouse_x = motion.x
 		  ui_state.mouse_y = motion.y
 	       end,
-	       
+
 	       [sdl.SDL_MOUSEBUTTONDOWN]=
 	       function()
 		  if button == 1 then
 		     ui_state.mouse_down = true
 		  end
 	       end,
-	       
+
 	       [sdl.SDL_MOUSEBUTTONUP]=
 	       function()
 		  if button == 1 then
 		     ui_state.mouse_down = false
 		  end
 	       end,
-	       
+
 	       [sdl.SDL_KEYDOWN]=
 	       function()
 		  ui_state.key_entered = key
 		  ui_state.key_mod = mod
 	       end,
-	       
+
 	       [sdl.SDL_KEYUP]=
 	       function()
 		  if key == sdl.SDLK_ESCAPE then

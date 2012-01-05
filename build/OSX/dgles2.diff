@@ -16,7 +16,7 @@ index 69563f2..c9e1fc4 100644
 --- a/dgles2/src/EGL/hcocoa.m
 +++ b/dgles2/src/EGL/hcocoa.m
 @@ -20,6 +20,7 @@
- 
+
  #import <AppKit/NSOpenGL.h>
  #import <AppKit/NSView.h>
 +#import <AppKit/NSWindow.h>
@@ -27,7 +27,7 @@ index 69563f2..c9e1fc4 100644
  static void *CreateView(EGLSurface s, void *nsview, unsigned *width,
      unsigned *height)
  {
-+#if 0 
++#if 0
      NSView *v = nsview;
 +#else //malkia - SDL does not provide us with NSView, but NSWindow
 +    NSWindow *w = nsview;

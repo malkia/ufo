@@ -78,7 +78,7 @@ do
 	 fps = real_fps
       end
       fps = fps*0.99 + 0.01*real_fps
-	 
+
       -- Update the window caption with statistics
       sdl.SDL_WM_SetCaption( string.format("%d %s %dx%d | %.2f fps | %.2f mps", ticks_base, tostring(bounce_mode), wm.window.w, wm.window.h, fps, fps * (wm.window.w * wm.window.h) / (1024*1024)), nil )
    end

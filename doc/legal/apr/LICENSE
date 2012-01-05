@@ -202,17 +202,17 @@
 
 
 
-APACHE PORTABLE RUNTIME SUBCOMPONENTS: 
+APACHE PORTABLE RUNTIME SUBCOMPONENTS:
 
 The Apache Portable Runtime includes a number of subcomponents with
 separate copyright notices and license terms. Your use of the source
 code for these subcomponents is subject to the terms and conditions
-of the following licenses. 
+of the following licenses.
 
 From strings/apr_fnmatch.c, include/apr_fnmatch.h, misc/unix/getopt.c,
 file_io/unix/mktemp.c, strings/apr_strings.c:
 
-/* 
+/*
  * Copyright (c) 1987, 1993, 1994
  *      The Regents of the University of California.  All rights reserved.
  *
@@ -303,7 +303,7 @@ From strings/apr_snprintf.c:
   *
 
   Copyright(C) Caldera International Inc.  2001-2002.  All rights reserved.
-  
+
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are
   met:

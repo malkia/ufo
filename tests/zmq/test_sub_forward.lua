@@ -25,7 +25,7 @@ assert( ctx )
 -- First, create an intermediate device.
 local xpub = zmq.zmq_socket( ctx, zmq.ZMQ_XPUB )
 assert( xpub )
-local rc = zmq.zmq_bind( xpub, "tcp://127.0.0.1:5560") 
+local rc = zmq.zmq_bind( xpub, "tcp://127.0.0.1:5560")
 assert (rc == 0)
 
 local xsub = zmq.zmq_socket( ctx, zmq.ZMQ_XSUB )

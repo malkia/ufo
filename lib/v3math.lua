@@ -128,10 +128,10 @@ if not ... then
 end
 
 return {
-   new   = new, 
-   mag   = mag, 
-   len   = len, 
-   dot   = dot, 
+   new   = new,
+   mag   = mag,
+   len   = len,
+   dot   = dot,
    neg   = neg,   negself   = negself,   negnew   = negnew,
    add   = add,   addself   = addself,   addnew   = addnew,
    sub   = sub,   subself   = subself,   subnew   = subnew,

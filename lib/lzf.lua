@@ -16,37 +16,37 @@ local function lzf_compress_ffi( inp, out, htab )
 	local MAX_OFF = 8192
 	local MAX_REF = 264
 	local inp_size = ffi.sizeof( inp )
-	
+
 	print( "inp_size = ", inp_size )
-	
+
 	local out_size = inp_size * 2
 	if out == nil then
 	   out = ffi.new( "uint8_t[?]", out_size )
 	else
 	   out_size = ffi.sizeof(out)
 	end
-	
+
 	if htab == nil then
 	   htab = ffi.new( "uint32_t[?]", 65536 )
 	else
 	   assert( ffi.sizeof(htab) == 65536 * 4 )
 	   ffi.fill(htab, ffi.sizeof(htab))
 	end
-	
+
 	local ref, lit, ip, op = 0, 0, 0, 1
 	local hval = shl(inp[ip], 8) + inp[ip + 1]
-	
+
 	while ip + 1 <= inp_size
 	do
 		if math.mod(ip,256)==0 then
 			print(ip)
 		end
-		
+
 		hval = shl(hval, 8) + inp[ip + 2]
 		local idx = band(shr(hval, 8) - hval, 0xFFFF)
 		ref, htab[ idx ] = htab[ idx ], ip
 		local off = ip - ref - 1
-		
+
 		if  true
 		and ref < ip
 		and off < MAX_OFF
@@ -73,17 +73,17 @@ local function lzf_compress_ffi( inp, out, htab )
 					len = len + 1; if inp[ref + len] ~= inp[ip + len] then break end
 					len = len + 1; if inp[ref + len] ~= inp[ip + len] then break end
 					len = len + 1; if inp[ref + len] ~= inp[ip + len] then break end
-					
+
 					len = len + 1; if inp[ref + len] ~= inp[ip + len] then break end
 					len = len + 1; if inp[ref + len] ~= inp[ip + len] then break end
 					len = len + 1; if inp[ref + len] ~= inp[ip + len] then break end
 					len = len + 1; if inp[ref + len] ~= inp[ip + len] then break end
-					
+
 					len = len + 1; if inp[ref + len] ~= inp[ip + len] then break end
 					len = len + 1; if inp[ref + len] ~= inp[ip + len] then break end
 					len = len + 1; if inp[ref + len] ~= inp[ip + len] then break end
 					len = len + 1; if inp[ref + len] ~= inp[ip + len] then break end
-					
+
 					len = len + 1; if inp[ref + len] ~= inp[ip + len] then break end
 					len = len + 1; if inp[ref + len] ~= inp[ip + len] then break end
 					len = len + 1; if inp[ref + len] ~= inp[ip + len] then break end
@@ -130,11 +130,11 @@ local function lzf_compress_ffi( inp, out, htab )
 			end
 		end
 	end
-	
+
 	if op + 3 > out_size then
 		return 0
 	end
-	
+
 	while ip < inp_size do
 		lit = lit + 1
 		out[ op ] = out[ ip ]
@@ -146,12 +146,12 @@ local function lzf_compress_ffi( inp, out, htab )
 			op = op + 1
 		end
 	end
-	
+
 	out[ op - lit - 1] = lit - 1
 	if lit == 0 then
 		op = op - 1
 	end
-	
+
 	return out, op
 end
 
@@ -166,7 +166,7 @@ end
 -- Load the file in lua string
 local lua_src_blob = load_file("1.DB")
 
--- Copy the loaded file from the lua string to a FFI array of uint8_t 
+-- Copy the loaded file from the lua string to a FFI array of uint8_t
 local ffi_src_blob = ffi.new( "uint8_t[?]", #lua_src_blob, lua_src_blob )
 
 -- Allocate also FFI space for compression, twice the size of the source data (Probably too much)

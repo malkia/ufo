@@ -77,8 +77,8 @@ assert (rc == 0);
 local sb = new_connection( sb )
 local sc = new_connection( sc )
 for i=0, 1024*60-1 do
-bounce( sb, sc )   
-end 
+bounce( sb, sc )
+end
 local sb = sb.handle
 local sc = sc.handle
 

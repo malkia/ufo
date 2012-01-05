@@ -31,7 +31,7 @@ ffi.cdef [[
 	 FT_Fixed  xx, xy;
 	 FT_Fixed  yx, yy;
       } FT_Matrix;
-      
+
       typedef struct {
 	 const FT_Byte* pointer;
 	 FT_Int         length;

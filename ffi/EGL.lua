@@ -21,7 +21,7 @@ ffi.cdef[[
 	 EGL_NO_CONTEXT			 = 0,
 	 EGL_NO_DISPLAY			 = 0,
 	 EGL_NO_SURFACE	 		 = 0,
-	 EGL_DONT_CARE		 	 = -1, 
+	 EGL_DONT_CARE		 	 = -1,
 	 EGL_SUCCESS			 = 0x3000,
 	 EGL_NOT_INITIALIZED		 = 0x3001,
 	 EGL_BAD_ACCESS			 = 0x3002,
@@ -178,8 +178,8 @@ ffi.cdef[[
       EGLBoolean  eglWaitNative(           EGLint engine );
       EGLBoolean  eglSwapBuffers(          EGLDisplay, EGLSurface );
       EGLBoolean  eglCopyBuffers(          EGLDisplay, EGLSurface, EGLNativePixmapType target );
-      EGLSurface  eglCreatePbufferFromClientBuffer( 
-	                                   EGLDisplay, EGLenum buftype, EGLClientBuffer, EGLConfig, 
+      EGLSurface  eglCreatePbufferFromClientBuffer(
+	                                   EGLDisplay, EGLenum buftype, EGLClientBuffer, EGLConfig,
 	                                   const EGLint *attrib_list );
 
       typedef void (* __eglMustCastToProperFunctionPointerType )( void );

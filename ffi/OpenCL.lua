@@ -148,7 +148,7 @@ enum {
   CL_FP_ROUND_TO_ZERO                          = 0x08,
   CL_FP_ROUND_TO_INF                           = 0x10,
   CL_FP_FMA                                    = 0x20,
-  CL_FP_SOFT_FLOAT                             = 0x40, 
+  CL_FP_SOFT_FLOAT                             = 0x40,
   CL_NONE                                      = 0x0,
   CL_READ_ONLY_CACHE                           = 0x1,
   CL_READ_WRITE_CACHE                          = 0x2,
@@ -582,7 +582,7 @@ typedef cl_uint          cl_gl_platform_info;
 typedef cl_uint          cl_gl_context_info;
 typedef struct __GLsync* cl_GLsync;
 typedef cl_int        (* clGetGLContextInfoKHR_fn)( const cl_context_properties *, cl_gl_context_info, size_t, void *, size_t * );
-    
+
 enum {
   cl_khr_gl_sharing                      = 1,
   CL_GL_OBJECT_BUFFER                    = 0x2000,
@@ -590,7 +590,7 @@ enum {
   CL_GL_OBJECT_TEXTURE3D                 = 0x2002,
   CL_GL_OBJECT_RENDERBUFFER              = 0x2003,
   CL_GL_TEXTURE_TARGET                   = 0x2004,
-  CL_GL_MIPMAP_LEVEL                     = 0x2005,  
+  CL_GL_MIPMAP_LEVEL                     = 0x2005,
   CL_INVALID_GL_SHAREGROUP_REFERENCE_KHR = -1000,
   CL_CURRENT_DEVICE_FOR_GL_CONTEXT_KHR   = 0x2006,
   CL_DEVICES_FOR_GL_CONTEXT_KHR          = 0x2007,

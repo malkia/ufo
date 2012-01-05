@@ -38,7 +38,7 @@ typedef enum {
     APR_LNK,                                   // a symbolic link
     APR_SOCK,                                  // a [unix domain] socket
     APR_UNKFILE                 =        127   // a file of some other unknown type
-} apr_filetype_e; 
+} apr_filetype_e;
 
 enum {
     APR_FPROT_USETID            =     0x8000, // Set user id
@@ -78,17 +78,17 @@ enum {
     APR_FINFO_PROT              = 0x00700000, // all protections
     APR_FINFO_NORM              = 0x0073b170, // an atomic unix apr_stat()
     APR_FINFO_DIRENT            = 0x02000000, // an atomic unix apr_dir_read()
-    APR_FILEPATH_NOTABOVEROOT   =       0x01, // Cause apr_filepath_merge to fail if addpath is above rootpath 
+    APR_FILEPATH_NOTABOVEROOT   =       0x01, // Cause apr_filepath_merge to fail if addpath is above rootpath
     APR_FILEPATH_SECUREROOTTEST =       0x02, // internal: Only meaningful with APR_FILEPATH_NOTABOVEROOT
     APR_FILEPATH_SECUREROOT     =       0x03, // Cause apr_filepath_merge to fail if addpath is above rootpath,
                                               // even given a rootpath /foo/bar and an addpath ../bar/bash
     APR_FILEPATH_NOTRELATIVE    =       0x04, // Fail apr_filepath_merge if the merged path is relative
     APR_FILEPATH_NOTABSOLUTE    =       0x08, // Fail apr_filepath_merge if the merged path is absolute
     APR_FILEPATH_NATIVE         =       0x10, // Return the file system's native path with path delimiters
-    APR_FILEPATH_TRUENAME       =       0x20, // Resolve the true case of existing directories and file 
+    APR_FILEPATH_TRUENAME       =       0x20, // Resolve the true case of existing directories and file
                                               // elements of addpath, (resolving any aliases on Win32)
                                               // and append a proper trailing slash if a directory
-    APR_FILEPATH_ENCODING_UNKNOWN    =     0, // The FilePath character encoding is unknown 
+    APR_FILEPATH_ENCODING_UNKNOWN    =     0, // The FilePath character encoding is unknown
     APR_FILEPATH_ENCODING_LOCALE     =     1, // The FilePath character encoding is locale-dependent
     APR_FILEPATH_ENCODING_UTF8       =     2, // The FilePath character encoding is UTF-8
     APR_ALLOCATOR_MAX_FREE_UNLIMITED =     0, // Symbolic constant
@@ -105,7 +105,7 @@ typedef struct apr_memnode_t {
 
 typedef struct apr_finfo_t {
     apr_pool_t*     pool;       // Allocates memory and closes lingering handles in the specified pool
-    int32_t         valid;      // The bitmask describing valid fields of this apr_finfo_t structure 
+    int32_t         valid;      // The bitmask describing valid fields of this apr_finfo_t structure
                                 //     including all available 'wanted' fields and potentially more
     apr_fileperms_t protection; // The access permissions of the file.  Mimics Unix access rights.
     apr_filetype_e  filetype;   // APR_REG, DIR, CHR, BLK, PIPE, LNK or SOCK.
@@ -117,8 +117,8 @@ typedef struct apr_finfo_t {
     apr_dev_t       device;     // The id of the device the file is on.
     int32_t         nlink;      // The number of hard links to the file.
     apr_off_t       size;       // The size of the file
-    apr_off_t       csize;      // The storage size consumed by the file 
-    apr_time_t      atime;      // The time the file was last accessed 
+    apr_off_t       csize;      // The storage size consumed by the file
+    apr_time_t      atime;      // The time the file was last accessed
     apr_time_t      mtime;      // The time the file was last modified
     apr_time_t      ctime;      // The time the file was created, or the inode was last changed
     const char*     fname;      // The pathname of the file (possibly unrooted)
@@ -134,7 +134,7 @@ void                apr_terminate2(void);
 apr_status_t        apr_pool_initialize();
 void                apr_pool_terminate();
 apr_status_t        apr_pool_create_ex(       apr_pool_t**, apr_pool_t*, apr_abortfunc_t, apr_allocator_t* );
-apr_status_t        apr_pool_create_ex_debug( apr_pool_t**, apr_pool_t*, apr_abortfunc_t, apr_allocator_t*, 
+apr_status_t        apr_pool_create_ex_debug( apr_pool_t**, apr_pool_t*, apr_abortfunc_t, apr_allocator_t*,
                                               const char* file_line );
 apr_status_t        apr_pool_create_unmanaged_ex(       apr_pool_t**, apr_abortfunc_t, apr_allocator_t* );
 apr_status_t        apr_pool_create_unmanaged_ex_debug( apr_pool_t**, apr_abortfunc_t, apr_allocator_t*,
@@ -183,7 +183,7 @@ apr_status_t        apr_filepath_get(        char** path, int32_t flags, apr_poo
 apr_status_t        apr_filepath_set(        const char* path, apr_pool_t* );
 apr_status_t        apr_filepath_encoding(   int* style, apr_pool_t* );
 apr_status_t        apr_filepath_root( const char** rootpth, const char** filepth, int32_t flgs, apr_pool_t* );
-apr_status_t        apr_filepath_merge(      char** newpath,  const char* rootpath,  const char *addpath, 
+apr_status_t        apr_filepath_merge(      char** newpath,  const char* rootpath,  const char *addpath,
                                              int32_t flags, apr_pool_t *);
 
 apr_status_t        apr_uid_current(      apr_uid_t* uid, apr_gid_t* gid, apr_pool_t* );

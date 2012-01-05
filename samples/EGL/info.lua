@@ -25,10 +25,10 @@ local function main()
   local value = ffi.new( "EGLint[1]" )
   local fmt = string.format
   local details = {
-     [egl.EGL_CONFIG_CAVEAT] = { 
-         [egl.EGL_NONE] = "Normal", 
-	 [egl.EGL_SLOW_CONFIG] = "Slow", 
-	 [egl.EGL_NON_CONFORMANT_CONFIG] = "Non-conformant" 
+     [egl.EGL_CONFIG_CAVEAT] = {
+         [egl.EGL_NONE] = "Normal",
+	 [egl.EGL_SLOW_CONFIG] = "Slow",
+	 [egl.EGL_NON_CONFORMANT_CONFIG] = "Non-conformant"
      },
      [egl.EGL_COLOR_BUFFER_TYPE] = {
          [egl.EGL_RGB_BUFFER] = "RGB color buffer",
@@ -58,7 +58,7 @@ local function main()
      },
   }
   for i=0, n_cfg-1 do
-    for _,k in ipairs{ 
+    for _,k in ipairs{
         "BUFFER_SIZE", "ALPHA_SIZE", "BLUE_SIZE", "GREEN_SIZE", "RED_SIZE", "DEPTH_SIZE", "STENCIL_SIZE", "LUMINANCE_SIZE",
 	"ALPHA_MASK_SIZE", "BIND_TO_TEXTURE_RGB", "BIND_TO_TEXTURE_RGBA", "COLOR_BUFFER_TYPE", "CONFORMANT",
         "CONFIG_CAVEAT", "CONFIG_ID", "LEVEL", "MAX_PBUFFER_HEIGHT", "MAX_PBUFFER_PIXELS", "MAX_PBUFFER_WIDTH",

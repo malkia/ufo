@@ -92,10 +92,10 @@ ffi.cdef[[
 	 GL_INVALID_VALUE                  = 0x0501,
 	 GL_INVALID_OPERATION              = 0x0502,
 	 GL_OUT_OF_MEMORY                  = 0x0505,
-	 
+
 	 GL_CW                             = 0x0900,
 	 GL_CCW                            = 0x0901,
-	 
+
 	 GL_LINE_WIDTH                     = 0x0B21,
 	 GL_ALIASED_POINT_SIZE_RANGE       = 0x846D,
 	 GL_ALIASED_LINE_WIDTH_RANGE       = 0x846E,
@@ -142,16 +142,16 @@ ffi.cdef[[
 	 GL_SAMPLES                        = 0x80A9,
 	 GL_SAMPLE_COVERAGE_VALUE          = 0x80AA,
 	 GL_SAMPLE_COVERAGE_INVERT         = 0x80AB,
-	 
+
 	 GL_NUM_COMPRESSED_TEXTURE_FORMATS = 0x86A2,
 	 GL_COMPRESSED_TEXTURE_FORMATS     = 0x86A3,
-	 
+
 	 GL_DONT_CARE                      = 0x1100,
 	 GL_FASTEST                        = 0x1101,
 	 GL_NICEST                         = 0x1102,
-	 
+
 	 GL_GENERATE_MIPMAP_HINT            = 0x8192,
-	 
+
 	 GL_BYTE                           = 0x1400,
 	 GL_UNSIGNED_BYTE                  = 0x1401,
 	 GL_SHORT                          = 0x1402,
@@ -167,11 +167,11 @@ ffi.cdef[[
 	 GL_RGBA                           = 0x1908,
 	 GL_LUMINANCE                      = 0x1909,
 	 GL_LUMINANCE_ALPHA                = 0x190A,
-	 
+
 	 GL_UNSIGNED_SHORT_4_4_4_4         = 0x8033,
 	 GL_UNSIGNED_SHORT_5_5_5_1         = 0x8034,
 	 GL_UNSIGNED_SHORT_5_6_5           = 0x8363,
-	 
+
 	 GL_FRAGMENT_SHADER                  = 0x8B30,
 	 GL_VERTEX_SHADER                    = 0x8B31,
 	 GL_MAX_VERTEX_ATTRIBS               = 0x8869,
@@ -191,8 +191,8 @@ ffi.cdef[[
 	 GL_ACTIVE_ATTRIBUTES                = 0x8B89,
 	 GL_ACTIVE_ATTRIBUTE_MAX_LENGTH      = 0x8B8A,
 	 GL_SHADING_LANGUAGE_VERSION         = 0x8B8C,
-	 GL_CURRENT_PROGRAM                  = 0x8B8D, 
-	 
+	 GL_CURRENT_PROGRAM                  = 0x8B8D,
+
 	 GL_NEVER                          = 0x0200,
 	 GL_LESS                           = 0x0201,
 	 GL_EQUAL                          = 0x0202,
@@ -201,7 +201,7 @@ ffi.cdef[[
 	 GL_NOTEQUAL                       = 0x0205,
 	 GL_GEQUAL                         = 0x0206,
 	 GL_ALWAYS                         = 0x0207,
-	 
+
 	 GL_KEEP                           = 0x1E00,
 	 GL_REPLACE                        = 0x1E01,
 	 GL_INCR                           = 0x1E02,
@@ -209,27 +209,27 @@ ffi.cdef[[
 	 GL_INVERT                         = 0x150A,
 	 GL_INCR_WRAP                      = 0x8507,
 	 GL_DECR_WRAP                      = 0x8508,
-	 
+
 	 GL_VENDOR                         = 0x1F00,
 	 GL_RENDERER                       = 0x1F01,
 	 GL_VERSION                        = 0x1F02,
 	 GL_EXTENSIONS                     = 0x1F03,
-	 
+
 	 GL_NEAREST                        = 0x2600,
 	 GL_LINEAR                         = 0x2601,
-	 
+
 	 GL_NEAREST_MIPMAP_NEAREST         = 0x2700,
 	 GL_LINEAR_MIPMAP_NEAREST          = 0x2701,
 	 GL_NEAREST_MIPMAP_LINEAR          = 0x2702,
 	 GL_LINEAR_MIPMAP_LINEAR           = 0x2703,
-	 
+
 	 GL_TEXTURE_MAG_FILTER             = 0x2800,
 	 GL_TEXTURE_MIN_FILTER             = 0x2801,
 	 GL_TEXTURE_WRAP_S                 = 0x2802,
 	 GL_TEXTURE_WRAP_T                 = 0x2803,
-	 
+
 	 GL_TEXTURE                        = 0x1702,
-	 
+
 	 GL_TEXTURE_CUBE_MAP               = 0x8513,
 	 GL_TEXTURE_BINDING_CUBE_MAP       = 0x8514,
 	 GL_TEXTURE_CUBE_MAP_POSITIVE_X    = 0x8515,
@@ -239,7 +239,7 @@ ffi.cdef[[
 	 GL_TEXTURE_CUBE_MAP_POSITIVE_Z    = 0x8519,
 	 GL_TEXTURE_CUBE_MAP_NEGATIVE_Z    = 0x851A,
 	 GL_MAX_CUBE_MAP_TEXTURE_SIZE      = 0x851C,
-	 
+
 	 GL_TEXTURE0                       = 0x84C0,
 	 GL_TEXTURE1                       = 0x84C1,
 	 GL_TEXTURE2                       = 0x84C2,
@@ -273,11 +273,11 @@ ffi.cdef[[
 	 GL_TEXTURE30                      = 0x84DE,
 	 GL_TEXTURE31                      = 0x84DF,
 	 GL_ACTIVE_TEXTURE                 = 0x84E0,
-	 
+
 	 GL_REPEAT                         = 0x2901,
 	 GL_CLAMP_TO_EDGE                  = 0x812F,
 	 GL_MIRRORED_REPEAT                = 0x8370,
-	 
+
 	 GL_FLOAT_VEC2                     = 0x8B50,
 	 GL_FLOAT_VEC3                     = 0x8B51,
 	 GL_FLOAT_VEC4                     = 0x8B52,
@@ -293,7 +293,7 @@ ffi.cdef[[
 	 GL_FLOAT_MAT4                     = 0x8B5C,
 	 GL_SAMPLER_2D                     = 0x8B5E,
 	 GL_SAMPLER_CUBE                   = 0x8B60,
-	 
+
 	 GL_VERTEX_ATTRIB_ARRAY_ENABLED        = 0x8622,
 	 GL_VERTEX_ATTRIB_ARRAY_SIZE           = 0x8623,
 	 GL_VERTEX_ATTRIB_ARRAY_STRIDE         = 0x8624,
@@ -301,35 +301,35 @@ ffi.cdef[[
 	 GL_VERTEX_ATTRIB_ARRAY_NORMALIZED     = 0x886A,
 	 GL_VERTEX_ATTRIB_ARRAY_POINTER        = 0x8645,
 	 GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING = 0x889F,
-	 
+
 	 GL_IMPLEMENTATION_COLOR_READ_TYPE   = 0x8B9A,
 	 GL_IMPLEMENTATION_COLOR_READ_FORMAT = 0x8B9B,
-	 
+
 	 GL_COMPILE_STATUS                 = 0x8B81,
 	 GL_INFO_LOG_LENGTH                = 0x8B84,
 	 GL_SHADER_SOURCE_LENGTH           = 0x8B88,
 	 GL_SHADER_COMPILER                = 0x8DFA,
-	 
+
 	 GL_SHADER_BINARY_FORMATS          = 0x8DF8,
 	 GL_NUM_SHADER_BINARY_FORMATS      = 0x8DF9,
-	 
+
 	 GL_LOW_FLOAT                      = 0x8DF0,
 	 GL_MEDIUM_FLOAT                   = 0x8DF1,
 	 GL_HIGH_FLOAT                     = 0x8DF2,
 	 GL_LOW_INT                        = 0x8DF3,
 	 GL_MEDIUM_INT                     = 0x8DF4,
 	 GL_HIGH_INT                       = 0x8DF5,
-	 
+
 	 GL_FRAMEBUFFER                    = 0x8D40,
 	 GL_RENDERBUFFER                   = 0x8D41,
-	 
+
 	 GL_RGBA4                          = 0x8056,
 	 GL_RGB5_A1                        = 0x8057,
 	 GL_RGB565                         = 0x8D62,
 	 GL_DEPTH_COMPONENT16              = 0x81A5,
 	 GL_STENCIL_INDEX                  = 0x1901,
 	 GL_STENCIL_INDEX8                 = 0x8D48,
-	 
+
 	 GL_RENDERBUFFER_WIDTH             = 0x8D42,
 	 GL_RENDERBUFFER_HEIGHT            = 0x8D43,
 	 GL_RENDERBUFFER_INTERNAL_FORMAT   = 0x8D44,
@@ -339,16 +339,16 @@ ffi.cdef[[
 	 GL_RENDERBUFFER_ALPHA_SIZE        = 0x8D53,
 	 GL_RENDERBUFFER_DEPTH_SIZE        = 0x8D54,
 	 GL_RENDERBUFFER_STENCIL_SIZE      = 0x8D55,
-	 
+
 	 GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE           = 0x8CD0,
 	 GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME           = 0x8CD1,
 	 GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL         = 0x8CD2,
 	 GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE = 0x8CD3,
-	 
+
 	 GL_COLOR_ATTACHMENT0              = 0x8CE0,
 	 GL_DEPTH_ATTACHMENT               = 0x8D00,
 	 GL_STENCIL_ATTACHMENT             = 0x8D20,
-	 
+
 	 GL_NONE                           = 0,
 
 	 GL_FRAMEBUFFER_COMPLETE                      = 0x8CD5,
@@ -356,11 +356,11 @@ ffi.cdef[[
 	 GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT = 0x8CD7,
 	 GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS         = 0x8CD9,
 	 GL_FRAMEBUFFER_UNSUPPORTED                   = 0x8CDD,
-	 
+
 	 GL_FRAMEBUFFER_BINDING            = 0x8CA6,
 	 GL_RENDERBUFFER_BINDING           = 0x8CA7,
 	 GL_MAX_RENDERBUFFER_SIZE          = 0x84E8,
-	 
+
 	 GL_INVALID_FRAMEBUFFER_OPERATION  = 0x0506,
       };
 

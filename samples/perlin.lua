@@ -10,7 +10,7 @@ local maxb, minb = -10000, 10000
 
 local function render( screen, tick )
    local p2 = pn.perlin2
-   local o = 0.5 
+   local o = 0.5
    local pixels_u32 = ffi.cast( uint32ptr, screen.pixels )
    local width, height, pitch = screen.w, screen.h, screen.pitch / 4
    local ooh = 1/height
@@ -103,7 +103,7 @@ do
 	 fps = real_fps
       end
       fps = fps*0.99 + 0.01*real_fps
-	 
+
       -- Update the window caption with statistics
       sdl.SDL_WM_SetCaption( string.format("%d %s %dx%d | %.2f fps | %.2f mps", ticks_base, tostring(bounce_mode), screen.w, screen.h, fps, fps * (screen.w * screen.h) / (1024*1024)), nil )
    end

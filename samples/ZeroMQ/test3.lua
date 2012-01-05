@@ -25,7 +25,7 @@ sb:bind( "inproc://a" )
 sc:connect( "inproc://a" )
 for i=0,1024*1024-1 do
   bounce( sb, sc )
-end    
+end
 sc:close()
 sb:close()
 ctx:term()

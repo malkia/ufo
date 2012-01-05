@@ -64,7 +64,7 @@ local function build_text( font, lines )
 
    local chars = 0
    for y = top, bottom do
-      chars = chars + #lines[ y ] 
+      chars = chars + #lines[ y ]
    end
 
    local v = ffi.new( "float[?]", chars * 12 )
@@ -89,7 +89,7 @@ local function build_text( font, lines )
       end
       y0 = y1
    end
-   
+
    return {
       tid = tid,
       n_verts = chars * 6,
@@ -157,7 +157,7 @@ local function main()
    local mx, my = ffi.new( "int[1]" ), ffi.new( "int[1]" )
    local sw, sh = ffi.new( "int[1]" ), ffi.new( "int[1]" )
    local dx, dy
-   while glfw.glfwIsWindow(window) and glfw.glfwGetKey(window, glfw.GLFW_KEY_ESCAPE) ~= glfw.GLFW_PRESS 
+   while glfw.glfwIsWindow(window) and glfw.glfwGetKey(window, glfw.GLFW_KEY_ESCAPE) ~= glfw.GLFW_PRESS
    do
       local t = glfw.glfwGetTime()
 
@@ -178,7 +178,7 @@ local function main()
       gl.glLoadIdentity()
 
       glu.gluPerspective(65, sw / sh, 1, 100)
-      
+
       gl.glMatrixMode( gl.GL_MODELVIEW )
       gl.glLoadIdentity()
       glu.gluLookAt(
@@ -186,7 +186,7 @@ local function main()
 	 0, 20, 0,   -- View-point
 	 0,  0, 1    -- Up Vector
       )
-      
+
       gl.glTranslatef(0, 14, 0)
       gl.glRotatef(0.3 * mx + t * 100, 0, 0, 1)
       gl.glBegin(gl.GL_TRIANGLES)
@@ -198,8 +198,8 @@ local function main()
 	 gl.glColor3f(0, 0, 1)
 	 gl.glVertex3f(0, 0, 6)
       end
-      gl.glEnd()  
-    
+      gl.glEnd()
+
       gl.glMatrixMode(gl.GL_PROJECTION)
       gl.glLoadIdentity()
       gl.glMatrixMode( gl.GL_MODELVIEW )

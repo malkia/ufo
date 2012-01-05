@@ -21,5 +21,5 @@ local s = pm.pixman_image_create_bits( pm.PIXMAN_a2r10g10b10, WIDTH, HEIGHT, src
 
 pm.pixman_image_set_alpha_map( s, a, 0, 0 )
 pm.pixman_image_set_alpha_map( a, s, 0, 0 )
-pm.pixman_image_composite( pm.PIXMAN_OP_SRC, s, NULL, d, 0, 0, 0, 0, 0, 0, WIDTH, HEIGHT ) 
+pm.pixman_image_composite( pm.PIXMAN_OP_SRC, s, NULL, d, 0, 0, 0, 0, 0, 0, WIDTH, HEIGHT )
 pm.pixman_image_unref( s )

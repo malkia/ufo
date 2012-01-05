@@ -3,13 +3,13 @@ index 8fb5356..7b60f30 100644
 --- a/pixman/pixman.c
 +++ b/pixman/pixman.c
 @@ -30,6 +30,10 @@
- 
+
  #include <stdlib.h>
- 
+
 +#ifdef _MSC_VER
 +#include <intsafe.h>
 +#endif
 +
  static pixman_implementation_t *global_implementation;
- 
+
  #ifdef TOOLCHAIN_SUPPORTS_ATTRIBUTE_CONSTRUCTOR

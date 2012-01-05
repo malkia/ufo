@@ -19,13 +19,13 @@ local function InitSDL()
    if systems[subsystem]=="x11" then
       display = wminfo.display
       print('X11', display, window)
-   end			      
+   end
    local event = ffi.new( "SDL_Event" )
    local prev_time, curr_time, fps = 0, 0, 0
    return {
       window = window,
       display = display,
-      update = function() 
+      update = function()
                -- Calculate the frame rate
 		  prev_time, curr_time = curr_time, os.clock()
 		  local diff = curr_time - prev_time + 0.00001
@@ -34,7 +34,7 @@ local function InitSDL()
 		     fps = real_fps
 		  end
 		  fps = fps*0.99 + 0.01*real_fps
-	 
+
       -- Update the window caption with statistics
 --		  sdl.SDL_WM_SetCaption( string.format("%d %s %dx%d | %.2f fps | %.2f mps", ticks_base, tostring(bounce_mode), screen.w, screen.h, fps, fps * (screen.w * screen.h) / (1024*1024)), nil )
 
@@ -50,10 +50,10 @@ local function InitSDL()
 			--sdl.SDL_WM_ToggleFullScreen( screen )
 		     end
 		  end
-		  return true 
+		  return true
 	       end,
-      exit = function() 
-		sdl.SDL_Quit() 
+      exit = function()
+		sdl.SDL_Quit()
 	     end,
    }
 end
@@ -81,7 +81,7 @@ local fs_src = [[
 	 gl_FragColor = vec4( 1., 0.9, 0.7, 1.0 ) * cos( 30.*sqrt(pos.x*pos.x + 1.5*pos.y*pos.y)  + atan(pos.y,pos.x) - phase );
 //	 gl_FragColor = one * cos( thirty * sqrt(pos.x*pos.x + pos.y*pos.y)  + atan(pos.y,pos.x) - phase );
 //	 gl_FragColor = vec4(pos.x*pos.y+phase);
-      }                                 
+      }
 ]]
 
 --  some more formulas to play with...
@@ -139,7 +139,7 @@ local function validate_shader( shader )
 --   assert( int[0] == length )
    error( ffi.string(buffer) )
 end
- 
+
 local function load_shader( src, type )
    local shader = gl.glCreateShader( type )
    if shader == 0 then
@@ -162,14 +162,14 @@ gl.glAttachShader( prog, vs )
 gl.glAttachShader( prog, fs )
 gl.glLinkProgram( prog )
 gl.glUseProgram( prog )
-   
+
 local loc_position = gl.glGetAttribLocation( prog, "position" )
 local loc_phase    = gl.glGetUniformLocation( prog, "phase" )
 local loc_offset   = gl.glGetUniformLocation( prog, "offset" )
 
 
 local phasep = 0
-local update_pos = true 
+local update_pos = true
 
 local phase = 0
 local norm_x = 0
@@ -194,34 +194,34 @@ while wm:update() do
    gl.glClear ( gl.GL_COLOR_BUFFER_BIT )
    gl.glUniform1f( loc_phase, phase )
    phase =  math.fmod( phase + 0.5, 2 * 3.141 )
- 
+
    if update_pos  then
       local old_offset_x  =  offset_x;
       local old_offset_y  =  offset_y;
-      
+
       offset_x  =  norm_x - p1_pos_x;
       offset_y  =  norm_y - p1_pos_y;
- 
+
       p1_pos_x  =  norm_x;
       p1_pos_y  =  norm_y;
- 
+
       offset_x  =  offset_x + old_offset_x;
       offset_y  =  offset_y + old_offset_y;
- 
+
       update_pos = false;
    end
- 
+
    gl.glUniform4f( loc_offset, offset_x , offset_y, 0.0 , 0.0 )
    gl.glVertexAttribPointer( loc_position, 3, gl.GL_FLOAT, gl.GL_FALSE, 0, vertexArray )
    gl.glEnableVertexAttribArray( loc_position )
    gl.glDrawArrays( gl.GL_TRIANGLE_STRIP, 0, 5 )
- 
+
    egl.eglSwapBuffers( dpy, surf )
 end
 
 egl.eglDestroyContext( dpy, ctx )
 egl.eglDestroySurface( dpy, surf )
 egl.eglTerminate( dpy )
- 
+
 wm:exit()
 

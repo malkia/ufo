@@ -1,4 +1,4 @@
-#!/usr/bin/env luajit 
+#!/usr/bin/env luajit
 
 local ffi  = require( "ffi" )
 local gl   = require( "ffi/OpenGL" )
@@ -19,12 +19,12 @@ local function DrawModel( wireframe )
    gl.glLightModeli(   gl.GL_LIGHT_MODEL_TWO_SIDE, 1 )
    gl.glColorMaterial( gl.GL_FRONT_AND_BACK,       gl.GL_DIFFUSE )
    gl.glLineWidth(     3 )
-    
+
    local num_pass
    if wireframe then
       OFF( gl.GL_CULL_FACE )
       OFF( gl.GL_LIGHTING )
-      gl.glPolygonMode( gl.GL_FRONT_AND_BACK, gl.GL_LINE) 
+      gl.glPolygonMode( gl.GL_FRONT_AND_BACK, gl.GL_LINE)
       num_pass = 1
    else
       ON( gl.GL_CULL_FACE )
@@ -34,10 +34,10 @@ local function DrawModel( wireframe )
    end
 
    local N, V = gl.glNormal3f, gl.glVertex3f
-   
+
    gl.glCullFace( gl.GL_FRONT )
    for pass=1, num_pass do
-      
+
       gl.glBegin(gl.GL_QUADS)
       N( 0, 0,-1) V(0,0,0) V(0,1,0) V(1,1,0) V(1,0,0) -- front face
       N( 0, 0, 1) V(0,0,1) V(1,0,1) V(1,1,1) V(0,1,1) -- back face
@@ -46,7 +46,7 @@ local function DrawModel( wireframe )
       N( 0,-1, 0) V(0,0,0) V(1,0,0) V(1,0,1) V(0,0,1) -- bottom face
       N( 0, 1, 0) V(0,1,0) V(0,1,1) V(1,1,1) V(1,1,0) -- top face
       gl.glEnd()
-      
+
       gl.glCullFace( gl.GL_BACK )
    end
 end
@@ -62,8 +62,8 @@ local function main()
    local window = glfw.glfwOpenWindow( width, height, glfw.GLFW_WINDOWED, "AntTweakBar with GLFW and OpenGL", nil )
    assert( window, "Failed to open GLFW window")
    glfw.glfwSetWindowPos( window, (desktop_width - width)/2, (desktop_height - height)/2 )
- 
-   local mouse = { 
+
+   local mouse = {
       x = 0, y = 0, wheel = 0,
       buttons = { {}, {}, {} },
    }
@@ -91,18 +91,18 @@ local function main()
 
    width, height = nil, nil
    local int1, int2 = ffi.new( "int[1]" ), ffi.new( "int[1]" )
-   while glfw.glfwIsWindow(window) 
-   and   glfw.glfwGetKey(window, glfw.GLFW_KEY_ESCAPE) ~= glfw.GLFW_PRESS 
+   while glfw.glfwIsWindow(window)
+   and   glfw.glfwGetKey(window, glfw.GLFW_KEY_ESCAPE) ~= glfw.GLFW_PRESS
    do
       glfw.glfwGetWindowSize(window, int1, int2)
       if width ~= int1[0] or height ~= int2[0] then
          width, height = int1[0], int2[0]
 	 gl.glViewport(0, 0, width, height)
 	 gl.glMatrixMode(gl.GL_PROJECTION)
-	 gl.glLoadIdentity()        
+	 gl.glLoadIdentity()
 	 glu.gluPerspective(40, width/height, 1, 10)
 	 glu.gluLookAt(-1,0,3, 0,0,0, 0,1,0)
-	 tw.TwWindowSize(width, height)         
+	 tw.TwWindowSize(width, height)
       end
 
       gl.glClearColor(var_bg_color[0], var_bg_color[1], var_bg_color[2], 1)
@@ -116,10 +116,10 @@ local function main()
       gl.glLoadIdentity()
       gl.glRotated(360 * var_turn[0], 0.4, 1, 0.2)
       gl.glTranslated(-0.5, -0.5, -0.5)
-      
+
       gl.glColor4ubv( var_cube_color )
       DrawModel( var_wire[0] ~= 0 )
- 
+
       glfw.glfwGetMousePos(window, int1, int2)
       mouse.x, mouse.y = int1[0], int2[0]
       do -- AntTweakBar

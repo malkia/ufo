@@ -27,7 +27,7 @@ Index: pgm/include/impl/security.h
 -#ifndef _CRT_SECURE_NO_WARNINGS
 +#if 1 // WDK 7.1 // ifndef _CRT_SECURE_NO_WARNINGS
  	FILE* stream;
- 
+
  	if (NULL == (stream = fopen (filename, mode)))
 @@ -202,7 +202,7 @@
  errno_t

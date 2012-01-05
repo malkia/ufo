@@ -208,7 +208,7 @@ typedef struct git_remote_head {
                char* name;
 } git_remote_head;
 
-typedef struct git_headarray 
+typedef struct git_headarray
                unsigned int      len;
                git_remote_head** heads;
 } git_headarray;
@@ -567,9 +567,9 @@ git_index_entry*
                git_index_get(git_index *index, unsigned int n);
 unsigned int   git_index_entrycount(git_index *index);
 unsigned int   git_index_entrycount_unmerged(git_index *index);
-const git_index_entry_unmerged* 
+const git_index_entry_unmerged*
                git_index_get_unmerged_bypath(git_index *index, const char *path);
-const git_index_entry_unmerged* 
+const git_index_entry_unmerged*
                git_index_get_unmerged_byindex(git_index *index, unsigned int n);
 int            git_index_entry_stage(const git_index_entry *entry);
 int            git_config_find_global(char *global_config_path);
