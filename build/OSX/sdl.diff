@@ -1,6 +1,6 @@
-diff -r 07fb0ac6886a build-scripts/fatbuild.sh
---- a/build-scripts/fatbuild.sh	Wed Dec 07 20:34:43 2011 -0500
-+++ b/build-scripts/fatbuild.sh	Thu Dec 08 10:00:13 2011 -0800
+diff -r f3c34d321289 build-scripts/fatbuild.sh
+--- a/build-scripts/fatbuild.sh	Fri Dec 09 02:32:21 2011 -0500
++++ b/build-scripts/fatbuild.sh	Sun Dec 25 22:26:01 2011 -0800
 @@ -24,19 +24,19 @@
  CONFIG_PPC="--host=powerpc-apple-darwin"
  CC_PPC="gcc-4.0"
@@ -24,17 +24,3 @@ diff -r 07fb0ac6886a build-scripts/fatbuild.sh
  
  #
  # Find the configure script
-diff -r 07fb0ac6886a src/video/cocoa/SDL_cocoawindow.m
---- a/src/video/cocoa/SDL_cocoawindow.m	Wed Dec 07 20:34:43 2011 -0500
-+++ b/src/video/cocoa/SDL_cocoawindow.m	Thu Dec 08 10:00:13 2011 -0800
-@@ -70,7 +70,9 @@
- 
-     [view setNextResponder:self];
- #if MAC_OS_X_VERSION_MAX_ALLOWED >= 1060
--    [view setAcceptsTouchEvents:YES];
-+    if ([view respondsToSelector:@selector(setAcceptsTouchEvents:)] ) {
-+        [view setAcceptsTouchEvents:YES];
-+    }
- #endif
- }
- 
