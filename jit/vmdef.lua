@@ -81,6 +81,7 @@ ircall = {
 "strlen",
 "memcpy",
 "memset",
+"lj_vm_errno",
 "lj_carith_mul64",
 }
 

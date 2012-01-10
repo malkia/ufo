@@ -95,8 +95,17 @@ echo LB: TARGET:  ARCH=%LB_TARGET_ARCH% CPU=%LB_TARGET_CPU% CROSS=%LB_TARGET_CRO
 call %LB_WDK_ROOT%\bin\setenv.bat %LB_WDK_ROOT% fre %LB_TARGET_CROSS% win7 no_oacr
 cd /d %~dp0..
 
-set LIB=%BASEDIR%\lib\crt\%LB_TARGET_CPU%;%BASEDIR%\lib\win7\%LB_TARGET_CPU%;%LIB%
-set INCLUDE=%CRT_INC_PATH%;%SDK_INC_PATH%\crt\stl70;%DDK_INC_PATH%;%INCLUDE%;
+set LB_WSDK71=%ProgramFiles%\Microsoft SDKs\Windows\v7.1
+set LB_WSDK71_LIB=%LB_WSDK71%\Lib
+set LB_WSDK71_INC=%LB_WSDK71%\Include
+if "%LB_TARGET_ARCH%"=="x64" set LB_WSDK71_LIB=%LB_WSDK71_LIB%\x64
+
+rem echo WSDK71=[%LB_WSDK71%]
+rem echo WSDK71_LIB=[%LB_WSDK71_LIB%]
+rem echo WSDK71_INC=[%LB_WSDK71_INC%]
+
+set LIB=%BASEDIR%\lib\crt\%LB_TARGET_CPU%;%BASEDIR%\lib\win7\%LB_TARGET_CPU%;%LB_WSDK71_LIB%;%LIB%
+set INCLUDE=%CRT_INC_PATH%;%SDK_INC_PATH%\crt\stl70;%DDK_INC_PATH%;%LB_WSDK71_INC%;%INCLUDE%;
 
 if "%LB_TARGET_ARCH%"=="x86" set LB_OBJS=msvcrt_win2000.obj
 if "%LB_TARGET_ARCH%"=="x64" set LB_OBJS=msvcrt_win2003.obj
