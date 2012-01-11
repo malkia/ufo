@@ -1065,8 +1065,9 @@ ffi.cdef[[
       SDL_DOLLARGESTURE   = 0x800,
       SDL_DOLLARRECORD,
       SDL_MULTIGESTURE,
-      SDL_CLIPBOARDUPDATE = 0x900, 
-      SDL_EVENT_COMPAT1 = 0x7000, 
+      SDL_CLIPBOARDUPDATE = 0x900,
+      SDL_DROPFILE        = 0x1000,
+      SDL_EVENT_COMPAT1   = 0x7000, 
       SDL_EVENT_COMPAT2,
       SDL_EVENT_COMPAT3,
       SDL_VIDEORESIZE  = SDL_EVENT_COMPAT2,
@@ -1075,7 +1076,8 @@ ffi.cdef[[
    } SDL_EventType;
 
    typedef struct SDL_WindowEvent {
-      uint32_t type;        
+      uint32_t type;  
+      uint32_t timestamp;      
       uint32_t windowID;    
       uint8_t event;        
       uint8_t padding1;
@@ -1086,7 +1088,8 @@ ffi.cdef[[
    } SDL_WindowEvent;
 
    typedef struct SDL_KeyboardEvent {
-      uint32_t type;        
+      uint32_t type;
+      uint32_t timestamp;        
       uint32_t windowID;    
       uint8_t state;        
       uint8_t repeat_;       
@@ -1096,7 +1099,8 @@ ffi.cdef[[
    } SDL_KeyboardEvent;
 
    typedef struct SDL_TextEditingEvent {
-      uint32_t type;                                
+      uint32_t type;   
+      uint32_t timestamp;                             
       uint32_t windowID;                            
       char text[32];  
       int start;                                  
@@ -1104,13 +1108,15 @@ ffi.cdef[[
    } SDL_TextEditingEvent;
 
    typedef struct SDL_TextInputEvent {
-      uint32_t type;                              
+      uint32_t type; 
+      uint32_t timestamp;                             
       uint32_t windowID;                          
       char text[32];  
    } SDL_TextInputEvent;
 
    typedef struct SDL_MouseMotionEvent {
-      uint32_t type;        
+      uint32_t type;   
+      uint32_t timestamp;     
       uint32_t windowID;    
       uint8_t state;        
       uint8_t padding1;
@@ -1123,7 +1129,8 @@ ffi.cdef[[
    } SDL_MouseMotionEvent;
 
    typedef struct SDL_MouseButtonEvent {
-      uint32_t type;        
+      uint32_t type;   
+      uint32_t timestamp;     
       uint32_t windowID;    
       uint8_t button;       
       uint8_t state;        
@@ -1135,6 +1142,7 @@ ffi.cdef[[
 
    typedef struct SDL_MouseWheelEvent {
       uint32_t type;        
+      uint32_t timestamp;     
       uint32_t windowID;    
       int x;              
       int y;              
@@ -1142,6 +1150,7 @@ ffi.cdef[[
 
    typedef struct SDL_JoyAxisEvent {
       uint32_t type;        
+      uint32_t timestamp;     
       uint8_t which;        
       uint8_t axis;         
       uint8_t padding1;
@@ -1151,6 +1160,7 @@ ffi.cdef[[
 
    typedef struct SDL_JoyBallEvent {
       uint32_t type;        
+      uint32_t timestamp;     
       uint8_t which;        
       uint8_t ball;         
       uint8_t padding1;
@@ -1161,6 +1171,7 @@ ffi.cdef[[
 
    typedef struct SDL_JoyHatEvent {
       uint32_t type;        
+      uint32_t timestamp;     
       uint8_t which;        
       uint8_t hat;          
       uint8_t value;        
@@ -1169,6 +1180,7 @@ ffi.cdef[[
 
    typedef struct SDL_JoyButtonEvent {
       uint32_t type;        
+      uint32_t timestamp;     
       uint8_t which;        
       uint8_t button;       
       uint8_t state;        
@@ -1177,6 +1189,7 @@ ffi.cdef[[
 
    typedef struct SDL_TouchFingerEvent {
       uint32_t type;        
+      uint32_t timestamp;     
       uint32_t windowID;    
       SDL_TouchID touchId;        
       SDL_FingerID fingerId;
@@ -1193,6 +1206,7 @@ ffi.cdef[[
 
    typedef struct SDL_TouchButtonEvent {
       uint32_t type;        
+      uint32_t timestamp;     
       uint32_t windowID;    
       SDL_TouchID touchId;        
       uint8_t state;        
@@ -1203,6 +1217,7 @@ ffi.cdef[[
 
    typedef struct SDL_MultiGestureEvent {
       uint32_t type;        
+      uint32_t timestamp;     
       uint32_t windowID;    
       SDL_TouchID touchId;        
       float dTheta;
@@ -1215,6 +1230,7 @@ ffi.cdef[[
 
    typedef struct SDL_DollarGestureEvent {
       uint32_t      type;        
+      uint32_t      timestamp;     
       uint32_t      windowID;    
       SDL_TouchID   touchId;        
       SDL_GestureID gestureId;
@@ -1222,12 +1238,20 @@ ffi.cdef[[
       float         error;
    } SDL_DollarGestureEvent;
 
+   typedef struct SDL_DropEvent {
+      uint32_t type;
+      uint32_t timestamp;
+      char*    file;
+   } SDL_DropEvent;
+
    typedef struct SDL_QuitEvent {
       uint32_t type;        
+      uint32_t timestamp;                             
    } SDL_QuitEvent;
 
    typedef struct SDL_UserEvent {
       uint32_t type;        
+      uint32_t timestamp;                             
       uint32_t windowID;    
       int code;           
       void *data1;        
@@ -1236,42 +1260,46 @@ ffi.cdef[[
 
    typedef struct SDL_SysWMEvent {
       uint32_t type;        
+      uint32_t timestamp;                             
       SDL_SysWMmsg *msg;  
    } SDL_SysWMEvent;
 
    typedef struct SDL_ActiveEvent {
       uint32_t type;
+      uint32_t timestamp;                             
       uint8_t gain;
       uint8_t state;
    } SDL_ActiveEvent;
 
    typedef struct SDL_ResizeEvent {
       uint32_t type;
+      uint32_t timestamp;                             
       int w, h;
    } SDL_ResizeEvent;
 
    typedef union SDL_Event {
-      uint32_t type;                    
-      SDL_WindowEvent window;         
-      SDL_KeyboardEvent key;          
-      SDL_TextEditingEvent edit;      
-      SDL_TextInputEvent text;        
-      SDL_MouseMotionEvent motion;    
-      SDL_MouseButtonEvent button;    
-      SDL_MouseWheelEvent wheel;      
-      SDL_JoyAxisEvent jaxis;         
-      SDL_JoyBallEvent jball;         
-      SDL_JoyHatEvent jhat;           
-      SDL_JoyButtonEvent jbutton;     
-      SDL_QuitEvent quit;             
-      SDL_UserEvent user;             
-      SDL_SysWMEvent syswm;           
-      SDL_TouchFingerEvent tfinger;   
-      SDL_TouchButtonEvent tbutton;   
-      SDL_MultiGestureEvent mgesture; 
+      uint32_t               type;                    
+      SDL_WindowEvent        window;         
+      SDL_KeyboardEvent      key;          
+      SDL_TextEditingEvent   edit;      
+      SDL_TextInputEvent     text;        
+      SDL_MouseMotionEvent   motion;    
+      SDL_MouseButtonEvent   button;    
+      SDL_MouseWheelEvent    wheel;      
+      SDL_JoyAxisEvent       jaxis;         
+      SDL_JoyBallEvent       jball;         
+      SDL_JoyHatEvent        jhat;           
+      SDL_JoyButtonEvent     jbutton;     
+      SDL_QuitEvent          quit;             
+      SDL_UserEvent          user;             
+      SDL_SysWMEvent         syswm;           
+      SDL_TouchFingerEvent   tfinger;   
+      SDL_TouchButtonEvent   tbutton;   
+      SDL_MultiGestureEvent  mgesture; 
       SDL_DollarGestureEvent dgesture; 
-      SDL_ActiveEvent active;
-      SDL_ResizeEvent resize;
+      SDL_DropEvent          drop;
+      SDL_ActiveEvent        active;
+      SDL_ResizeEvent        resize;
    } SDL_Event;
 
    typedef enum SDL_eventaction {
@@ -1310,8 +1338,8 @@ ffi.cdef[[
       uint32_t UnusedBits:31;
    } SDL_Overlay;
 
-   typedef int (* SDL_EventFilter) (void *userdata, SDL_Event * event); 
-   typedef void (* SDL_LogOutputFunction )( void* userdata, int category, SDL_LogPriority priority, const char* message );
+   typedef int  (* SDL_EventFilter       )( void* userdata, SDL_Event* ); 
+   typedef void (* SDL_LogOutputFunction )( void* userdata, int category, SDL_LogPriority, const char* message );
 
    void*                  SDL_malloc(               size_t size );
    void*                  SDL_calloc(               size_t nmemb, size_t size );
@@ -1733,73 +1761,71 @@ ffi.cdef[[
    const char*   SDL_GetRevision(             );
    int           SDL_GetRevisionNumber(       );
 
-   const SDL_VideoInfo* SDL_GetVideoInfo(void);
-   const SDL_version*   SDL_Linked_Version(void);
-   const char*          SDL_AudioDriverName(char *namebuf, int maxlen);
-   const char*          SDL_VideoDriverName(char *namebuf, int maxlen);
-   int                  SDL_VideoModeOK(int width, int height, int bpp, uint32_t flags);
-   SDL_Rect**           SDL_ListModes(const SDL_PixelFormat * format, uint32_t flags);
-   SDL_Surface*         SDL_SetVideoMode(int width, int height, int bpp, uint32_t flags);
-   SDL_Surface*         SDL_GetVideoSurface(void);
-   void                 SDL_UpdateRects(SDL_Surface * screen, int numrects, SDL_Rect * rects);
-   void                 SDL_UpdateRect(SDL_Surface * screen, int32_t x, int32_t y, uint32_t w, uint32_t h);
-   int                  SDL_Flip(SDL_Surface * screen);
-   int                  SDL_SetAlpha(SDL_Surface * surface, uint32_t flag, uint8_t alpha);
-   SDL_Surface*         SDL_DisplayFormat(SDL_Surface * surface);
-   SDL_Surface*         SDL_DisplayFormatAlpha(SDL_Surface * surface);
-   void                 SDL_WM_SetCaption(const char *title, const char *icon);
-   void                 SDL_WM_GetCaption(const char **title, const char **icon);
-   void                 SDL_WM_SetIcon(SDL_Surface * icon, uint8_t * mask);
-   int                  SDL_WM_IconifyWindow(void);
-   int                  SDL_WM_ToggleFullScreen(SDL_Surface * surface);
-   SDL_GrabMode         SDL_WM_GrabInput(SDL_GrabMode mode);
-   int                  SDL_SetPalette(SDL_Surface*, int flgs, const SDL_Color* cols, int first, int n_cols );
-   int                  SDL_SetColors(SDL_Surface*,            const SDL_Color* cols, int first, int n_cols );
-   int                  SDL_GetWMInfo(SDL_SysWMinfo *info);
-   uint8_t              SDL_GetAppState(void);
-   void                 SDL_WarpMouse(uint16_t x, uint16_t y);
-   SDL_Overlay*         SDL_CreateYUVOverlay(int width, int height, uint32_t format, SDL_Surface * display);
-   int                  SDL_LockYUVOverlay(    SDL_Overlay * overlay);
-   void                 SDL_UnlockYUVOverlay(  SDL_Overlay * overlay);
-   int                  SDL_DisplayYUVOverlay( SDL_Overlay * overlay, SDL_Rect * dstrect);
-   void                 SDL_FreeYUVOverlay(    SDL_Overlay * overlay);
-   void                 SDL_GL_SwapBuffers(    );
-   int                  SDL_SetGamma(          float red, float green, float blue);
-   int                  SDL_SetGammaRamp(const uint16_t * red, const uint16_t * green, const uint16_t * blue);
-   int                  SDL_GetGammaRamp(uint16_t * red, uint16_t * green, uint16_t * blue);
-   int                  SDL_EnableKeyRepeat(int delay, int interval);
-   void                 SDL_GetKeyRepeat(int *delay, int *interval);
-   int                  SDL_EnableUNICODE(int enable);
-
-   int      SDL_SetTimer(              uint32_t interval, SDL_OldTimerCallback callback );
-   int      SDL_putenv(                const char* variable );
-   int      SDL_Init(                  uint32_t flags );
-   int      SDL_InitSubSystem(         uint32_t flags );
-   void     SDL_QuitSubSystem(         uint32_t flags );
-   uint32_t SDL_WasInit(               uint32_t flags );
-   void     SDL_Quit(                  );
-   void     SDL_InstallParachute(      );
-   void     SDL_UninstallParachute(    );
-   int      SDL_AssertionsInit(        );
-   void     SDL_AssertionsQuit(        );
-   int      SDL_HapticInit(            );
-   void     SDL_HapticQuit(            );
-   int      SDL_JoystickInit(          );
-   void     SDL_JoystickQuit(          );
-   int      SDL_PrivateJoystickAxis(   SDL_Joystick*, uint8_t axis,   int16_t value );
-   int      SDL_PrivateJoystickBall(   SDL_Joystick*, uint8_t ball,   int16_t xrel, int16_t yrel );
-   int      SDL_PrivateJoystickHat(    SDL_Joystick*, uint8_t hat,    uint8_t value );
-   int      SDL_PrivateJoystickButton( SDL_Joystick*, uint8_t button, uint8_t state );
-   int      SDL_PrivateJoystickValid(  SDL_Joystick ** joystick );
-   void     SDL_StartTicks(            );
-   int      SDL_TimerInit(             );
-   void     SDL_TimerQuit(             );
-   int      SDL_HelperWindowCreate(    );
-   int      SDL_HelperWindowDestroy(   );
-
-   void     SDL_SetError(const char *fmt, ...);
-   char*    SDL_GetError(void);
-   void     SDL_ClearError(void);
+   const SDL_VideoInfo* SDL_GetVideoInfo(          );
+   const SDL_version*   SDL_Linked_Version(        );
+   const char*          SDL_AudioDriverName(       char *namebuf, int maxlen );
+   const char*          SDL_VideoDriverName(       char *namebuf, int maxlen );
+   int                  SDL_VideoModeOK(           int width, int height, int bpp, uint32_t flags );
+   SDL_Rect**           SDL_ListModes(             const SDL_PixelFormat*, uint32_t flags );
+   SDL_Surface*         SDL_SetVideoMode(          int width, int height, int bpp, uint32_t flags );
+   SDL_Surface*         SDL_GetVideoSurface(       );
+   void                 SDL_UpdateRects(           SDL_Surface*, int numrects, SDL_Rect * rects );
+   void                 SDL_UpdateRect(            SDL_Surface*, int32_t x, int32_t y, uint32_t w, uint32_t h );
+   int                  SDL_Flip(                  SDL_Surface*  );
+   int                  SDL_SetAlpha(              SDL_Surface*, uint32_t flag, uint8_t alpha );
+   SDL_Surface*         SDL_DisplayFormat(         SDL_Surface*  );
+   SDL_Surface*         SDL_DisplayFormatAlpha(    SDL_Surface*  );
+   void                 SDL_WM_SetCaption(         const char*   title, const char*  icon );
+   void                 SDL_WM_GetCaption(         const char**  title, const char** icon );
+   void                 SDL_WM_SetIcon(            SDL_Surface*  icon, uint8_t* mask );
+   int                  SDL_WM_IconifyWindow(      );
+   int                  SDL_WM_ToggleFullScreen(   SDL_Surface* );
+   SDL_GrabMode         SDL_WM_GrabInput(          SDL_GrabMode mode );
+   int                  SDL_SetPalette(            SDL_Surface*, int flgs, const SDL_Color* cols, int first, int n_cols );
+   int                  SDL_SetColors(             SDL_Surface*,           const SDL_Color* cols, int first, int n_cols );
+   int                  SDL_GetWMInfo(             SDL_SysWMinfo* info );
+   uint8_t              SDL_GetAppState(           );
+   void                 SDL_WarpMouse(             uint16_t x, uint16_t y );
+   SDL_Overlay*         SDL_CreateYUVOverlay(      int width, int height, uint32_t format, SDL_Surface* display );
+   int                  SDL_LockYUVOverlay(        SDL_Overlay*  );
+   void                 SDL_UnlockYUVOverlay(      SDL_Overlay*  );
+   int                  SDL_DisplayYUVOverlay(     SDL_Overlay*, SDL_Rect* dstrect);
+   void                 SDL_FreeYUVOverlay(        SDL_Overlay*  );
+   void                 SDL_GL_SwapBuffers(        );
+   int                  SDL_SetGamma(              float red, float green, float blue);
+   int                  SDL_SetGammaRamp(          const uint16_t * red, const uint16_t * green, const uint16_t * blue);
+   int                  SDL_GetGammaRamp(          uint16_t* red, uint16_t* green, uint16_t* blue);
+   int                  SDL_EnableKeyRepeat(       int delay, int interval);
+   void                 SDL_GetKeyRepeat(          int *delay, int *interval);
+   int                  SDL_EnableUNICODE(         int enable);
+   int                  SDL_SetTimer(              uint32_t interval, SDL_OldTimerCallback callback );
+   int                  SDL_putenv(                const char* variable );
+   int                  SDL_Init(                  uint32_t flags );
+   int                  SDL_InitSubSystem(         uint32_t flags );
+   void                 SDL_QuitSubSystem(         uint32_t flags );
+   uint32_t             SDL_WasInit(               uint32_t flags );
+   void                 SDL_Quit(                  );
+   void                 SDL_InstallParachute(      );
+   void                 SDL_UninstallParachute(    );
+   int                  SDL_AssertionsInit(        );
+   void                 SDL_AssertionsQuit(        );
+   int                  SDL_HapticInit(            );
+   void                 SDL_HapticQuit(            );
+   int                  SDL_JoystickInit(          );
+   void                 SDL_JoystickQuit(          );
+   int                  SDL_PrivateJoystickAxis(   SDL_Joystick*, uint8_t axis,   int16_t value );
+   int                  SDL_PrivateJoystickBall(   SDL_Joystick*, uint8_t ball,   int16_t xrel, int16_t yrel );
+   int                  SDL_PrivateJoystickHat(    SDL_Joystick*, uint8_t hat,    uint8_t value );
+   int                  SDL_PrivateJoystickButton( SDL_Joystick*, uint8_t button, uint8_t state );
+   int                  SDL_PrivateJoystickValid(  SDL_Joystick ** joystick );
+   void                 SDL_StartTicks(            );
+   int                  SDL_TimerInit(             );
+   void                 SDL_TimerQuit(             );
+   int                  SDL_HelperWindowCreate(    );
+   int                  SDL_HelperWindowDestroy(   );
+   void                 SDL_SetError(              const char *fmt, ... );
+   char*                SDL_GetError(              );
+   void                 SDL_ClearError(            );
 ]]
 
 return sdl
