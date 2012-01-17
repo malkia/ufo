@@ -5,11 +5,12 @@ fossil clean --force
 set NAME=%LB_PROJECT_NAME%
 
 echo.>sources.tmp
+for %%i in (libtommath\*.c) do if not exist %%i.exclude echo %%i >> sources.tmp
 for %%i in (win\tclWin*.c) do if not exist %%i.exclude echo %%i >> sources.tmp
-for %%i in (regc_lex.c regc_color.c regc_nfa.c regc_cvec.c regc_locale.c rege_dfa.c tclUniData.c tclPkgConfig.c) do echo.>>generic\%%i.exclude
+for %%i in (regc_lex.c regc_color.c regc_nfa.c regc_cvec.c regc_locale.c rege_dfa.c tclUniData.c tclPkgConfig.c tclLoadNone.c) do echo.>>generic\%%i.exclude
 for %%i in (generic\*.c) do if not exist %%i.exclude echo %%i >> sources.tmp
 
-cl %LB_CL_OPTS% -Fe%NAME%.dll -DBUILD_tcl -DBUILD_tclOO -I libtommath -I win -I generic -I xlib -I bitmaps -I ..\tcl\generic -Dinline=__inline -W0 @sources.tmp USER32.LIB GDI32.LIB
+cl %LB_CL_OPTS% -LD -Fe%NAME%.dll -DTCL_TOMMATH -DMP_PREC=4 -DSTDC_HEADERS -DBUILD_tcl -DBUILD_tclOO -I libtommath -I win -I generic -I xlib -I bitmaps -I ..\tcl\generic -Dinline=__inline -W0 @sources.tmp USER32.LIB GDI32.LIB
 
 rem (for /f "usebackq tokens=1,2,3* delims==" %%i in (`findstr /B SOURCE= freetype.dsp`) do if /I "%%~xj"==".c" echo %%j) > sources.tmp
 rem echo ..\..\..\src\bzip2\ftbzip2.c >> sources.tmp
