@@ -437,7 +437,7 @@ cl_command_queue clCreateCommandQueue(          cl_context, cl_device_id, cl_com
 cl_int           clRetainCommandQueue(          cl_command_queue );
 cl_int           clReleaseCommandQueue(         cl_command_queue );
 cl_int           clGetCommandQueueInfo(         cl_command_queue, cl_command_queue_info, size_t, void *, size_t * );
-cl_int           clSetCommandQueueProperty(     cl_command_queue, cl_command_queue_properties, cl_bool, cl_command_queue_properties * );
+cl_int           clSetCommandQueueProperty(     cl_command_queue, cl_command_queue_properties, cl_bool, cl_command_queue_properties * ); // DEPRECATED in 1.1
 cl_mem           clCreateBuffer(                cl_context, cl_mem_flags, size_t, void *, cl_int *);
 cl_mem           clCreateImage2D(               cl_context, cl_mem_flags, const cl_image_format *, size_t, size_t, size_t, void *, cl_int * );
 cl_mem           clCreateImage3D(               cl_context, cl_mem_flags, const cl_image_format *, size_t, size_t, size_t, size_t, size_t, void *, cl_int *);
