@@ -15,7 +15,7 @@ cl %LB_CL_OPTS% -EHsc -Fe%NAME%.dll -LD^
  -DHAVE_CONFIG_H -D_WIN32_WINNT=0x0502 -DEIO_STACKSIZE=262144 -D_GNU_SOURCE -DWIN32 -DNDEBUG^
  -DBUILDING_UV_SHARED^
  -Iinclude -Iinclude/uv-private -Isrc -Isrc/ares/config_win32^
- -I"%~dp0\include" @sources.tmp /link"%LB_LINK_OPTS% ws2_32.lib advapi32.lib"
+ -I"%~dp0\include" @sources.tmp /link"%LB_LINK_OPTS% ws2_32.lib advapi32.lib psapi.lib Iphlpapi.lib"
 
 call %~dp0/wdk/install %LB_PROJECT_NAME%.dll
 call %~dp0/wdk/install %LB_PROJECT_NAME%.lib
