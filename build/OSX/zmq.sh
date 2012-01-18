@@ -1,4 +1,7 @@
 set -e
+reldir=$(dirname $0)
+pushd $reldir 1>/dev/null 2&>1 && absdir=$(pwd) && popd 1>/dev/null 2&>1
+
 pushd ${0%/*}
 LIBZMQ=../../../libzmq
 pushd $LIBZMQ
@@ -19,18 +22,21 @@ git clean -fdx
 
 #exit
 
-FLAGS="-arch i386 -arch x86_64 -mmacosx-version-min=10.4"
+FLAGS="-arch i386 -arch x86_64 -mmacosx-version-min=10.5"
 CXX="g++ $FLAGS"
 CC="gcc $FLAGS"
 #make clean
 ./autogen.sh
-./configure CXX="$CXX" CC="$CC" CPP=/usr/bin/cpp CXXCPP=/usr/bin/cpp #--with-pgm
-make -j
+export OpenPGM_CFLAGS=-I../../openpgm/pgm/include
+export OpenPGM_LIBS="-L../../openpgm/pgm/ -lpgm"
+./configure CXX="$CXX" CC="$CC" CPP=/usr/bin/cpp CXXCPP=/usr/bin/cpp --with-system-pgm
+make -j V=1
 
 git log -1 >> src/.libs/libzmq.3.dylib
 
 popd
 mv $LIBZMQ/src/.libs/libzmq.3.dylib ../../bin/OSX/zmq.dylib
 install_name_tool -id @loader_path/zmq.dylib ../../bin/OSX/zmq.dylib
+install_name_tool -change /usr/local/lib/libpgm-5.2.0.dylib @loader_path/pgm.dylib zmq.dylib
 popd
 
