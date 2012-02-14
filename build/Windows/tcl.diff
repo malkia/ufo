@@ -1,0 +1,167 @@
+Index: generic/tclStubInit.c
+==================================================================
+--- generic/tclStubInit.c
++++ generic/tclStubInit.c
+@@ -463,10 +463,16 @@
+     TclBN_s_mp_sqr, /* 59 */
+     TclBN_s_mp_sub, /* 60 */
+     TclBN_mp_init_set_int, /* 61 */
+     TclBN_mp_set_int, /* 62 */
+     TclBN_mp_cnt_lsb, /* 63 */
++    TclBN_fast_mp_montgomery_reduce, /* 64 */
++    mp_montgomery_reduce, /* 65 */
++    mp_dr_reduce, /* 66 */
++    mp_reduce, /* 67 */
++    mp_reduce_2k, /* 68 */
++    mp_reduce_2k_l, /* 69 */
+ };
+ 
+ static const TclStubHooks tclStubHooks = {
+     &tclPlatStubs,
+     &tclIntStubs,
+
+Index: generic/tclTomMath.decls
+==================================================================
+--- generic/tclTomMath.decls
++++ generic/tclTomMath.decls
+@@ -218,6 +218,24 @@
+ declare 62 {
+     int TclBN_mp_set_int(mp_int* a, unsigned long i)
+ }
+ declare 63 {
+     int TclBN_mp_cnt_lsb(const mp_int* a)
++}
++declare 64 {
++    int TclBN_fast_mp_montgomery_reduce(mp_int *a, mp_int *m, mp_digit mp)
++}
++declare 65 {
++    int mp_montgomery_reduce(mp_int *a, mp_int *m, mp_digit mp)
++}
++declare 66 {
++    int mp_dr_reduce(mp_int *a, mp_int *b, mp_digit mp)
++}
++declare 67 {
++    int mp_reduce(mp_int *a, mp_int *n, mp_digit d)
++}
++declare 68 {
++    int mp_reduce_2k(mp_int *a, mp_int *n, mp_digit d)
++}
++declare 69 {
++    int mp_reduce_2k_l(mp_int *a, mp_int *n, mp_digit d)
+ }
+
+Index: generic/tclTomMath.h
+==================================================================
+--- generic/tclTomMath.h
++++ generic/tclTomMath.h
+@@ -13,10 +13,11 @@
+  * Tom St Denis, tomstdenis@gmail.com, http://math.libtomcrypt.com
+  */
+ #ifndef BN_H_
+ #define BN_H_
+ 
++#include "tclInt.h"
+ #include "tclTomMathDecls.h"
+ #ifndef MODULE_SCOPE
+ #define MODULE_SCOPE extern
+ #endif
+ 
+@@ -828,5 +829,6 @@
+ #ifdef __cplusplus
+ }
+ #endif
+ 
+ #endif
++
+
+Index: generic/tclTomMathDecls.h
+==================================================================
+--- generic/tclTomMathDecls.h
++++ generic/tclTomMathDecls.h
+@@ -112,10 +112,16 @@
+ #define mp_zero TclBN_mp_zero
+ #define s_mp_add TclBN_s_mp_add
+ #define s_mp_mul_digs TclBN_s_mp_mul_digs
+ #define s_mp_sqr TclBN_s_mp_sqr
+ #define s_mp_sub TclBN_s_mp_sub
++#define fast_mp_montgomery_reduce TclBN_fast_mp_montgomery_reduce
++#define mp_montgomery_reduce TclBN_mp_montgomery_reduce
++#define mp_dr_reduce TclBN_mp_dr_reduce
++#define mp_reduce TclBN_mp_reduce
++#define mp_reduce_2k TclBN_mp_reduce_2k
++#define mp_reduce_2k_l TclBN_mp_reduce_2k_l
+ 
+ #undef TCL_STORAGE_CLASS
+ #ifdef BUILD_tcl
+ #   define TCL_STORAGE_CLASS DLLEXPORT
+ #else
+@@ -273,10 +279,24 @@
+ EXTERN int		TclBN_mp_init_set_int(mp_int*a, unsigned long i);
+ /* 62 */
+ EXTERN int		TclBN_mp_set_int(mp_int*a, unsigned long i);
+ /* 63 */
+ EXTERN int		TclBN_mp_cnt_lsb(const mp_int*a);
++/* 64 */
++EXTERN int		TclBN_fast_mp_montgomery_reduce(mp_int *a, mp_int *m,
++				mp_digit mp);
++/* 65 */
++EXTERN int		mp_montgomery_reduce(mp_int *a, mp_int *m,
++				mp_digit mp);
++/* 66 */
++EXTERN int		mp_dr_reduce(mp_int *a, mp_int *b, mp_digit mp);
++/* 67 */
++EXTERN int		mp_reduce(mp_int *a, mp_int *n, mp_digit d);
++/* 68 */
++EXTERN int		mp_reduce_2k(mp_int *a, mp_int *n, mp_digit d);
++/* 69 */
++EXTERN int		mp_reduce_2k_l(mp_int *a, mp_int *n, mp_digit d);
+ 
+ typedef struct TclTomMathStubs {
+     int magic;
+     const struct TclTomMathStubHooks *hooks;
+ 
+@@ -342,10 +362,16 @@
+     int (*tclBN_s_mp_sqr) (mp_int *a, mp_int *b); /* 59 */
+     int (*tclBN_s_mp_sub) (mp_int *a, mp_int *b, mp_int *c); /* 60 */
+     int (*tclBN_mp_init_set_int) (mp_int*a, unsigned long i); /* 61 */
+     int (*tclBN_mp_set_int) (mp_int*a, unsigned long i); /* 62 */
+     int (*tclBN_mp_cnt_lsb) (const mp_int*a); /* 63 */
++    int (*tclBN_fast_mp_montgomery_reduce) (mp_int *a, mp_int *m, mp_digit mp); /* 64 */
++    int (*mp_montgomery_reduce) (mp_int *a, mp_int *m, mp_digit mp); /* 65 */
++    int (*mp_dr_reduce) (mp_int *a, mp_int *b, mp_digit mp); /* 66 */
++    int (*mp_reduce) (mp_int *a, mp_int *n, mp_digit d); /* 67 */
++    int (*mp_reduce_2k) (mp_int *a, mp_int *n, mp_digit d); /* 68 */
++    int (*mp_reduce_2k_l) (mp_int *a, mp_int *n, mp_digit d); /* 69 */
+ } TclTomMathStubs;
+ 
+ #ifdef __cplusplus
+ extern "C" {
+ #endif
+@@ -486,14 +512,26 @@
+ 	(tclTomMathStubsPtr->tclBN_mp_init_set_int) /* 61 */
+ #define TclBN_mp_set_int \
+ 	(tclTomMathStubsPtr->tclBN_mp_set_int) /* 62 */
+ #define TclBN_mp_cnt_lsb \
+ 	(tclTomMathStubsPtr->tclBN_mp_cnt_lsb) /* 63 */
++#define TclBN_fast_mp_montgomery_reduce \
++	(tclTomMathStubsPtr->tclBN_fast_mp_montgomery_reduce) /* 64 */
++#define mp_montgomery_reduce \
++	(tclTomMathStubsPtr->mp_montgomery_reduce) /* 65 */
++#define mp_dr_reduce \
++	(tclTomMathStubsPtr->mp_dr_reduce) /* 66 */
++#define mp_reduce \
++	(tclTomMathStubsPtr->mp_reduce) /* 67 */
++#define mp_reduce_2k \
++	(tclTomMathStubsPtr->mp_reduce_2k) /* 68 */
++#define mp_reduce_2k_l \
++	(tclTomMathStubsPtr->mp_reduce_2k_l) /* 69 */
+ 
+ #endif /* defined(USE_TCL_STUBS) */
+ 
+ /* !END!: Do not edit above this line. */
+ 
+ #undef TCL_STORAGE_CLASS
+ #define TCL_STORAGE_CLASS DLLIMPORT
+ 
+ #endif /* _TCLINTDECLS */
+

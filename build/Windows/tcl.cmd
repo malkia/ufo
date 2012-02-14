@@ -7,30 +7,32 @@ set NAME=%LB_PROJECT_NAME%
 echo.>sources.tmp
 for %%i in (libtommath\*.c) do if not exist %%i.exclude echo %%i >> sources.tmp
 for %%i in (win\tclWin*.c) do if not exist %%i.exclude echo %%i >> sources.tmp
-for %%i in (regc_lex.c regc_color.c regc_nfa.c regc_cvec.c regc_locale.c rege_dfa.c tclUniData.c tclPkgConfig.c tclLoadNone.c) do echo.>>generic\%%i.exclude
+rem for %%i in (regc_lex.c regc_color.c regc_nfa.c regc_cvec.c regc_locale.c rege_dfa.c tclUniData.c tclPkgConfig.c tclLoadNone.c) do echo.>>generic\%%i.exclude
+for %%i in (regfronts.c regc_lex.c regc_color.c regc_nfa.c regc_cvec.c regc_locale.c rege_dfa.c tclUniData.c tclLoadNone.c) do echo.>>generic\%%i.exclude
 for %%i in (generic\*.c) do if not exist %%i.exclude echo %%i >> sources.tmp
 
-cl %LB_CL_OPTS% -LD -Fe%NAME%.dll -DTCL_TOMMATH -DMP_PREC=4 -DSTDC_HEADERS -DBUILD_tcl -DBUILD_tclOO -I libtommath -I win -I generic -I xlib -I bitmaps -I ..\tcl\generic -Dinline=__inline -W0 @sources.tmp USER32.LIB GDI32.LIB
+sh -c "tclsh tools/genStubs.tcl generic generic/tcl.decls generic/tclInt.decls generic/tclTomMath.decls"
+sh -c "tclsh tools/fix_tommath_h.tcl libtommath/tommath.h > generic/tclTomMath.h"
 
-rem (for /f "usebackq tokens=1,2,3* delims==" %%i in (`findstr /B SOURCE= freetype.dsp`) do if /I "%%~xj"==".c" echo %%j) > sources.tmp
-rem echo ..\..\..\src\bzip2\ftbzip2.c >> sources.tmp
+echo -DCFG_RUNTIME_LIBDIR="""""">>sources.tmp
+echo -DCFG_RUNTIME_BINDIR="""""">>sources.tmp
+echo -DCFG_RUNTIME_SCRDIR="""""">>sources.tmp
+echo -DCFG_RUNTIME_INCDIR="""""">>sources.tmp
+echo -DCFG_RUNTIME_DOCDIR="""""">>sources.tmp
+echo -DCFG_INSTALL_LIBDIR="""""">>sources.tmp
+echo -DCFG_INSTALL_BINDIR="""""">>sources.tmp
+echo -DCFG_INSTALL_SCRDIR="""""">>sources.tmp
+echo -DCFG_INSTALL_INCDIR="""""">>sources.tmp
+echo -DCFG_INSTALL_DOCDIR="""""">>sources.tmp
+echo -DCFG_INSTALL_DOCDIR="""""">>sources.tmp
+echo -DTCL_USE_STATIC_PACKAGES=1>>sources.tmp
+echo -DTCL_CFGVAL_ENCODING="""cp1252""">>sources.tmp
+echo -D"TCL_THREADS=1">>sources.tmp
 
-rem cl -c %LB_CL_OPTS% -Fe%NAME%.dll -DNDEBUG=1 -DWIN32 -DFT2_BUILD_LIBRARY^
-rem    -I%LB_ROOT%\..\bzip2\^
-rem    -I%~dp0%NAME% -I..\..\..\include @sources.tmp
+cl %LB_CL_OPTS% -LD -Fe%NAME%.dll -DTCL_TOMMATH=1 -DMP_PREC=4 -DSTDC_HEADERS -DBUILD_tcl -DBUILD_tclOO -I win -I generic -I libtommath -I xlib -I bitmaps -Dinline=__inline -W0 @sources.tmp USER32.LIB GDI32.LIB NETAPI32.LIB "%~dp0msvcrt_compat_%LB_TARGET_ARCH%.lib"
 
-rem move %NAME%.lib %NAME%_static.lib
-
-rem if "%LB_TARGET_BITS%"=="32" set CUTSYMPOS=12
-rem if "%LB_TARGET_BITS%"=="64" set CUTSYMPOS=11
-
-rem echo EXPORTS>%NAME%.def
-rem link /LIB /OUT:%NAME%_static.lib *.obj
-rem link /DUMP /LINKERMEMBER:1 %NAME%_static.lib | grep -E " [ 0-9A-Z]{7}[0-9A-Z] [A-Za-z_]+" | cut -b%CUTSYMPOS%- | sort | uniq >> %NAME%.def
-rem link /DEF:%NAME%.def /OUT:%NAME%.dll %LB_LINK_OPTS% %NAME%_static.lib %~dp0\..\..\bin\Windows\%LB_TARGET_ARCH%\bz2.lib
-
-rem call %~dp0/wdk/install %NAME%.dll
-rem call %~dp0/wdk/install %NAME%.lib
-rem call %~dp0/wdk/install %NAME%.pdb
+call %~dp0/wdk/install %NAME%.dll
+call %~dp0/wdk/install %NAME%.lib
+call %~dp0/wdk/install %NAME%.pdb
 
 popd
