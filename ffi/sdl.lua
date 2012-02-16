@@ -1089,7 +1089,7 @@ ffi.cdef[[
 
    typedef struct SDL_KeyboardEvent {
       uint32_t type;
-      uint32_t timestamp;        
+      //uint32_t timestamp;        
       uint32_t windowID;    
       uint8_t state;        
       uint8_t repeat_;       
@@ -1100,7 +1100,7 @@ ffi.cdef[[
 
    typedef struct SDL_TextEditingEvent {
       uint32_t type;   
-      uint32_t timestamp;                             
+      //uint32_t timestamp;                             
       uint32_t windowID;                            
       char text[32];  
       int start;                                  
@@ -1109,14 +1109,14 @@ ffi.cdef[[
 
    typedef struct SDL_TextInputEvent {
       uint32_t type; 
-      uint32_t timestamp;                             
+      //uint32_t timestamp;                             
       uint32_t windowID;                          
       char text[32];  
    } SDL_TextInputEvent;
 
    typedef struct SDL_MouseMotionEvent {
       uint32_t type;   
-      uint32_t timestamp;     
+      //uint32_t timestamp;     
       uint32_t windowID;    
       uint8_t state;        
       uint8_t padding1;
@@ -1130,7 +1130,7 @@ ffi.cdef[[
 
    typedef struct SDL_MouseButtonEvent {
       uint32_t type;   
-      uint32_t timestamp;     
+      //uint32_t timestamp;     
       uint32_t windowID;    
       uint8_t button;       
       uint8_t state;        
@@ -1142,7 +1142,7 @@ ffi.cdef[[
 
    typedef struct SDL_MouseWheelEvent {
       uint32_t type;        
-      uint32_t timestamp;     
+      //uint32_t timestamp;     
       uint32_t windowID;    
       int x;              
       int y;              
@@ -1150,7 +1150,7 @@ ffi.cdef[[
 
    typedef struct SDL_JoyAxisEvent {
       uint32_t type;        
-      uint32_t timestamp;     
+      //uint32_t timestamp;     
       uint8_t which;        
       uint8_t axis;         
       uint8_t padding1;
@@ -1160,7 +1160,7 @@ ffi.cdef[[
 
    typedef struct SDL_JoyBallEvent {
       uint32_t type;        
-      uint32_t timestamp;     
+      //uint32_t timestamp;     
       uint8_t which;        
       uint8_t ball;         
       uint8_t padding1;
@@ -1171,7 +1171,7 @@ ffi.cdef[[
 
    typedef struct SDL_JoyHatEvent {
       uint32_t type;        
-      uint32_t timestamp;     
+      //uint32_t timestamp;     
       uint8_t which;        
       uint8_t hat;          
       uint8_t value;        
@@ -1180,7 +1180,7 @@ ffi.cdef[[
 
    typedef struct SDL_JoyButtonEvent {
       uint32_t type;        
-      uint32_t timestamp;     
+      //uint32_t timestamp;     
       uint8_t which;        
       uint8_t button;       
       uint8_t state;        
@@ -1189,7 +1189,7 @@ ffi.cdef[[
 
    typedef struct SDL_TouchFingerEvent {
       uint32_t type;        
-      uint32_t timestamp;     
+      //uint32_t timestamp;     
       uint32_t windowID;    
       SDL_TouchID touchId;        
       SDL_FingerID fingerId;
@@ -1206,7 +1206,7 @@ ffi.cdef[[
 
    typedef struct SDL_TouchButtonEvent {
       uint32_t type;        
-      uint32_t timestamp;     
+      //uint32_t timestamp;     
       uint32_t windowID;    
       SDL_TouchID touchId;        
       uint8_t state;        
@@ -1217,7 +1217,7 @@ ffi.cdef[[
 
    typedef struct SDL_MultiGestureEvent {
       uint32_t type;        
-      uint32_t timestamp;     
+      //uint32_t timestamp;     
       uint32_t windowID;    
       SDL_TouchID touchId;        
       float dTheta;
@@ -1240,18 +1240,18 @@ ffi.cdef[[
 
    typedef struct SDL_DropEvent {
       uint32_t type;
-      uint32_t timestamp;
+      //uint32_t timestamp;
       char*    file;
    } SDL_DropEvent;
 
    typedef struct SDL_QuitEvent {
       uint32_t type;        
-      uint32_t timestamp;                             
+      //uint32_t timestamp;                             
    } SDL_QuitEvent;
 
    typedef struct SDL_UserEvent {
       uint32_t type;        
-      uint32_t timestamp;                             
+      //uint32_t timestamp;                             
       uint32_t windowID;    
       int code;           
       void *data1;        
@@ -1260,20 +1260,20 @@ ffi.cdef[[
 
    typedef struct SDL_SysWMEvent {
       uint32_t type;        
-      uint32_t timestamp;                             
+      //uint32_t timestamp;                             
       SDL_SysWMmsg *msg;  
    } SDL_SysWMEvent;
 
    typedef struct SDL_ActiveEvent {
       uint32_t type;
-      uint32_t timestamp;                             
+      //uint32_t timestamp;                             
       uint8_t gain;
       uint8_t state;
    } SDL_ActiveEvent;
 
    typedef struct SDL_ResizeEvent {
       uint32_t type;
-      uint32_t timestamp;                             
+      //uint32_t timestamp;                             
       int w, h;
    } SDL_ResizeEvent;
 
