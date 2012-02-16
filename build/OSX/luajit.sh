@@ -1,12 +1,13 @@
 set -e
 LUAJIT=../../../luajit
+FLAGS='-mmacosx-version-min=10.5 -DLUAJIT_ENABLE_LUA52COMPAT'
 (rm *.tmp 1>/dev/null 2>/dev/null) && true
-make -C $LUAJIT -j BUILDMODE=dynamic CC="gcc -mmacosx-version-min=10.5 -arch i386"   LUAJIT_SO=luajit.dylib TARGET_DYLIBPATH=luajit.dylib cleaner
-make -C $LUAJIT -j BUILDMODE=dynamic CC="gcc -mmacosx-version-min=10.5 -arch i386"   LUAJIT_SO=luajit.dylib TARGET_DYLIBPATH=luajit.dylib amalg
+make -C $LUAJIT -j BUILDMODE=dynamic CC="gcc $FLAGS -arch i386"   LUAJIT_SO=luajit.dylib TARGET_DYLIBPATH=luajit.dylib cleaner
+make -C $LUAJIT -j BUILDMODE=dynamic CC="gcc $FLAGS -arch i386"   LUAJIT_SO=luajit.dylib TARGET_DYLIBPATH=luajit.dylib amalg
 mv $LUAJIT/src/luajit luajit32.exe.tmp
 mv $LUAJIT/src/luajit.dylib luajit32.dylib.tmp
-make -C $LUAJIT -j BUILDMODE=dynamic CC="gcc -mmacosx-version-min=10.5 -arch x86_64" LUAJIT_SO=luajit.dylib TARGET_DYLIBPATH=luajit.dylib cleaner
-make -C $LUAJIT -j BUILDMODE=dynamic CC="gcc -mmacosx-version-min=10.5 -arch x86_64" LUAJIT_SO=luajit.dylib TARGET_DYLIBPATH=luajit.dylib amalg
+make -C $LUAJIT -j BUILDMODE=dynamic CC="gcc $FLAGS -arch x86_64" LUAJIT_SO=luajit.dylib TARGET_DYLIBPATH=luajit.dylib cleaner
+make -C $LUAJIT -j BUILDMODE=dynamic CC="gcc $FLAGS -arch x86_64" LUAJIT_SO=luajit.dylib TARGET_DYLIBPATH=luajit.dylib amalg
 mv $LUAJIT/src/luajit luajit64.exe.tmp
 mv $LUAJIT/src/luajit.dylib luajit64.dylib.tmp
 lipo -create ./luajit*.exe.tmp -output luajit

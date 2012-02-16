@@ -2,7 +2,7 @@ set -e
 
 PROJECT=png
 SRCDIR=../../../lib$PROJECT
-SOURCE=$SRCDIR/.libs/lib"$PROJECT"14.14.dylib
+SOURCE=$SRCDIR/.libs/lib"$PROJECT"15.15.dylib
 TARGET=../../bin/OSX/$PROJECT.dylib
 
 pushd $SRCDIR
