@@ -234,7 +234,7 @@ local function main()
    local window = glfw.glfwOpenWindow( 300, 300, glfw.GLFW_WINDOWED, "Gears", nil )
    assert( window )
 
-   glfw.glfwEnable( window, glfw.GLFW_KEY_REPEAT )
+   glfw.glfwSetInputMode( window, glfw.GLFW_KEY_REPEAT, 1 )
    glfw.glfwSwapInterval( 1 )
 
    init()

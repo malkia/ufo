@@ -173,7 +173,7 @@ local function main()
    assert( fw.glfwInit() )
    local window = fw.glfwOpenWindow( 640, 480, fw.GLFW_WINDOWED, "Spinning Triangle", nil)
    assert( window )
-   fw.glfwEnable(window, fw.GLFW_STICKY_KEYS);
+   fw.glfwSetInputMode(window, fw.GLFW_STICKY_KEYS, 1);
    fw.glfwSwapInterval(1);
    print( window )
 

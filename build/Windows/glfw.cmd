@@ -1,16 +1,21 @@
 @echo off
 call %~dp0/wdk/setup %~n0 %*
-SetLocal EnableExtensions EnableDelayedExpansion
 pushd %LB_PROJECT_ROOT%\src
+
 git clean -fdx
+echo #define _GLFW_WIN32_WGL>config.h
+echo #define _GLFW_NO_DLOAD_GDI32 1>>config.h
+echo #define _GLFW_NO_DLOAD_WINMM 1>>config.h
+git log --format=format:"#define _GLFW_VERSION_FULL ""%%H""" -1>>config.h
 
 set NAME=%LB_PROJECT_NAME%
 
-copy /y "%~dpn0-config.h" config.h
-for /F %%i in (%~dp0..\source\%NAME%.files) do set FILES=!FILES! %%i
-for /F %%i in (%~dp0..\source\%NAME%.Windows.files) do set FILES=!FILES! %%i
+set FILES=^
+  error.c fullscreen.c gamma.c init.c input.c joystick.c opengl.c time.c^
+  win32_dllmain.c win32_fullscreen.c win32_gamma.c win32_init.c win32_input.c^
+  win32_joystick.c win32_opengl.c win32_time.c win32_window.c window.c
 
-cl %LB_CL_OPTS% -Fe%NAME%.dll -LD -DGLFW_BUILD_DLL=1 -Iwin32 -I. %FILES%^
+cl %LB_CL_OPTS% -Fe%NAME%.dll -LD -DGLFW_BUILD_DLL=1 %FILES% -Z7 -MP^
    /link"%LB_LINK_OPTS% user32.lib opengl32.lib gdi32.lib winmm.lib"
 
 call %~dp0/wdk/install %NAME%.dll

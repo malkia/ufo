@@ -295,7 +295,7 @@ local function main()
    local window = glfw.glfwOpenWindow( 400, 400, glfw.GLFW_WINDOWED, "Boing (classic Amiga demo)", nil )
    assert( window )
    
-   glfw.glfwEnable( window, glfw.GLFW_STICKY_KEYS )
+   glfw.glfwSetInputMode( window, glfw.GLFW_STICKY_KEYS, 1 )
    glfw.glfwSwapInterval( 1 )
    glfw.glfwSetTime( 0 )
    

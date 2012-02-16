@@ -17,7 +17,8 @@ copy /y %~dp0..\include\GL\glext.h %LB_PROJECT_ROOT%\src\GL
 copy %~dp0maglev.c %LB_PROJECT_ROOT%\src
 pushd src && cl %LB_CL_OPTS% -c maglev.c && popd
 for /F %%i in ('cygpath -m %~dp0') do set CYGCD=%%i
-make -f Makefile.win32 CFG=%DEBUG_RELEASE% CC="cl %LB_CL_OPTS% -I%CYGCD%/freetype2 -I%CYGCD%/../../../freetype2/include" AR="link /LIB" LD="link %LB_LINK_OPTS% opengl32.lib maglev.obj %CYGCD%/../../bin/Windows/%LB_TARGET_ARCH%/freetype2.lib"
+for /F %%i in ('cygpath -m %LB_PROJECT_ROOT%') do set CYGCD2=%%i
+make cairo -f Makefile.win32 CFG=%DEBUG_RELEASE% CC="cl %LB_CL_OPTS% -I%CYGCD%/include -I%CYGCD%/freetype2 -I%CYGCD%/../../../freetype2/include" AR="link /LIB" LD="link %LB_LINK_OPTS% opengl32.lib %CYGCD2%/src/maglev.obj %CYGCD%/../../bin/Windows/%LB_TARGET_ARCH%/freetype2.lib"
 
 call %~dp0/wdk/install src\%DEBUG_RELEASE%\%LB_PROJECT_NAME%.dll
 call %~dp0/wdk/install src\%DEBUG_RELEASE%\%LB_PROJECT_NAME%.lib

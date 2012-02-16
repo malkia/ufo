@@ -1,4 +1,4 @@
-rem @echo off
+@echo off
 set LB_LINK_SWAPRUN=-NOLOGO
 call %~dp0/wdk/setup %~n0 %*
 pushd %LB_PROJECT_ROOT%\src

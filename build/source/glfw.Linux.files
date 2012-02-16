@@ -1,9 +1,0 @@
-x11/x11_enable.c
-x11/x11_fullscreen.c
-x11/x11_gamma.c
-x11/x11_init.c
-x11/x11_joystick.c
-x11/x11_keysym2unicode.c
-x11/x11_opengl.c
-x11/x11_time.c
-x11/x11_window.c

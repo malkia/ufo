@@ -145,7 +145,7 @@ local function main()
 
    local window = glfw.glfwOpenWindow( 1024, 768, glfw.GLFW_WINDOWED, "Spinning Triangle", nil)
    assert( window )
-   glfw.glfwEnable(window, glfw.GLFW_STICKY_KEYS)
+   glfw.glfwSetInputMode(window, glfw.GLFW_STICKY_KEYS, 1)
    glfw.glfwSwapInterval(1)
 
    local font = bind_font( fonts[4] )

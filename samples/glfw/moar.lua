@@ -197,7 +197,7 @@ local function main()
       return glfw.glfwGetKey( window, glfw[ "GLFW_KEY_" .. key:upper() ] ) == glfw.GLFW_PRESS
    end
 
-   glfw.glfwEnable( window, glfw.GLFW_STICKY_KEYS )
+   glfw.glfwSetInputMode( window, glfw.GLFW_STICKY_KEYS, 1 )
    glfw.glfwSetWindowPos( window, (desktop_width - width)/2, (desktop_height - height)/2 )
    glfw.glfwSwapInterval( 0 ) -- 0=nosync 1=60fps
 
