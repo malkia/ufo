@@ -37,6 +37,6 @@ git log -1 >> src/.libs/libzmq.3.dylib
 popd
 mv $LIBZMQ/src/.libs/libzmq.3.dylib ../../bin/OSX/zmq.dylib
 install_name_tool -id @loader_path/zmq.dylib ../../bin/OSX/zmq.dylib
-install_name_tool -change /usr/local/lib/libpgm-5.2.0.dylib @loader_path/pgm.dylib zmq.dylib
+install_name_tool -change /usr/local/lib/libpgm-5.2.0.dylib @loader_path/pgm.dylib ../../bin/OSX/zmq.dylib
 popd
 
