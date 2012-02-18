@@ -9,7 +9,7 @@ set NAME=%LB_PROJECT_NAME%
 (for /f "usebackq tokens=1,2,3* delims==" %%i in (`findstr /B SOURCE= freetype.dsp`) do if /I "%%~xj"==".c" echo %%j) > sources.tmp
 echo ..\..\..\src\bzip2\ftbzip2.c >> sources.tmp
 
-cl -c %LB_CL_OPTS% -Z7 -MP -Fe%NAME%.dll -DNDEBUG=1 -DWIN32 -DFT2_BUILD_LIBRARY^
+cl -c %LB_CL_OPTS% -Fe%NAME%.dll -DNDEBUG=1 -DWIN32 -DFT2_BUILD_LIBRARY^
    -I%~dp0\..\include^
    -I%~dp0%NAME% -I..\..\..\include @sources.tmp
 

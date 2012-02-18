@@ -5,7 +5,7 @@ setlocal
 
 set NAME=%LB_PROJECT_NAME%
 
-cl -Fe%NAME%.dll -DPTW32_BUILD=1 -I. %NAME%.c -LD %LB_CL_OPTS% /link"%LB_LINK_OPTS%"
+cl -Fe%NAME%.dll -D_MSC_VER=1399 -DPTW32_BUILD=1 -I. %NAME%.c -LD %LB_CL_OPTS% /link"%LB_LINK_OPTS%"
 
 call %~dp0/wdk/install %NAME%.dll
 call %~dp0/wdk/install %NAME%.lib

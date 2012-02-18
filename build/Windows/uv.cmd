@@ -11,7 +11,7 @@ echo src/uv-common.c>sources.tmp
 for %%i in (src\ares\*.c) do echo %%i >> sources.tmp
 for %%i in (src\win\*.c) do echo %%i >> sources.tmp
 
-cl %LB_CL_OPTS% -Z7 -MP -EHsc -Fe%NAME%.dll -LD^
+cl %LB_CL_OPTS% -EHsc -Fe%NAME%.dll -LD^
  -DHAVE_CONFIG_H -D_WIN32_WINNT=0x0502 -DEIO_STACKSIZE=262144 -D_GNU_SOURCE -DWIN32 -DNDEBUG^
  -DBUILDING_UV_SHARED^
  -Iinclude -Iinclude/uv-private -Isrc -Isrc/ares/config_win32^

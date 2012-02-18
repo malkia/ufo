@@ -11,7 +11,7 @@ copy ..\..\include\SDL_config_win32.h ..\..\include\SDL_config.h
 
 (for /f "usebackq tokens=1,2,3* delims==" %%i in (`findstr RelativePath %NAME%_VS2008.vcproj`) do if /I "%%~xj"==".c" if /I NOT "%%~nxj"=="SDL_stdlib.c" echo %%j) > sources.tmp
 
-cl %LB_CL_OPTS% -Z7 -MP -LD -Fe%NAME%.dll -DNDEBUG=1 -D_WINDOWS -I"%DXSDK_DIR%\include" -I..\..\include -I"%~dp0include" @sources.tmp /link"%LB_LINK_OPTS% user32.lib gdi32.lib kernel32.lib winmm.lib imm32.lib ole32.lib version.lib oleaut32.lib Advapi32.lib dxguid.lib"
+cl %LB_CL_OPTS% -LD -Fe%NAME%.dll -DNDEBUG=1 -D_WINDOWS -I"%DXSDK_DIR%\include" -I..\..\include -I"%~dp0include" @sources.tmp /link"%LB_LINK_OPTS% user32.lib gdi32.lib kernel32.lib winmm.lib imm32.lib ole32.lib version.lib oleaut32.lib Advapi32.lib dxguid.lib"
 
 call %~dp0/wdk/install %NAME%.dll
 call %~dp0/wdk/install %NAME%.lib
