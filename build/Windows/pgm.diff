@@ -2,33 +2,46 @@ Index: pgm/include/impl/security.h
 ===================================================================
 --- pgm/include/impl/security.h	(revision 1458)
 +++ pgm/include/impl/security.h	(working copy)
-@@ -58,7 +58,7 @@
- /* MinGW does not export a 32-bit or 64-bit specific API */
- 	_ftime (timeptr);
- 	return 0;
--#	elif  defined( _CRT_SECURE_NO_WARNINGS )
-+#	elif  defined( _CRT_SECURE_NO_WARNINGS ) && 0 // _ftime64_s not available in Windows XP MSVCRT.DLL
- /* validates timeptr is not NULL, otherwise returns EINVAL */
- 	return _ftime64_s (timeptr);
- #	else
-@@ -202,7 +202,7 @@
- errno_t
- pgm_dupenv_s (char **buffer, size_t *count, const char* name)
+@@ -19,6 +19,8 @@
+  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  */
+ 
++#undef _CRT_SECURE_NO_WARNINGS
++
+ #if !defined (__PGM_IMPL_FRAMEWORK_H_INSIDE__) && !defined (PGM_COMPILATION)
+ #	error "Only <framework.h> can be included directly."
+ #endif
+@@ -115,9 +117,11 @@
+ 			str[size - 1] = 0;
+ 		return retval;
+ 	}
++	{
+ 	const int retval = _vsnprintf (str, count + 1, format, ap);
+ 	str[count] = 0;
+ 	return retval;
++	}
+ #else
+ 	return _vsnprintf_s (str, size, count, format, ap);
+ #endif
+@@ -141,7 +145,7 @@
+ 	return retval;
+ }
+ 
+-static inline
++/*static inline
+ int
+ pgm_sscanf_s (const char *buffer, const char *format, ...)
  {
--#ifndef _CRT_SECURE_NO_WARNINGS
-+#if _CRT_SECURE_NO_WARNINGS || 1 // _dupenv_s not available in Windows XP's MSVCRT.DLL
- 	const char *val = getenv (name);
- /* not found */
- 	if (NULL == val) {
-@@ -236,7 +236,7 @@
- errno_t
- pgm_wcstombs_s (size_t *retval, char *dest, size_t size, const wchar_t *src, size_t count)
- {
--#	ifndef _CRT_SECURE_NO_WARNINGS
-+#	if !defined(_CRT_SECURE_NO_WARNINGS) || 1 // wcstombs_s is not available in Windows XP MSVCRT.DLL
- 	size_t characters;
- 	if (_TRUNCATE == count) {
- 		characters = wcstombs (dest, src, size);
+@@ -152,7 +156,8 @@
+ 	retval = vsscanf (buffer, format, ap);
+ 	va_end (ap);
+ 	return retval;
+-}
++	}*/
++#define pgm_sscanf_s sscanf
+ #else
+ #	define pgm_snprintf_s		_snprintf_s
+ #	define pgm_sscanf_s		sscanf_s
 Index: pgm/include/pgm/atomic.h
 ===================================================================
 --- pgm/include/pgm/atomic.h	(revision 1458)
