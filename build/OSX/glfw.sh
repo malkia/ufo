@@ -1,3 +1,5 @@
+set -e
+
 GLFW=../../../glfw
 
 pushd $GLFW
@@ -5,7 +7,7 @@ git clean -fdx
 
 mkdir build
 pushd build
-cmake -D CMAKE_OSX_DEPLOYMENT_TARGET=10.5 -D CMAKE_OSX_ARCHITECTURES="i386;x86_64" ../
+cmake -D CMAKE_OSX_DEPLOYMENT_TARGET=10.5 -D CMAKE_OSX_ARCHITECTURES="i386;x86_64" -D CMAKE_C_COMPILER=clang -D CMAKE_OSX_SYSROOT="`xcode-select -print-path`/SDKs/MacOSX10.5.sdk" ../
 make -j
 popd
 
