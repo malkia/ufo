@@ -7,7 +7,7 @@ Index: pgm/include/impl/security.h
  	_ftime (timeptr);
  	return 0;
 -#	elif  defined( _CRT_SECURE_NO_WARNINGS )
-+#	elif  defined( _CRT_SECURE_NO_WARNINGS ) && (_MSC_VER >= 1400)
++#	elif  defined( _CRT_SECURE_NO_WARNINGS ) && 0 // _ftime64_s not available in Windows XP MSVCRT.DLL
  /* validates timeptr is not NULL, otherwise returns EINVAL */
  	return _ftime64_s (timeptr);
  #	else
@@ -16,10 +16,19 @@ Index: pgm/include/impl/security.h
  pgm_dupenv_s (char **buffer, size_t *count, const char* name)
  {
 -#ifndef _CRT_SECURE_NO_WARNINGS
-+#if 1 //malkia (missing in WDK msvcrt) ndef _CRT_SECURE_NO_WARNINGS
++#if _CRT_SECURE_NO_WARNINGS || 1 // _dupenv_s not available in Windows XP's MSVCRT.DLL
  	const char *val = getenv (name);
  /* not found */
  	if (NULL == val) {
+@@ -236,7 +236,7 @@
+ errno_t
+ pgm_wcstombs_s (size_t *retval, char *dest, size_t size, const wchar_t *src, size_t count)
+ {
+-#	ifndef _CRT_SECURE_NO_WARNINGS
++#	if !defined(_CRT_SECURE_NO_WARNINGS) || 1 // wcstombs_s is not available in Windows XP MSVCRT.DLL
+ 	size_t characters;
+ 	if (_TRUNCATE == count) {
+ 		characters = wcstombs (dest, src, size);
 Index: pgm/include/pgm/atomic.h
 ===================================================================
 --- pgm/include/pgm/atomic.h	(revision 1458)
