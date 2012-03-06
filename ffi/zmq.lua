@@ -12,7 +12,7 @@ ffi.cdef([[
    enum {
       ZMQ_VERSION_MAJOR     = 3,
       ZMQ_VERSION_MINOR     = 1,
-      ZMQ_VERSION_PATCH     = 0,
+      ZMQ_VERSION_PATCH     = 1,
       ZMQ_VERSION           = ZMQ_VERSION_MAJOR * 10000 + ZMQ_VERSION_MINOR * 100 + ZMQ_VERSION_PATCH,
       
       ZMQ_HAUSNUMERO        = 156384712,
@@ -23,15 +23,12 @@ ffi.cdef([[
       ZMQ_SUB               = 2,
       ZMQ_REQ               = 3,
       ZMQ_REP               = 4,
-      ZMQ_XREQ              = 5,
-      ZMQ_XREP              = 6,
+      ZMQ_DEALER            = 5,
+      ZMQ_ROUTER            = 6,
       ZMQ_PULL              = 7,
       ZMQ_PUSH              = 8,
       ZMQ_XPUB              = 9,
       ZMQ_XSUB              = 10,
-      ZMQ_GENERIC           = 13,
-      ZMQ_ROUTER            = ZMQ_XREP,
-      ZMQ_DEALER            = ZMQ_XREQ,
 
       // Socket options
       ZMQ_AFFINITY          = 4,
@@ -56,6 +53,7 @@ ffi.cdef([[
       ZMQ_RCVTIMEO          = 27,
       ZMQ_SNDTIMEO          = 28,
       ZMQ_IPV4ONLY          = 31,
+      ZMQ_LAST_ENDPOINT     = 32,
 
       // Message options
       ZMQ_MORE              = 1,
@@ -70,6 +68,14 @@ ffi.cdef([[
       ZMQ_POLLERR           = 4,
    }
 
+   typedef struct zmq_socket_t { 
+      void *data;
+   } zmq_socket_t;
+
+   typedef struct zmq_ctx_t {
+      void *data; 
+   } zmq_ctx_t;
+
    typedef struct zmq_pollitem_t {
       void* socket;
 ]] .. ((ffi.os == "Windows") and "void*" or "int") .. [[ fd;
@@ -81,6 +87,12 @@ ffi.cdef([[
       unsigned char _ [32];
    } zmq_msg_t;
 
+   typedef struct zmq_iovec_t {
+      void *iov_base;
+      size_t iov_len;
+   } zmq_iovec_t;
+
+
    typedef void (zmq_free_fn)(        void *data, void *hint );
 
    void          zmq_version(         int* major, int* minor, int* patch );
@@ -91,26 +103,32 @@ ffi.cdef([[
    int           zmq_msg_init(        zmq_msg_t* msg );
    int           zmq_msg_init_size(   zmq_msg_t* msg, size_t size );
    int           zmq_msg_init_data(   zmq_msg_t* msg, void* data, size_t size, zmq_free_fn*, void* hint );
+   int           zmq_msg_send(        zmq_msg_t* msg, zmq_socket_t s, int flags );
+   int           zmq_msg_recv(        zmq_msg_t* msg, zmq_socket_t s, int flags );
    int           zmq_msg_close(       zmq_msg_t* msg );
    int           zmq_msg_move(        zmq_msg_t* dest, zmq_msg_t* src );
    int           zmq_msg_copy(        zmq_msg_t* dest, zmq_msg_t* src );
    void*         zmq_msg_data(        zmq_msg_t* msg );
    size_t        zmq_msg_size(        zmq_msg_t* msg );
-   int           zmq_getmsgopt(       zmq_msg_t* msg, int option, void *optval, size_t* optvallen );
+   int           zmq_msg_more(        zmq_msg_t* msg );
+   int           zmq_msg_get(         zmq_msg_t* msg, int option,       void *optval, size_t* optvallen );
+   int           zmq_msg_set(         zmq_msg_t *msg, int option, const void *optval, size_t* optvallen);
 
-   void*         zmq_init(            int io_threads );
-   int           zmq_term(            void* context );
+   zmq_ctx_t     zmq_init(            int io_threads );
+   int           zmq_term(            zmq_ctx_t context );
    
-   void*         zmq_socket(          void *context, int type );
-   int           zmq_close(           void *s  );
-   int           zmq_setsockopt(      void *s, int option, const void *optval, size_t optvallen ); 
-   int           zmq_getsockopt(      void *s, int option, void *optval, size_t *optvallen );
-   int           zmq_bind(            void *s, const char *addr );
-   int           zmq_connect(         void *s, const char *addr );
-   int           zmq_send(            void *s, const void* buf, int len, int flags );
-   int           zmq_recv(            void *s, void* buf, int len, int flags );
-   int           zmq_sendmsg(         void *s, zmq_msg_t *msg, int flags );
-   int           zmq_recvmsg(         void *s, zmq_msg_t *msg, int flags );
+   zmq_socket_t  zmq_socket(          zmq_ctx_t, int type );
+   int           zmq_close(           zmq_socket_t );
+   int           zmq_setsockopt(      zmq_socket_t, int option, const void *optval, size_t  optvallen ); 
+   int           zmq_getsockopt(      zmq_socket_t, int option,       void *optval, size_t* optvallen );
+   int           zmq_bind(            zmq_socket_t, const char *addr );
+   int           zmq_connect(         zmq_socket_t, const char *addr );
+   int           zmq_send(            zmq_socket_t, const void* buf, int len, int flags );
+   int           zmq_recv(            zmq_socket_t,       void* buf, int len, int flags );
+   int           zmq_sendmsg(         zmq_socket_t, zmq_msg_t* msg, int flags );
+   int           zmq_recvmsg(         zmq_socket_t, zmq_msg_t* msg, int flags );
+   int           zmq_sendiov(         zmq_socket_t, zmq_iovec_t* iov, size_t  count, int flags );
+   int           zmq_recviov(         zmq_socket_t, zmq_iovec_t* iov, size_t *count, int flags );
    
    int           zmq_poll(            zmq_pollitem_t* items, int nitems, long timeout );
 
