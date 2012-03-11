@@ -1,6 +1,8 @@
 set -e
 pushd ../../../sdl
 hg purge --all
+hg checkout 6248 --clean
+sed -i .bak "s/10\.[46]/10\.5/g" build-scripts/fatbuild.sh
 build-scripts/fatbuild.sh
 popd
 mv ../../../sdl/build/.libs/libSDL-1.3.0.dylib ../../bin/OSX/sdl.dylib
