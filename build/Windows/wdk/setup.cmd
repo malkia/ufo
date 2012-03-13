@@ -10,7 +10,7 @@ rem LB_TARGET_BITS  - 32 or 64 (default: 32)
 rem LB_TARGET_ARCH  - x86, x64, arm (default: x86)
 rem LB_TARGET_CPU   - i386, amd64, armv7l (default: i386)
 rem LB_TARGET_CROSS - x32-64 (default: empty)
-rem LB_WDK_ROOT     - The Windows DDK Root. It's detected by looking at the ftype GraphEdtGraph
+rem LB_WDK_ROOT     - The Windows DDK Root. It's detected by looking at specific registry settings for WDK7.1
 
 
 rem LB_TARGET_OS
@@ -78,12 +78,14 @@ rem LB_TARGET_CROSS would be set to the cross compiler
 rem
 if "%LB_TARGET_CROSS%"=="" if "%LB_TARGET_CPU%"=="amd64" set LB_TARGET_CROSS=x32-64
 
-
+set LB_REG_EXE=%SystemRoot%\SysWOW64\reg.exe
+if not exist %LB_REG_EXE% set LB_REG_EXE=%SystemRoot%\System32\reg.exe
 
 rem LB_WDK_ROOT (from %3 by default)
 rem
 if "%LB_WDK_ROOT%"=="" set LB_WDK_ROOT=%3
-if "%LB_WDK_ROOT%"=="" for /F "tokens=2 delims==" %%i in ('ftype GraphEdtGraph') do set LB_WDK_ROOT=%%~dpi/../../../
+if "%LB_WDK_ROOT%"=="" for /F "skip=2 usebackq tokens=3*" %%i in (`%LB_REG_EXE% QUERY HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\KitSetup\configured-kits\{B4285279-1846-49B4-B8FD-B9EAF0FF17DA}\{68656B6B-555E-5459-5E5D-6363635E5F61} /v setup-install-location`) do set LB_WDK_ROOT=%%i
+
 if "%LB_WDK_ROOT%"=="" set LB_WDK_ROOT=e:\apps\wdk
 for %%i in ("%LB_WDK_ROOT%/") do set LB_WDK_ROOT=%%~dpi
 
