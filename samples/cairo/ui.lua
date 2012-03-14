@@ -10,6 +10,32 @@ local lines = {{ x=0, y=0, solid = false }}
 local gfx = {}
 local ui = {}
 
+local function gencode()
+   local functions = {
+      "move_to", "line_to", "curve_to", "rel_move_to", "rel_line_to", "rel_curve_to",
+      "arc", "new_path", "rectangle", "close_path", "set_source_rgb", "set_source_rgba",
+      "fill_preserve", "stroke_preserve", "stroke", "set_line_width", "show_text", "clip",
+      "reset_clip", "text_extents", "save", "restore", "set_font_size", "set_operator",
+      "paint", "select_font_face",
+   }
+   local c = {}
+   c[#c+1] = "return {\n"
+   for _,n in ipairs(functions) do
+      c[#c+1]=n.."=function(self,...)return self.library.cairo_" .. n .. "(self.context,...)end,\n"
+   end
+   c[#c+1] = "}\n"
+   return table.concat(c)
+end
+
+--print(gencode())
+
+local cairo = loadstring(gencode())()
+cairo.library = cr
+cairo.context = {}
+cairo.surface = {}
+
+--for k,v in pairs(cairo) do print(k,v) end
+
 -- From the cairo cookbook
 -- http://cairographics.org/cookbook/roundedrectangles/
 function gfx:round_rect_a(x,y,width,height,radius)
@@ -18,41 +44,40 @@ function gfx:round_rect_a(x,y,width,height,radius)
    local double_radius = radius + radius
    local x0, y0 = x, y -- + half_radius, y + half_radius
    local x1, y1 = x0+width, y0+height
-   local ctx = gfx.ctx
 
    if width < double_radius then 
       if height < double_radius then
-	 cr.cairo_move_to(  ctx, x0, (y0 + y1) * 0.5 )
-	 cr.cairo_curve_to( ctx, x0, y0, x0, y0, (x0 + x1) * 0.5, y0 )
-	 cr.cairo_curve_to( ctx, x1, y0, x1, y0, x1, (y0 + y1) * 0.5 )
-	 cr.cairo_curve_to( ctx, x1, y1, x1, y1, (x1 + x0) * 0.5, y1 )
-	 cr.cairo_curve_to( ctx, x0, y1, x0, y1, x0, (y0 + y1) * 0.5 )
+	 cairo:move_to(  x0, (y0 + y1) * 0.5 )
+	 cairo:curve_to( x0, y0, x0, y0, (x0 + x1) * 0.5, y0 )
+	 cairo:curve_to( x1, y0, x1, y0, x1, (y0 + y1) * 0.5 )
+	 cairo:curve_to( x1, y1, x1, y1, (x1 + x0) * 0.5, y1 )
+	 cairo:curve_to( x0, y1, x0, y1, x0, (y0 + y1) * 0.5 )
       else 
-	 cr.cairo_move_to(  ctx, x0, y0 + radius )
-	 cr.cairo_curve_to( ctx, x0 ,y0, x0, y0, (x0 + x1)/2, y0 )
-	 cr.cairo_curve_to( ctx, x1, y0, x1, y0, x1, y0 + radius )
-	 cr.cairo_line_to(  ctx, x1, y1 - radius )
-	 cr.cairo_curve_to( ctx, x1, y1, x1, y1, (x1 + x0)/2, y1 )
-	 cr.cairo_curve_to( ctx, x0, y1, x0, y1, x0, y1- radius )
+	 cairo:move_to(  x0, y0 + radius )
+	 cairo:curve_to( x0 ,y0, x0, y0, (x0 + x1)/2, y0 )
+	 cairo:curve_to( x1, y0, x1, y0, x1, y0 + radius )
+	 cairo:line_to(  x1, y1 - radius )
+	 cairo:curve_to( x1, y1, x1, y1, (x1 + x0)/2, y1 )
+	 cairo:curve_to( x0, y1, x0, y1, x0, y1- radius )
       end
    else
       if height < double_radius then
-	 cr.cairo_move_to(  ctx, x0, (y0 + y1)/2 )
-	 cr.cairo_curve_to( ctx, x0 , y0, x0, y0, x0 + radius, y0 )
-	 cr.cairo_line_to(  ctx, x1 - radius, y0 )
-	 cr.cairo_curve_to( ctx, x1, y0, x1, y0, x1, (y0 + y1)/2 )
-	 cr.cairo_curve_to( ctx, x1, y1, x1, y1, x1 - radius, y1 )
-	 cr.cairo_line_to(  ctx, x0 + radius, y1 )
-	 cr.cairo_curve_to( ctx, x0, y1, x0, y1, x0, (y0 + y1)/2 )
+	 cairo:move_to(  x0, (y0 + y1)/2 )
+	 cairo:curve_to( x0 , y0, x0, y0, x0 + radius, y0 )
+	 cairo:line_to(  x1 - radius, y0 )
+	 cairo:curve_to( x1, y0, x1, y0, x1, (y0 + y1)/2 )
+	 cairo:curve_to( x1, y1, x1, y1, x1 - radius, y1 )
+	 cairo:line_to(  x0 + radius, y1 )
+	 cairo:curve_to( x0, y1, x0, y1, x0, (y0 + y1)/2 )
       else
-	 cr.cairo_move_to(  ctx, x0, y0 + radius)
-	 cr.cairo_curve_to( ctx, x0 , y0, x0 , y0, x0 + radius, y0)
-	 cr.cairo_line_to(  ctx, x1 - radius, y0)
-	 cr.cairo_curve_to( ctx, x1, y0, x1, y0, x1, y0 + radius)
-	 cr.cairo_line_to(  ctx, x1, y1 - radius)
-	 cr.cairo_curve_to( ctx, x1, y1, x1, y1, x1 - radius, y1)
-	 cr.cairo_line_to(  ctx, x0 + radius, y1)
-	 cr.cairo_curve_to( ctx, x0, y1, x0, y1, x0, y1- radius)
+	 cairo:move_to(  x0, y0 + radius)
+	 cairo:curve_to( x0 , y0, x0 , y0, x0 + radius, y0)
+	 cairo:line_to(  x1 - radius, y0)
+	 cairo:curve_to( x1, y0, x1, y0, x1, y0 + radius)
+	 cairo:line_to(  x1, y1 - radius)
+	 cairo:curve_to( x1, y1, x1, y1, x1 - radius, y1)
+	 cairo:line_to(  x0 + radius, y1)
+	 cairo:curve_to( x0, y1, x0, y1, x0, y1- radius)
       end
    end
 end
@@ -74,38 +99,37 @@ function gfx:round_rect_b(x,y,w,h,radius_x,radius_y)
    -- approximate (quite close) the arc using a bezier curve
    local c1 = ARC_TO_BEZIER * radius_x
    local c2 = ARC_TO_BEZIER * radius_y
-   local ctx = gfx.ctx
 
-   cr.cairo_move_to(      ctx, x + radius_x, y )
-   cr.cairo_rel_line_to(  ctx, w - 2 * radius_x, 0.0 )
-   cr.cairo_rel_curve_to( ctx, c1, 0.0, radius_x, c2, radius_x, radius_y )
-   cr.cairo_rel_line_to(  ctx, 0, h - 2 * radius_y )
-   cr.cairo_rel_curve_to( ctx, 0, c2, c1 - radius_x, radius_y, -radius_x, radius_y )
-   cr.cairo_rel_line_to(  ctx, -w + 2 * radius_x, 0 )
-   cr.cairo_rel_curve_to( ctx, -c1, 0, -radius_x, -c2, -radius_x, -radius_y )
-   cr.cairo_rel_line_to(  ctx,   0, -h + 2 * radius_y )
-   cr.cairo_rel_curve_to( ctx,   0, -c2, radius_x - c1, -radius_y, radius_x, -radius_y )
+   cairo:move_to(      x + radius_x, y )
+   cairo:rel_line_to(  w - 2 * radius_x, 0.0 )
+   cairo:rel_curve_to( c1, 0.0, radius_x, c2, radius_x, radius_y )
+   cairo:rel_line_to(  0, h - 2 * radius_y )
+   cairo:rel_curve_to( 0, c2, c1 - radius_x, radius_y, -radius_x, radius_y )
+   cairo:rel_line_to(  -w + 2 * radius_x, 0 )
+   cairo:rel_curve_to( -c1, 0, -radius_x, -c2, -radius_x, -radius_y )
+   cairo:rel_line_to(  0, -h + 2 * radius_y )
+   cairo:rel_curve_to( 0, -c2, radius_x - c1, -radius_y, radius_x, -radius_y )
 end
 
 function gfx:round_rect_c(x, y, w, h, r)
-   local ctx, r = self.ctx, r or 5
-   cr.cairo_move_to(  ctx, x  +r, y                                )                  
-   cr.cairo_line_to(  ctx, x+w-r, y                                )                
-   cr.cairo_curve_to( ctx, x+w,   y,    x+w, y,   x+w,   y     + r ) 
-   cr.cairo_line_to(  ctx, x+w,   y+h-r                            )           
-   cr.cairo_curve_to( ctx, x+w,   y+h,  x+w, y+h, x+w-r, y + h     )
-   cr.cairo_line_to(  ctx, x  +r, y+h                              )                   
-   cr.cairo_curve_to( ctx, x,     y+h,  x,   y+h, x,     y + h - r )      
-   cr.cairo_line_to(  ctx, x,     y  +r                            )                     
-   cr.cairo_curve_to( ctx, x,     y,    x,   y,   x  +r, y         )            
+   local r = r or 5
+   cairo:move_to(  x  +r, y                                )                  
+   cairo:line_to(  x+w-r, y                                )                
+   cairo:curve_to( x+w,   y,    x+w, y,   x+w,   y     + r ) 
+   cairo:line_to(  x+w,   y+h-r                            )           
+   cairo:curve_to( x+w,   y+h,  x+w, y+h, x+w-r, y + h     )
+   cairo:line_to(  x  +r, y+h                              )                   
+   cairo:curve_to( x,     y+h,  x,   y+h, x,     y + h - r )      
+   cairo:line_to(  x,     y  +r                            )                     
+   cairo:curve_to( x,     y,    x,   y,   x  +r, y         )            
 end
 
 function gfx:round_rect_d(x, y, w, h, r)
-   local ctx, r, half_pi = gfx.ctx, r or 5, pi * 0.5
-   cr.cairo_arc( ctx, x     + r, y     + r, r, 2*half_pi, 3*half_pi )
-   cr.cairo_arc( ctx, x + w - r, y     + r, r, 3*half_pi, 4*half_pi )
-   cr.cairo_arc( ctx, x + w - r, y + h - r, r, 0*half_pi, 1*half_pi )
-   cr.cairo_arc( ctx, x     + r, y + h - r, r, 1*half_pi, 2*half_pi )
+   local r, half_pi = r or 5, pi * 0.5
+   cairo:arc( x     + r, y     + r, r, 2*half_pi, 3*half_pi )
+   cairo:arc( x + w - r, y     + r, r, 3*half_pi, 4*half_pi )
+   cairo:arc( x + w - r, y + h - r, r, 0*half_pi, 1*half_pi )
+   cairo:arc( x     + r, y + h - r, r, 1*half_pi, 2*half_pi )
 end
 
 local function take_string( table_or_string, table_key )
@@ -132,7 +156,6 @@ end
 
 -- items is meta structure
 function gfx:list_box(items, x, y, w, h)
-   local ctx = gfx.ctx
    local eh = 24 -- element height
    local h = h or eh * #items
    local ev = floor( h / eh ) -- elements visible
@@ -150,53 +173,52 @@ function gfx:list_box(items, x, y, w, h)
    items.top, items.bottom = top, bottom
 
    -- Make the rectangle path
-   cr.cairo_new_path( ctx )
-   cr.cairo_rectangle( ctx, x, y, w, h )
-   cr.cairo_close_path( ctx )
+   cairo:new_path()
+   cairo:rectangle( x, y, w, h )
+   cairo:close_path()
 
    -- Fill it first, but preserve the path
-   cr.cairo_set_source_rgb( ctx, 1, 1, 1 ) -- listbox background color
-   cr.cairo_fill_preserve( ctx )
+   cairo:set_source_rgb( 1, 1, 1 ) -- listbox background color
+   cairo:fill_preserve()
 
    -- Next stroke it, and preserve the path
-   cr.cairo_set_source_rgb( ctx, 0, 0, 0 ) -- listbox "wire" color
-   cr.cairo_set_line_width( ctx, 0.25 )
-   cr.cairo_stroke_preserve( ctx )
+   cairo:set_source_rgb( 0, 0, 0 ) -- listbox "wire" color
+   cairo:set_line_width( 0.25 )
+   cairo:stroke_preserve()
 
    -- Now set the clip, do not keep the path
-   cr.cairo_clip( ctx )
+   cairo:clip()
    for i=top, bottom do
       local y = y + (i - top) * eh
       local current = (i == current)
       if current then
-	 cr.cairo_new_path(       ctx )
-	 cr.cairo_move_to(        ctx,  x,  y )
-	 cr.cairo_rel_line_to(    ctx,  w,  0 )
-	 cr.cairo_rel_line_to(    ctx,  0, eh )
-	 cr.cairo_rel_line_to(    ctx, -w,  0 )
-	 cr.cairo_close_path(     ctx )
+	 cairo:new_path()
+	 cairo:move_to(      x,  y )
+	 cairo:rel_line_to(  w,  0 )
+	 cairo:rel_line_to(  0, eh )
+	 cairo:rel_line_to( -w,  0 )
+	 cairo:close_path()
 	 -- background
-	 cr.cairo_set_source_rgb( ctx, 0, 0, 1 )
-	 cr.cairo_fill_preserve(  ctx )
+	 cairo:set_source_rgb( 0, 0, 1 )
+	 cairo:fill_preserve()
 	 -- wiring
-	 cr.cairo_set_source_rgb( ctx, 1, 1, 1 )
-	 cr.cairo_stroke(         ctx )
+	 cairo:set_source_rgb( 1, 1, 1 )
+	 cairo:stroke()
       end
-      cr.cairo_move_to(        ctx, x + 8, y + eh * 0.8 )
-      cr.cairo_set_source_rgb( ctx, current and 1 or 0, current and 1 or 0, current and 1 or 0 )
-      cr.cairo_show_text( ctx, take_string( items[i] ) )
+      cairo:move_to(        x + 8, y + eh * 0.8 )
+      cairo:set_source_rgb( current and 1 or 0, current and 1 or 0, current and 1 or 0 )
+      cairo:show_text(      take_string( items[i] ) )
    end
-   cr.cairo_reset_clip( ctx )
+   cairo:reset_clip()
 end
 
 local gfx_text_extents = ffi.new( "cairo_text_extents_t" )
 function gfx:text_extents( text )
-   cr.cairo_text_extents( self.ctx, text, gfx_text_extents )
+   cairo:text_extents( text, gfx_text_extents )
    return gfx_text_extents
 end
 
 function gfx:main_menu(items, x, y, w, h)
-   local ctx = gfx.ctx
    local eh = 24 -- element height
    local ev = floor( h / eh ) -- elements visible
    local h = ev * eh
@@ -214,21 +236,21 @@ function gfx:main_menu(items, x, y, w, h)
    end
 
    -- Make the rectangle path
-   cr.cairo_new_path( ctx )
-   cr.cairo_rectangle( ctx, x, y, width, height + vgap*2 )
-   cr.cairo_close_path( ctx )
+   cairo:new_path()
+   cairo:rectangle( x, y, width, height + vgap*2 )
+   cairo:close_path()
 
    -- Fill it first, but preserve the path
-   cr.cairo_set_source_rgb( ctx, 1, 1, 1 ) -- listbox background color
-   cr.cairo_fill_preserve( ctx )
+   cairo:set_source_rgb( 1, 1, 1 ) -- listbox background color
+   cairo:fill_preserve( )
 
    -- Next stroke it, and preserve the path
-   cr.cairo_set_source_rgb( ctx, 0, 0, 0 ) -- listbox "wire" color
-   cr.cairo_set_line_width( ctx, 0.25 )
-   cr.cairo_stroke_preserve( ctx )
+   cairo:set_source_rgb( 0, 0, 0 ) -- listbox "wire" color
+   cairo:set_line_width( 0.25 )
+   cairo:stroke_preserve()
 
    -- Now set the clip, do not keep the path
-   cr.cairo_clip( ctx )
+   cairo:clip()
    local cx = hgap
    for i=1, #items do
       local iw = gfx:text_extents( take_string(items[i]) ).width + hgap*2
@@ -238,44 +260,44 @@ function gfx:main_menu(items, x, y, w, h)
       if current then
 	 if items.opened then
 	 else
-	    cr.cairo_new_path(       ctx )
-	    cr.cairo_move_to(        ctx,  cx-hgap,  y )
-	    cr.cairo_rel_line_to(    ctx,  iw,  0 )
-	    cr.cairo_rel_line_to(    ctx,   0,  height + vgap*2 )
-	    cr.cairo_rel_line_to(    ctx, -iw,  0 )
-	    cr.cairo_close_path(     ctx )
+	    cairo:new_path()
+	    cairo:move_to( cx-hgap,  y )
+	    cairo:rel_line_to(  iw,  0 )
+	    cairo:rel_line_to(   0,  height + vgap*2 )
+	    cairo:rel_line_to( -iw,  0 )
+	    cairo:close_path()
 	    -- background
-	    cr.cairo_set_source_rgb( ctx, 0, 0, 1 )
-	    cr.cairo_fill_preserve(  ctx )
+	    cairo:set_source_rgb( 0, 0, 1 )
+	    cairo:fill_preserve()
 	    -- wiring
-	    cr.cairo_set_source_rgb( ctx, 1, 1, 1 )
-	    cr.cairo_stroke(         ctx )
+	    cairo:set_source_rgb( 1, 1, 1 )
+	    cairo:stroke()
 	 end
       end
-      cr.cairo_move_to(        ctx, cx, y + height*1.2  )
+      cairo:move_to( cx, y + height*1.2  )
       if current and not opened then
-	 cr.cairo_set_source_rgb( ctx, 1, 1, 1 )
+	 cairo:set_source_rgb( 1, 1, 1 )
       else
 	 if current and opened then
-	    cr.cairo_set_source_rgb( ctx, 0.5, 0.5, 0.5 )
+	    cairo:set_source_rgb( 0.5, 0.5, 0.5 )
 	 else
-	    cr.cairo_set_source_rgb( ctx, 0, 0, 0 )
+	    cairo:set_source_rgb( 0, 0, 0 )
 	 end
       end
       local item = take_string( items[i] )
-      cr.cairo_show_text( ctx, item )
+      cairo:show_text( item )
       if current and opened then
 	 local items = items[i][2]
 	 if items then
-	    cr.cairo_save( ctx )
-	    cr.cairo_reset_clip( ctx )
+	    cairo:save()
+	    cairo:reset_clip()
 	    gfx:list_box( items, cx, y + height+hgap, 100 )
-	    cr.cairo_restore( ctx )
+	    cairo:restore()
 	 end
       end
       cx = cx + iw
    end
-   cr.cairo_reset_clip( ctx )
+   cairo:reset_clip()
 end
 
 function ui:list_box(state)
@@ -393,30 +415,28 @@ local key2cmd = {
 }
 
 do
-   local surf, ctx, sdl_surf
+   local sdl_surf
 
    function wm:resized()
       local format = cr.CAIRO_FORMAT_RGB24
-      surf = ffi.gc(
+      cairo.surface = ffi.gc(
 	 cr.cairo_image_surface_create( format, self.width, self.height ),
 	 cr.cairo_surface_destroy 
       )
-      ctx = ffi.gc(
-	 cr.cairo_create( surf ),
+      cairo.context = ffi.gc(
+	 cr.cairo_create( cairo.surface ),
 	 cr.cairo_destroy
       )
       sdl_surf = ffi.gc(
 	 sdl.SDL_CreateRGBSurfaceFrom(
-	    cr.cairo_image_surface_get_data( surf ),
+	    cr.cairo_image_surface_get_data( cairo.surface ),
 	    self.width, self.height, 32,
 	    cr.cairo_format_stride_for_width( format, self.width ),
-	    0,  0, 0, 0
+	    0, 0, 0, 0
 	 ),
 	 sdl.SDL_FreeSurface
       )
       sdl.SDL_WM_SetCaption( "GUI Demo", nil )
-      gfx.ctx = ctx
-      gfx.surf = surf
    end
 
    function wm:key_pressed()
@@ -430,35 +450,35 @@ do
    local frame = 0 
 
    while wm:update(false) do
-      cr.cairo_save(               ctx )
-      cr.cairo_set_operator(       ctx, cr.CAIRO_OPERATOR_SOURCE )
-      cr.cairo_set_source_rgba(    ctx, 1, 0.75, 0.15, 1 )
-      cr.cairo_paint(              ctx )
-      cr.cairo_restore(            ctx )
+      cairo:save()
+      cairo:set_operator( cr.CAIRO_OPERATOR_SOURCE )
+      cairo:set_source_rgba( 1, 0.75, 0.15, 1 )
+      cairo:paint()
+      cairo:restore()
 
-      cr.cairo_select_font_face(   ctx, "Tahoma", 0, 0 )
-      cr.cairo_set_font_size(      ctx, 16 )
-      cr.cairo_move_to(            ctx, wm.width - 50, wm.height - 16 )
-      cr.cairo_set_source_rgba(    ctx, 1, 1, 1, 1 )
-      cr.cairo_show_text(          ctx, tostring( #lines ))
+      cairo:select_font_face( "Tahoma", 0, 0 )
+      cairo:set_font_size( 16 )
+      cairo:move_to( wm.width - 50, wm.height - 16 )
+      cairo:set_source_rgba( 1, 1, 1, 1 )
+      cairo:show_text( tostring( #lines ))
 
-      cr.cairo_set_line_width(     ctx, 1+math.sqrt(math.max(1,wm.wheel/16)))
+      cairo:set_line_width( 1+math.sqrt(math.max(1,wm.wheel/16)))
 
       local color = 0
       for i=1,#lines do
 	 local point = lines[i]
 	 if i > 1 and lines[i-1].solid then
-	    cr.cairo_line_to(      ctx, point.x, point.y )
+	    cairo:line_to( point.x, point.y )
 	 else
-	    cr.cairo_move_to(      ctx, point.x, point.y )
-	    cr.cairo_stroke(  ctx )
---	    cr.cairo_set_line_width( ctx, random()*3 + math.sqrt(math.max(1,wm.wheel/16)))
+	    cairo:move_to( point.x, point.y )
+	    cairo:stroke()
+--	    cairo:set_line_width( random()*3 + math.sqrt(math.max(1,wm.wheel/16)))
 	    color = color + 1
 	    local color = colors[ color % #colors + 1 ]
-	    cr.cairo_set_source_rgba( ctx, color[1], color[2], color[3], color[4] )
+	    cairo:set_source_rgba( color[1], color[2], color[3], color[4] )
 	 end
       end
-      cr.cairo_stroke(  ctx )
+      cairo:stroke()
 
       if wm.mb[1] then
 	 local dx = lines[ #lines ].x - wm.mx
@@ -475,7 +495,7 @@ do
 	 colors = make_colors()
       end
 
-      cr.cairo_set_line_width( ctx, 0.5 )
+      cairo:set_line_width( 0.5 )
 
       local bw, bh = 128 + 16 + frame,32 + frame
       local cols, rows = floor(wm.width / bw) + 1, floor(wm.height / bh) + 1
@@ -485,24 +505,24 @@ do
 	 local x, y = col * bw, row * bh + 50
 	 local inset = 10
 	 local method = (i % 4 + 1) --random(1,4)
-	 cr.cairo_set_source_rgba(    ctx, 1, 1, 1, 1 )
+	 cairo:set_source_rgba( 1, 1, 1, 1 )
 
-	 cr.cairo_new_path( gfx.ctx )
+	 cairo:new_path()
 	 gfx["round_rect_"..string.char(32+64+method)](gfx, x+inset, y+inset, bw-inset, bh-inset, bh / 3 )
-	 cr.cairo_close_path( gfx.ctx )
+	 cairo:close_path()
 	 local a, b, c, d = random(#colors), random(#colors),random(#colors),random(#colors)
 	 if i ~= os.time() % (cols*rows) then
-	    cr.cairo_set_source_rgba( ctx, 1, 1, 1, 1 )
+	    cairo:set_source_rgba( 1, 1, 1, 1 )
 	 else
-	    cr.cairo_set_source_rgba( ctx, 0.25, 0.5, 1, 1 )
+	    cairo:set_source_rgba( 0.25, 0.5, 1, 1 )
 	 end
 
-	 cr.cairo_fill_preserve(   ctx  )
-	 cr.cairo_set_source_rgba( ctx, 0, 0, 0, 1 )
-	 cr.cairo_stroke(          ctx  )
-	 cr.cairo_move_to(         ctx, x + 22, y + bh * 0.8 )
-	 cr.cairo_set_font_size(   ctx, bh * 0.5 )
-	 cr.cairo_show_text(       ctx, "Aa" )
+	 cairo:fill_preserve()
+	 cairo:set_source_rgba( 0, 0, 0, 1 )
+	 cairo:stroke()
+	 cairo:move_to( x + 22, y + bh * 0.8 )
+	 cairo:set_font_size( bh * 0.5 )
+	 cairo:show_text( "Aa" )
       end
 
       local current = items.current - 1
