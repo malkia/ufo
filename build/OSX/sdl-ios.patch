@@ -1,0 +1,256 @@
+Hi Brian, 
+Actually you dont need to do that  
+Here's the patch which implements such kind of events - I did them because 
+I needed them for iOS, but they are generic enough to be used on any other 
+systems. 
+The patch implements a new call: 
+SDL_SetSystemEventHook(SDL_SystemEventHandler handler) 
+and a new event (SDL_SystemEvent) and 4 event types: 
+SDL_SYSEVENT_TERMINATE - system wants to terminate app 
+SDL_SYSEVENT_SUSPEND - system wants to suspend app 
+SDL_SYSEVENT_RESUME - system wants to resume app 
+SDL_SYSEVENT_LOWMEMORY - low memory warning 
+
+Other events can be easily added there. 
+
+At the beginning of your program you need to call SDL_SetSystemEventHook() 
+with a pointer to your event handler. 
+The event handler should be programmed like any other SDL event handler 
+ie.: 
+
+switch (event->Type) 
+{ 
+case SDL_SYSEVENT_RESUME: 
+// do your stuff here 
+break; 
+case SDL_SYSEVENT_SUSPEND: 
+// do your stuff here 
+break; 
+} 
+
+
+The patch also modifies app delegates in SDL_uikitappdelegate.m to make 
+use of the hook if it was set up. It also adds 
+applicationDidReceiveMemoryWarning impementation, calling the hook. 
+
+regards, 
+Piotr 
+
+diff -r eb0e11b096ab include/SDL_events.h 
+--- a/include/SDL_events.h	Wed Nov 16 05:13:40 2011 -0500 
++++ b/include/SDL_events.h	Mon Nov 28 13:40:24 2011 +0100 
+@@ -107,7 +107,14 @@ 
+
+SDL_CLIPBOARDUPDATE = 0x900, /**< The clipboard changed */ 
+
+- /* Obsolete events */ 
++ /* System events */ 
++ 
++ SDL_SYSEVENT_TERMINATE = 0xa00, 
++ SDL_SYSEVENT_SUSPEND, 
++ SDL_SYSEVENT_RESUME, 
++ SDL_SYSEVENT_LOWMEMORY, 
++ 
++	/* Obsolete events */ 
+SDL_EVENT_COMPAT1 = 0x7000, /**< SDL 1.2 events for compatibility */ 
+SDL_EVENT_COMPAT2, 
+SDL_EVENT_COMPAT3, 
+@@ -280,7 +287,7 @@ 
+
+
+/** 
+- * \brief Touch finger motion/finger event structure (event.tfinger.*) 
++ * \brief Touch finger motion/finger event structure (event.tmotion.*) 
+*/ 
+typedef struct SDL_TouchFingerEvent 
+{ 
+@@ -302,7 +309,7 @@ 
+
+
+/** 
+- * \brief Touch finger motion/finger event structure (event.tbutton.*) 
++ * \brief Touch finger motion/finger event structure (event.tmotion.*) 
+*/ 
+typedef struct SDL_TouchButtonEvent 
+{ 
+@@ -357,6 +364,15 @@ 
+Uint32 type; /**< ::SDL_QUIT */ 
+} SDL_QuitEvent; 
+
++/** 
++ * \brief System event 
++ */ 
++ 
++typedef struct SDL_SystemEvent 
++{ 
++	Uint32 type; 
++	void *data; 
++} SDL_SystemEvent; 
+
+/** 
+* \brief A user-defined event type (event.user.*) 
+@@ -437,7 +453,7 @@ 
+SDL_TouchButtonEvent tbutton; /**< Touch button event data */ 
+SDL_MultiGestureEvent mgesture; /**< Multi Finger Gesture data */ 
+SDL_DollarGestureEvent dgesture; /**< Multi Finger Gesture data */ 
+- 
++ SDL_SystemEvent sysevent; /**< System event data */ 
+/** Temporarily here for backwards compatibility */ 
+/*@{*/ 
+#ifndef SDL_NO_COMPAT 
+@@ -626,6 +642,16 @@ 
+*/ 
+extern DECLSPEC Uint32 SDLCALL SDL_RegisterEvents(int numevents); 
+
++/** 
++ * Set system event hook 
++ * 
++ */ 
++typedef int (SDLCALL * SDL_SystemEventHandler) (SDL_Event* event); 
++ 
++extern DECLSPEC void SDLCALL 
+SDL_SetSystemEventHook(SDL_SystemEventHandler handler); 
++ 
++ 
++ 
+/* Ends C function definitions when using C++ */ 
+#ifdef __cplusplus 
+/* *INDENT-OFF* */ 
+diff -r eb0e11b096ab src/events/SDL_events.c 
+--- a/src/events/SDL_events.c	Wed Nov 16 05:13:40 2011 -0500 
++++ b/src/events/SDL_events.c	Mon Nov 28 13:40:24 2011 +0100 
+@@ -36,6 +36,7 @@ 
+/* Public data -- the event filter */ 
+SDL_EventFilter SDL_EventOK = NULL; 
+void *SDL_EventOKParam; 
++SDL_SystemEventHandler SDL_SysEventHandler = NULL; 
+
+typedef struct SDL_EventWatcher { 
+SDL_EventFilter callback; 
+@@ -528,4 +529,13 @@ 
+return (posted); 
+} 
+
++void 
++SDL_SetSystemEventHook(SDL_SystemEventHandler handler) 
++{ 
++	if (handler) 
++	{ 
++	 SDL_SysEventHandler=handler; 
++	} 
++} 
++ 
+/* vi: set ts=4 sw=4 expandtab: */ 
+diff -r eb0e11b096ab src/events/SDL_events_c.h 
+--- a/src/events/SDL_events_c.h	Wed Nov 16 05:13:40 2011 -0500 
++++ b/src/events/SDL_events_c.h	Mon Nov 28 13:40:24 2011 +0100 
+@@ -44,4 +44,7 @@ 
+extern SDL_EventFilter SDL_EventOK; 
+extern void *SDL_EventOKParam; 
+
++/* The system event hook function */ 
++extern SDL_SystemEventHandler SDL_SysEventHandler; 
++ 
+/* vi: set ts=4 sw=4 expandtab: */ 
+diff -r eb0e11b096ab src/video/uikit/SDL_uikitappdelegate.m 
+--- a/src/video/uikit/SDL_uikitappdelegate.m	Wed Nov 16 05:13:40 2011 
+-0500 
++++ b/src/video/uikit/SDL_uikitappdelegate.m	Mon Nov 28 13:40:24 2011 
++0100 
+@@ -123,7 +123,12 @@ 
+
+- (void)applicationWillTerminate:(UIApplication *)application 
+{ 
+- SDL_SendQuit(); 
++	SDL_Event event; 
++	event.type=SDL_SYSEVENT_TERMINATE; 
++	event.sysevent.data=NULL; 
++ if (SDL_SysEventHandler) 
++	 SDL_SysEventHandler(&event); 
++	else SDL_SendQuit(); 
+/* hack to prevent automatic termination. See SDL_uikitevents.m for 
+details */ 
+longjmp(*(jump_env()), 1); 
+} 
+@@ -131,35 +136,58 @@ 
+- (void) applicationWillResignActive:(UIApplication*)application 
+{ 
+//NSLog(@"%@", NSStringFromSelector(_cmd)); 
++	SDL_Event event; 
++	event.type=SDL_SYSEVENT_SUSPEND; 
++	event.sysevent.data=NULL; 
++ if (SDL_SysEventHandler) 
++	 SDL_SysEventHandler(&event); 
++	else { 
++ // Send every window on every screen a MINIMIZED event. 
++	 SDL_VideoDevice *_this = SDL_GetVideoDevice(); 
++	 if (!_this) { 
++	 return; 
++	 } 
+
+- // Send every window on every screen a MINIMIZED event. 
+- SDL_VideoDevice *_this = SDL_GetVideoDevice(); 
+- if (!_this) { 
+- return; 
+- } 
+- 
+- SDL_Window *window; 
+- for (window = _this->windows; window != nil; window = window->next) { 
+- SDL_SendWindowEvent(window, SDL_WINDOWEVENT_MINIMIZED, 0, 0); 
+- } 
++	 SDL_Window *window; 
++	 for	(window = _this->windows; window != nil; window = 
+window->next) { 
++	 SDL_SendWindowEvent(window, 
+SDL_WINDOWEVENT_MINIMIZED, 0, 0); 
++	 } 
++	} 
+} 
+
+- (void) applicationDidBecomeActive:(UIApplication*)application 
+{ 
+//NSLog(@"%@", NSStringFromSelector(_cmd)); 
+
+- // Send every window on every screen a RESTORED event. 
+- SDL_VideoDevice *_this = SDL_GetVideoDevice(); 
+- if (!_this) { 
+- return; 
+- } 
++	SDL_Event event; 
++	event.type=SDL_SYSEVENT_RESUME; 
++	event.sysevent.data=NULL; 
++ if (SDL_SysEventHandler) 
++	 SDL_SysEventHandler(&event); 
++	else { 
++	 // Send every window on every screen a RESTORED event. 
++	 SDL_VideoDevice *_this = SDL_GetVideoDevice(); 
++	 if (!_this) { 
++	 return; 
++	 } 
+
+- SDL_Window *window; 
+- for (window = _this->windows; window != nil; window = window->next) { 
+- SDL_SendWindowEvent(window, SDL_WINDOWEVENT_RESTORED, 0, 0); 
+- } 
++	 SDL_Window *window; 
++	 for (window = _this->windows; window != nil; window = 
+window->next) { 
++	 SDL_SendWindowEvent(window, 
+SDL_WINDOWEVENT_RESTORED, 0, 0); 
++	 } 
++	} 
+} 
+
++- (void)applicationDidReceiveMemoryWarning:(UIApplication*)application 
++{ 
++ //NSLog(@"%@", NSStringFromSelector(_cmd)); 
++	
++	SDL_Event event; 
++	event.type=SDL_SYSEVENT_LOWMEMORY; 
++	event.sysevent.data=NULL; 
++ if (SDL_SysEventHandler) 
++	 SDL_SysEventHandler(&event); 
++} 
+@end 
+
+#endif /* SDL_VIDEO_DRIVER_UIKIT */ 
