@@ -1,7 +1,7 @@
 ----------------------------------------------------------------------------
 -- LuaJIT x86/x64 disassembler module.
 --
--- Copyright (C) 2005-2011 Mike Pall. All rights reserved.
+-- Copyright (C) 2005-2012 Mike Pall. All rights reserved.
 -- Released under the MIT license. See Copyright Notice in luajit.h
 ----------------------------------------------------------------------------
 -- This is a helper module used by the LuaJIT machine code dumper module.
@@ -403,7 +403,7 @@ local function putop(ctx, text, operands)
     local sym = ctx.symtab[imm]
     if sym then text = text.."\t->"..sym end
   end
-  ctx.out(format((ctx.x64 and "%016x" or "%08x").."  %s%s\n", ctx.addr+ctx.start, hex, text))
+  ctx.out(format("%08x  %s%s\n", ctx.addr+ctx.start, hex, text))
   ctx.mrm = false
   ctx.start = pos
   ctx.imm = nil
