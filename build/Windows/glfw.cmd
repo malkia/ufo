@@ -15,7 +15,7 @@ set FILES=^
   win32_dllmain.c win32_fullscreen.c win32_gamma.c win32_init.c win32_input.c^
   win32_joystick.c win32_opengl.c win32_time.c win32_window.c window.c
 
-cl %LB_CL_OPTS% -Fe%NAME%.dll -LD -DGLFW_BUILD_DLL=1 %FILES%^
+cl %LB_CL_OPTS% -Fe%NAME%.dll -LD -D_GLFW_BUILD_DLL=1 %FILES%^
    /link"%LB_LINK_OPTS% user32.lib opengl32.lib gdi32.lib winmm.lib"
 
 call %~dp0/wdk/install %NAME%.dll

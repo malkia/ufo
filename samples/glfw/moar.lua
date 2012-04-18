@@ -65,7 +65,7 @@ local function unbind_font( font )
 end
 
 local function build_text( font, lines, top, bottom )
-   local fixed = false
+   local fixed = true
    local lines = type(lines)=="string" and { lines } or lines
    local top = top or 1
    local bottom = bottom or #lines
@@ -78,7 +78,9 @@ local function build_text( font, lines, top, bottom )
 
    local chars = 0
    for y = top, bottom do
-      chars = chars + #lines[ y ] 
+      local lines = lines[y]
+      local n_lines = #lines
+      chars = chars + n_lines
    end
 
    local v = ffi.new( "float[?]", chars * 12 )
@@ -173,7 +175,7 @@ local function read_text_file(n)
    return lines
 end
 
-local source = read_text_file( ... or (arg and arg[1]) or "ffi/OpenGL.lua" )
+local source = read_text_file( ... or (arg and arg[1]) or "e:/p/ufo/ffi/OpenGL.lua" )
 
 local state = {
    lines = {},
@@ -183,7 +185,6 @@ local state = {
 
 local function main()
    assert( glfw.glfwInit() )
-
 
    local desktop_mode = ffi.new( "GLFWvidmode[1]" )
    glfw.glfwGetDesktopMode( desktop_mode )
@@ -201,15 +202,16 @@ local function main()
    glfw.glfwSetWindowPos( window, (desktop_width - width)/2, (desktop_height - height)/2 )
    glfw.glfwSwapInterval( 0 ) -- 0=nosync 1=60fps
 
-   local font = bind_font( fonts[4] )
-   local font2 = bind_font( fonts[1] )
+   local font2 = bind_font( fonts[4] )
+   local font = bind_font( fonts[3] )
 
    local mx, my = ffi.new( "int[1]" ), ffi.new( "int[1]" ) -- mouse x, y 
    local ww, wh = ffi.new( "int[1]" ), ffi.new( "int[1]" ) -- window width, height
-   local sx, sy = ffi.new( "int[1]" ), ffi.new( "int[1]" ) -- mouse scroll x, y 
+   local sx, sy = ffi.new( "double[1]" ), ffi.new( "double[1]" ) -- mouse scroll x, y 
    local px, py, pdx, pdy = 0, 0, 0, 0
    local s1 = 10
    local s2 = 100
+   local dc
 
    while glfw.glfwIsWindow(window) and glfw.glfwGetKey(window, glfw.GLFW_KEY_ESCAPE) ~= glfw.GLFW_PRESS do
       glfw.glfwGetWindowSize(window, ww, wh)
@@ -285,8 +287,10 @@ local function main()
       glfw.glfwPollEvents()
    end
    glfw.glfwTerminate()
-
-   print( "Verts: ", dc.n_verts )
+   
+   if dc then
+      print( "Verts: ", dc.n_verts )
+   end
 end
 
 main()

@@ -14,6 +14,9 @@ Some of the bindings included are:
 To fire up quickly a sample, please do:
    ./luajit samples/intro.lua  (uses SDL)
 
+To create a world-map .pdf, .svg and .png using cairo
+   ./luajit samples/cairo/world-map.lua
+   
 Some more:
    ./luajit samples/glfw/moar.lua (uses OpenGL, glu, GLFW)
    ./luajit samples/AntTweakBar/simple.lua (AntTweakBar, others)

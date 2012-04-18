@@ -22,7 +22,7 @@ if "%LB_TARGET_ARCH%"=="x64" set AS=ml64
 set NAME=z
 
 nmake -f win32/Makefile.msc^
-      CC="cl -I. %LB_CL_OPTS%"^
+      CC="cl -I. %LB_CL_OPTS% -Dvsnprintf=_vsnprintf"^
       SHAREDLIB="%NAME%.dll"^
       OBJA="%OBJA%"^
       AS="%AS%"^

@@ -14,6 +14,7 @@ organized per operating system ($OS), then architecture ($ARCH), like this:
 		- Linux   (i386, x864_64, armv7l. Tested with 11.04 (x86), and Ubuntu 10.10 (arvm7l - efika mx))
 		- Android (arm) - Compiler right now using android-ndk-r6 for Android 2.2 (platform-8)
 		- webOS   HP TouchPad for now
+		- bbx     BlackBerry PlayBook
 		
 	Architecutures:
 		- x86     (i386)

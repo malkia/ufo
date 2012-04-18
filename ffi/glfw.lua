@@ -1,21 +1,19 @@
 local ffi  = require( "ffi" )
 
 local libs = ffi_glfw_libs or {
-   OSX     = { x86 = "bin/OSX/glfw.dylib", x64 = "bin/OSX/glfw.dylib" },
+   OSX     = { x86 = "bin/OSX/glfw.dylib",       x64 = "bin/OSX/glfw.dylib" },
    Windows = { x86 = "bin/Windows/x86/glfw.dll", x64 = "bin/Windows/x64/glfw.dll" },
-   Linux   = { x86 = "bin/Linux/x86/libglfw.so",  x64 = "bin/Linux/x64/libglfw.so", arm = "bin/Linux/arm/libglfw.so"  },
-   BSD     = { x86 = "bin/glfw32.so",  x64 = "bin/glfw64.so"  },
-   POSIX   = { x86 = "bin/glfw32.so",  x64 = "bin/glfw64.so"  },
-   Other   = { x86 = "bin/glfw32.so",  x64 = "bin/glfw64.so"  },
+   Linux   = { x86 = "bin/Linux/x86/libglfw.so", x64 = "bin/Linux/x64/libglfw.so",
+	       arm = "bin/Linux/arm/libglfw.so"  },
+   BSD     = { x86 = "bin/glfw32.so", x64 = "bin/glfw64.so" },
+   POSIX   = { x86 = "bin/glfw32.so", x64 = "bin/glfw64.so" },
+   Other   = { x86 = "bin/glfw32.so", x64 = "bin/glfw64.so" },
 }
 
 local lib  = ffi_glfw_lib or libs[ ffi.os ][ ffi.arch ]
-
-local glfw = ffi.load( (... and "" or "../") .. lib )
+local glfw = ffi.load( lib )
 
 ffi.cdef[[
-      typedef struct GLFWwindow* GLFWwindow;
-
       enum {
 	 GLFW_VERSION_MAJOR         =  3,
 	 GLFW_VERSION_MINOR         =  0,
@@ -72,8 +70,9 @@ ffi.cdef[[
 	 GLFW_KEY_BACKSLASH         = 92,
 	 GLFW_KEY_RIGHT_BRACKET     = 93, 
 	 GLFW_KEY_GRAVE_ACCENT      = 96,
-	 GLFW_KEY_WORLD_1           = 161,
+         GLFW_KEY_WORLD_1           = 161,
 	 GLFW_KEY_WORLD_2           = 162,
+
 	 GLFW_KEY_ESCAPE            = 256,
 	 GLFW_KEY_ENTER             = 257,
 	 GLFW_KEY_TAB               = 258,
@@ -146,6 +145,21 @@ ffi.cdef[[
 	 GLFW_KEY_MENU              = 348,
 	 GLFW_KEY_LAST              = GLFW_KEY_MENU,
 
+         GLFW_KEY_ESC               = GLFW_KEY_ESCAPE,
+         GLFW_KEY_DEL               = GLFW_KEY_DELETE,
+         GLFW_KEY_PAGEUP            = GLFW_KEY_PAGE_UP,
+         GLFW_KEY_PAGEDOWN          = GLFW_KEY_PAGE_DOWN,
+         GLFW_KEY_KP_NUM_LOCK       = GLFW_KEY_NUM_LOCK,
+         GLFW_KEY_LCTRL             = GLFW_KEY_LEFT_CONTROL,
+         GLFW_KEY_LSHIFT            = GLFW_KEY_LEFT_SHIFT,
+         GLFW_KEY_LALT              = GLFW_KEY_LEFT_ALT,
+         GLFW_KEY_LSUPER            = GLFW_KEY_LEFT_SUPER,
+         GLFW_KEY_RCTRL             = GLFW_KEY_RIGHT_CONTROL,
+         GLFW_KEY_RSHIFT            = GLFW_KEY_RIGHT_SHIFT,
+         GLFW_KEY_RALT              = GLFW_KEY_RIGHT_ALT,
+         GLFW_KEY_RSUPER            = GLFW_KEY_RIGHT_SUPER,
+
+
 	 GLFW_MOUSE_BUTTON_1        = 0,
 	 GLFW_MOUSE_BUTTON_2        = 1,
 	 GLFW_MOUSE_BUTTON_3        = 2,
@@ -154,6 +168,7 @@ ffi.cdef[[
 	 GLFW_MOUSE_BUTTON_6        = 5,
 	 GLFW_MOUSE_BUTTON_7        = 6,
 	 GLFW_MOUSE_BUTTON_8        = 7,
+
 	 GLFW_MOUSE_BUTTON_LAST     = GLFW_MOUSE_BUTTON_8,
 	 GLFW_MOUSE_BUTTON_LEFT     = GLFW_MOUSE_BUTTON_1,
 	 GLFW_MOUSE_BUTTON_RIGHT    = GLFW_MOUSE_BUTTON_2,
@@ -179,10 +194,12 @@ ffi.cdef[[
 
 	 GLFW_WINDOWED              = 0x00010001,
 	 GLFW_FULLSCREEN            = 0x00010002,
+
 	 GLFW_ACTIVE                = 0x00020001,
 	 GLFW_ICONIFIED             = 0x00020002,
 	 GLFW_ACCELERATED           = 0x00020003,
          GLFW_OPENGL_REVISION       = 0x00020004,
+
 	 GLFW_RED_BITS              = 0x00021000,
 	 GLFW_GREEN_BITS            = 0x00021001,
 	 GLFW_BLUE_BITS             = 0x00021002,
@@ -256,6 +273,8 @@ ffi.cdef[[
 	 unsigned short blue[GLFW_GAMMA_RAMP_SIZE];
       } GLFWgammaramp;
 
+      typedef struct GLFWwindow* GLFWwindow;
+
       typedef void  (* GLFWerrorfun)(         int, const char* );
       typedef void  (* GLFWwindowsizefun)(    GLFWwindow, int, int );
       typedef int   (* GLFWwindowclosefun)(   GLFWwindow);
@@ -264,7 +283,7 @@ ffi.cdef[[
       typedef void  (* GLFWwindowiconifyfun)( GLFWwindow, int );
       typedef void  (* GLFWmousebuttonfun)(   GLFWwindow, int, int );
       typedef void  (* GLFWmouseposfun)(      GLFWwindow, int, int );
-      typedef void  (* GLFWscrollfun)(        GLFWwindow, int, int );
+      typedef void  (* GLFWscrollfun)(        GLFWwindow, double, double );
       typedef void  (* GLFWkeyfun)(           GLFWwindow, int, int );
       typedef void  (* GLFWcharfun)(          GLFWwindow, int );
 
@@ -313,7 +332,8 @@ ffi.cdef[[
       int         glfwGetMouseButton(           GLFWwindow, int  button );
       void        glfwGetMousePos(              GLFWwindow, int* x, int* y );
       void        glfwSetMousePos(              GLFWwindow, int  x, int  y );
-      void        glfwGetScrollOffset(          GLFWwindow, int* x, int* y );
+      void        glfwGetScrollOffset(          GLFWwindow, double* x, double* y );
+
       void        glfwSetKeyCallback(           GLFWkeyfun         cbfun );
       void        glfwSetCharCallback(          GLFWcharfun        cbfun );
       void        glfwSetMouseButtonCallback(   GLFWmousebuttonfun cbfun );
@@ -323,6 +343,9 @@ ffi.cdef[[
       int         glfwGetJoystickParam(         int joy, int param );
       int         glfwGetJoystickPos(           int joy, float* pos, int numaxes );
       int         glfwGetJoystickButtons(       int joy, unsigned char* buttons, int numbuttons );
+
+      void        glfwSetClipboardString(       GLFWwindow, const char* );
+      const char* glfwGetClipboardString(       GLFWwindow  );
 
       double      glfwGetTime(                  );
       void        glfwSetTime(                  double time );

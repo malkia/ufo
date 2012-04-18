@@ -2,6 +2,7 @@
 call %~dp0/wdk/setup %~n0 %*
 pushd %LB_PROJECT_ROOT%\%LB_PROJECT_NAME%
 git clean -fdx
+rem git checkout pixman-0.25.2
 setlocal
 
 if "%LB_TARGET_BITS%"=="32" set CUTSYMPOS=12

@@ -11,7 +11,7 @@ echo echo ....... Custom cl.cmd [%%*] >> %~dp0/bin/cl.cmd
 echo set PDB= >> %~dp0/bin/cl.cmd
 echo if exist buildvm.exe set PDB=/Fdlua51.pdb >> %~dp0/bin/cl.cmd
 echo if exist lua51.dll set PDB=/Fdluajit.pdb >> %~dp0/bin/cl.cmd
-echo cl.exe %LB_CL_OPTS% /D_MSC_VER=1399 /DLUAJIT_ENABLE_LUA52COMPAT=1 %%* %%PDB%% >> %~dp0/bin/cl.cmd
+echo cl.exe %LB_CL_OPTS% /D_MSC_VER=1399 /DLUAJIT_ENABLE_LUA52COMPAT=1 /DLUA_API_CHECK=1 /DLUA_USE_ASSERT=1 %%* %%PDB%% >> %~dp0/bin/cl.cmd
 
 rem LOL! /SWAPRUN:NET,CD makes Symantec AntiVir go crazy :)
 
