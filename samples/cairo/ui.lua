@@ -1,6 +1,5 @@
 local ffi = require( "ffi" )
 local sdl = require( "ffi/sdl" )
-local cr  = require( "ffi/cairo" )
 local wm  = require( "lib/wm/sdl" )
 local random, floor, pi = math.random, math.floor, math.pi
 
@@ -11,30 +10,53 @@ local gfx = {}
 local ui = {}
 
 local function gencode()
-   local functions = {
+   local constructors = {
+      "image_surface_create",
+      "create",
+   }
+   local context_functions = {
       "move_to", "line_to", "curve_to", "rel_move_to", "rel_line_to", "rel_curve_to",
       "arc", "new_path", "rectangle", "close_path", "set_source_rgb", "set_source_rgba",
       "fill_preserve", "stroke_preserve", "stroke", "set_line_width", "show_text", "clip",
       "reset_clip", "text_extents", "save", "restore", "set_font_size", "set_operator",
-      "paint", "select_font_face",
+      "paint", "select_font_face", "surface_destroy", "destroy"
    }
-   local c = {}
-   c[#c+1] = "return {\n"
-   for _,n in ipairs(functions) do
-      c[#c+1]=n.."=function(self,...)return self.library.cairo_" .. n .. "(self.context,...)end,\n"
+   local surface_functions = {
+   }
+   local c = { "return {\n" }
+   for _,n in ipairs(constructors) do
+      assert( c[#c+1] == nil )
+      c[#c+1]='["'..n..'"]=function(self,...)return self.library.cairo_' .. n .. "(...)end,\n"
+   end
+   for _,n in ipairs(context_functions) do
+      assert( c[#c+1] == nil )
+      c[#c+1]='["'..n..'"]=function(self,...)return self.library.cairo_' .. n .. "(self.context,...)end,\n"
+   end
+   for _,n in ipairs(surface_functions) do
+      assert( c[#c+1] == nil )
+      c[#c+1]='["'..n..'"]=function(self,...)return self.library.cairo_' .. n .. "(self.surface,...)end,\n"
    end
    c[#c+1] = "}\n"
    return table.concat(c)
 end
 
+local function fillconstants(m)
+   local constants = {
+      "FORMAT_RGB24", "OPERATOR_SOURCE",
+   }
+   for _,n in ipairs(constants) do
+      assert( m[n] == nil )
+      m[n] = m.library["CAIRO_" .. n]
+   end
+end
+
 --print(gencode())
 
 local cairo = loadstring(gencode())()
-cairo.library = cr
+cairo.library = require( "ffi/cairo" )
+fillconstants(cairo)
 cairo.context = {}
 cairo.surface = {}
-
---for k,v in pairs(cairo) do print(k,v) end
 
 -- From the cairo cookbook
 -- http://cairographics.org/cookbook/roundedrectangles/
@@ -113,23 +135,24 @@ end
 
 function gfx:round_rect_c(x, y, w, h, r)
    local r = r or 5
-   cairo:move_to(  x  +r, y                                )                  
-   cairo:line_to(  x+w-r, y                                )                
-   cairo:curve_to( x+w,   y,    x+w, y,   x+w,   y     + r ) 
-   cairo:line_to(  x+w,   y+h-r                            )           
-   cairo:curve_to( x+w,   y+h,  x+w, y+h, x+w-r, y + h     )
-   cairo:line_to(  x  +r, y+h                              )                   
-   cairo:curve_to( x,     y+h,  x,   y+h, x,     y + h - r )      
-   cairo:line_to(  x,     y  +r                            )                     
-   cairo:curve_to( x,     y,    x,   y,   x  +r, y         )            
+   cairo:move_to(  x  +r, y                            )                  
+   cairo:line_to(  x+w-r, y                            )                
+   cairo:curve_to( x+w,   y,    x+w, y,   x+w,   y  +r ) 
+   cairo:line_to(  x+w,   y+h-r                        )           
+   cairo:curve_to( x+w,   y+h,  x+w, y+h, x+w-r, y+h   )
+   cairo:line_to(  x  +r, y+h                          )                   
+   cairo:curve_to( x,     y+h,  x,   y+h, x,     y+h-r )      
+   cairo:line_to(  x,     y  +r                        )                     
+   cairo:curve_to( x,     y,    x,   y,   x  +r, y     )            
 end
 
 function gfx:round_rect_d(x, y, w, h, r)
    local r, half_pi = r or 5, pi * 0.5
-   cairo:arc( x     + r, y     + r, r, 2*half_pi, 3*half_pi )
-   cairo:arc( x + w - r, y     + r, r, 3*half_pi, 4*half_pi )
-   cairo:arc( x + w - r, y + h - r, r, 0*half_pi, 1*half_pi )
-   cairo:arc( x     + r, y + h - r, r, 1*half_pi, 2*half_pi )
+   cairo:new_path()
+   cairo:arc( x  +r, y  +r, r, 2*half_pi, 3*half_pi )
+   cairo:arc( x+w-r, y  +r, r, 3*half_pi, 4*half_pi )
+   cairo:arc( x+w-r, y+h-r, r, 0*half_pi, 1*half_pi )
+   cairo:arc( x  +r, y+h-r, r, 1*half_pi, 2*half_pi )
 end
 
 local function take_string( table_or_string, table_key )
@@ -173,9 +196,7 @@ function gfx:list_box(items, x, y, w, h)
    items.top, items.bottom = top, bottom
 
    -- Make the rectangle path
-   cairo:new_path()
    cairo:rectangle( x, y, w, h )
-   cairo:close_path()
 
    -- Fill it first, but preserve the path
    cairo:set_source_rgb( 1, 1, 1 ) -- listbox background color
@@ -192,12 +213,11 @@ function gfx:list_box(items, x, y, w, h)
       local y = y + (i - top) * eh
       local current = (i == current)
       if current then
-	 cairo:new_path()
 	 cairo:move_to(      x,  y )
 	 cairo:rel_line_to(  w,  0 )
 	 cairo:rel_line_to(  0, eh )
 	 cairo:rel_line_to( -w,  0 )
-	 cairo:close_path()
+
 	 -- background
 	 cairo:set_source_rgb( 0, 0, 1 )
 	 cairo:fill_preserve()
@@ -236,9 +256,7 @@ function gfx:main_menu(items, x, y, w, h)
    end
 
    -- Make the rectangle path
-   cairo:new_path()
    cairo:rectangle( x, y, width, height + vgap*2 )
-   cairo:close_path()
 
    -- Fill it first, but preserve the path
    cairo:set_source_rgb( 1, 1, 1 ) -- listbox background color
@@ -260,12 +278,11 @@ function gfx:main_menu(items, x, y, w, h)
       if current then
 	 if items.opened then
 	 else
-	    cairo:new_path()
 	    cairo:move_to( cx-hgap,  y )
 	    cairo:rel_line_to(  iw,  0 )
 	    cairo:rel_line_to(   0,  height + vgap*2 )
 	    cairo:rel_line_to( -iw,  0 )
-	    cairo:close_path()
+
 	    -- background
 	    cairo:set_source_rgb( 0, 0, 1 )
 	    cairo:fill_preserve()
@@ -415,23 +432,23 @@ local key2cmd = {
 }
 
 do
-   local sdl_surf
+   local sdl_surface
 
    function wm:resized()
-      local format = cr.CAIRO_FORMAT_RGB24
+      local format = cairo.FORMAT_RGB24
       cairo.surface = ffi.gc(
-	 cr.cairo_image_surface_create( format, self.width, self.height ),
-	 cr.cairo_surface_destroy 
+	 cairo:image_surface_create( format, self.width, self.height ),
+	 cairo.library.cairo_surface_destroy 
       )
       cairo.context = ffi.gc(
-	 cr.cairo_create( cairo.surface ),
-	 cr.cairo_destroy
+	 cairo:create( cairo.surface ),
+	 cairo.library.cairo_destroy
       )
-      sdl_surf = ffi.gc(
+      sdl_surface = ffi.gc(
 	 sdl.SDL_CreateRGBSurfaceFrom(
-	    cr.cairo_image_surface_get_data( cairo.surface ),
+	    cairo.library.cairo_image_surface_get_data( cairo.surface ),
 	    self.width, self.height, 32,
-	    cr.cairo_format_stride_for_width( format, self.width ),
+	    cairo.library.cairo_format_stride_for_width( format, self.width ),
 	    0, 0, 0, 0
 	 ),
 	 sdl.SDL_FreeSurface
@@ -451,7 +468,7 @@ do
 
    while wm:update(false) do
       cairo:save()
-      cairo:set_operator( cr.CAIRO_OPERATOR_SOURCE )
+      cairo:set_operator( cairo.OPERATOR_SOURCE )
       cairo:set_source_rgba( 1, 0.75, 0.15, 1 )
       cairo:paint()
       cairo:restore()
@@ -507,9 +524,8 @@ do
 	 local method = (i % 4 + 1) --random(1,4)
 	 cairo:set_source_rgba( 1, 1, 1, 1 )
 
-	 cairo:new_path()
 	 gfx["round_rect_"..string.char(32+64+method)](gfx, x+inset, y+inset, bw-inset, bh-inset, bh / 3 )
-	 cairo:close_path()
+
 	 local a, b, c, d = random(#colors), random(#colors),random(#colors),random(#colors)
 	 if i ~= os.time() % (cols*rows) then
 	    cairo:set_source_rgba( 1, 1, 1, 1 )
@@ -538,7 +554,7 @@ do
       gfx:list_box( items, 170, wm.height/2-25, 175, 300 )
       gfx:main_menu( main_menu, 0, 0, wm.width, 100 )
       
-      sdl.SDL_UpperBlit( sdl_surf, nil, wm.window, nil )
+      sdl.SDL_UpperBlit( sdl_surface, nil, wm.window, nil )
    end
 end
 
