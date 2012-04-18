@@ -304,7 +304,11 @@ function gfx:main_menu(items, x, y, w, h)
       local item = take_string( items[i] )
       cairo:show_text( item )
       if current and opened then
-	 local items = items[i][2]
+	 local items = items[i]
+	 if type(items)=="function" then
+	    items = items()
+	 end
+	 local items = items[2]
 	 if items then
 	    cairo:save()
 	    cairo:reset_clip()
@@ -340,34 +344,119 @@ local items = {
    current = 2,
 }
 
-local main_menu =
-{
-   {
-      "File",
-      {
-	 "Visit New File | C-x C-f",
-	 "Open File..." 
+-- Table is a magic construct :)
+-- The menu would be defined in it
+-- All "array" elements define order of display
+-- All "dictionary" elements define actions
+
+local edit_menu = { 
+   "Edit", { 
+      "Undo", { 
+	 "Cut" 
       },
-   },
-   { 
-      "Edit",
-      { 
-	 "Undo",
-	 { "Cut" },
-	 "Paste",
-	 { 
-	    "Paste from Kill Menu",
-	    { 
-	       "Clip1",
-	       "Clip2",
-	       "Clip3" 
-	    },
+      "Paste", { 
+	 "Paste from Kill Menu", { 
+	    "Clip1",
+	    "Clip2",
+	    "Clip3" 
 	 },
       },
    },
+}
+
+local edit_menu2 = { 
+   "Edit", { 
+      "Undo2", { 
+	 "Cut2" 
+      },
+      "Paste2", { 
+	 "Paste2 from Kill Menu", { 
+	    "Clip4",
+	    "Clip5",
+	    "Clip6" 
+	 },
+      },
+   },
+}
+
+local which_edit_menu
+
+local test_menu = {
+   "(Apple)", {
+      "About This Mac", function() end,
+      "Software Update...", function() end,
+      "App Store...", function() end,
+      "", {},
+   },
+   "File", {
+      
+   },
+   "Edit", {
+   },
+   "Options", {
+      "Line Wrapping", {
+      },
+      { true, "Smart Word Spacing in Text Modes" },
+      "", {},
+      ""
+   },
+}
+
+--[[
+  lua types: 
+    nil, boolean, number, string, function, userdata, thread, and table
+  First item
+    if function, then eval it, and put result back here
+    if string then that's the textual contents
+    if number
+    if boolean
+  Second item
+
+  First item -- Visual representation
+    nil      -> ? bad idea to rely on it
+    boolean  -> ? Maybe way to display checked menu items?
+    number   -> ? 
+    string   -> The text of the item
+    function -> Evals the function, then feedback the result back to "First item"
+    userdata -> ?
+    thread   -> Like function, but actually resumes the thread coroutine, and expects value to be yielded back to "First item"
+    table    -> Special cases - like Check boxed item, or image item, builtin-slider, etc... Maybe widget or whole OO style widgets
+    cdata    -> ?
+
+  Second item -- Action to be taken
+    nil      -> ? bad idea to rely on it
+    boolean  -> ? Maybe not active, or disabled or it could be a way to specify checked menu items
+    number   -> This can keep some kind of number identifier - like 513
+    string   -> This can keep some kind of string identifier - like "ID_MENU_ITEM_BLAH123"
+    function -> Action to be taken when pressed
+    userdata -> ?
+    thread   -> Like function, but actually resumes the thread coroutine with the action. Could be the only way to implement interactive dialogs in the menu, like in OSX Help ->Search
+    table    -> Sub-items are listed here
+    cdata    -> ?
+--]]
+
+-- Menu is defined in pairs of 2
+-- First item is the textual representation
+--       If it's a string, then it's the text itself
+--       If it's a function, then the function returns the representation
+--       If it's a table, number, userdata, etc. - undefined for now
+-- Second item is either menu expansion or function
+--       If it's a table, then it's an expansion
+--       Otherwise if it's a function then it acts on it's value.
+
+local main_menu = {
+   {
+      "File", {
+	 { "Visit New File | C-x C-f" },
+	 { "Open File...", "Test" },
+      },
+   },
+   function()
+      which_edit_menu = not(which_edit_menu)
+      return which_edit_menu and edit_menu or edit_menu2
+   end,
    { 
-      "Options",
-      {
+      "Options", {
 	 "Line Wrapping",
 	 "Smart Word Spacing",
 	 "-------------",
@@ -376,19 +465,18 @@ local main_menu =
 	 "----"
       },
    },
-   { "Buffers",
-     { 
-	{ name1 = "One" },
-	{ name = "Two" },
-	{ label = "Treeh" }
-     },
-  },
+   { 
+      "Buffers", { 
+	 { name1 = "One" },
+	 { name = "Two" },
+	 { label = "Treeh" }
+      },
+   },
    { "Tools" },
    { "Lua" },
    { 
-      "Help",
-      {
-	 "Search [|   ]",
+      "Help", {
+	 function() return "Search [|   ]" end,
 	 "Help on Word",
 	 "Documentation",
 	 "About",
@@ -401,7 +489,7 @@ local main_menu =
 	 function() return os.date( "%d %b %Y" ) end,
       }
    },
-   current = 2,
+   current = 3,
 }
 
 local function make_colors(n)
