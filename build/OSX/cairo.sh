@@ -17,7 +17,6 @@ export png_CFLAGS="-I$absdir/../../../libpng"
 
 export gl_LIBS=" -framework OpenGL "
 export gl_CFLAGS="-I$absdir/include "
-# -framework OpenGL"
 
 CONFIGURATION="\
     --enable-static=no \
@@ -47,7 +46,7 @@ CONFIGURATION="\
 pushd $SRCDIR
 git clean -fdx
 NOCONFIGURE=1 ./autogen.sh
-./configure CPP="cpp" CC="cc -mmacosx-version-min=10.5 -arch i386" $CONFIGURATION
+./configure CPP="cpp" CC="clang -mmacosx-version-min=10.5 -arch i386" $CONFIGURATION
 echo .PHONY: all > perf/Makefile
 echo .PHONY: all > perf/micro/Makefile
 echo .PHONY: all > test/Makefile

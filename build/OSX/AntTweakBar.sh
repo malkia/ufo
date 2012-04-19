@@ -1,10 +1,11 @@
 ANT_TWEAK_BAR=../../../AntTweakBar
-GCC="gcc -mmacosx-version-min=10.5"
+CXXCFG=-O1
+GCC="clang -mmacosx-version-min=10.5"
 echo ANT_TWEAK_BAR=$ANT_TWEAK_BAR GCC=$GCC
 
 pushd $ANT_TWEAK_BAR/src
 make -f Makefile.osx clean
-make -j -f Makefile.osx CXX="$GCC" LINK="$GCC"
+make -j -f Makefile.osx CXXCFG="$CXXCFG" CXX="$GCC" LINK="$GCC"
 popd
 
 mv $ANT_TWEAK_BAR/lib/libAntTweakBar.dylib ../../bin/OSX/AntTweakBar.dylib

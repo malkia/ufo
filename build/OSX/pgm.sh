@@ -7,7 +7,7 @@ DEPO=../../../openpgm/pgm
 pushd $DEPO
 . $absdir/../bin/clean-svn
 ./bootstrap.sh
-./configure CFLAGS="-arch i386 -arch x86_64 -mmacosx-version-min=10.5 -D__APPLE_USE_RFC_3542=1" --disable-dependency-tracking
+./configure CC=clang CXX=clang CFLAGS="-arch i386 -arch x86_64 -mmacosx-version-min=10.5 -D__APPLE_USE_RFC_3542=1" --disable-dependency-tracking
 make -j
 
 #git log -1 >> .libs/libpgm-5.2.0.dylib

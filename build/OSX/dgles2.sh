@@ -8,8 +8,8 @@ pushd dgles2
 ./configure --disable-X11 --ARCH=i386
 ./configure --disable-X11 --ARCH=x86_64
 
-make ARCH=i386 CC="gcc -arch i386 -mmacosx-version-min=10.5"
-make ARCH=x86_64 CC="gcc -arch x86_64 -mmacosx-version-min=10.5"
+make ARCH=i386 CC="clang -arch i386 -mmacosx-version-min=10.5"
+make ARCH=x86_64 CC="clang -arch x86_64 -mmacosx-version-min=10.5"
 
 lipo -create -output egl.dylib   `find objs-i386/libEGL\.[0-9]*\.[0-9]*\.[0-9]*\.dylib`    `find objs-x86_64/libEGL\.[0-9]*\.[0-9]*\.[0-9]*\.dylib`
 lipo -create -output gles2.dylib `find objs-i386/libGLESv2\.[0-9]*\.[0-9]*\.[0-9]*\.dylib` `find objs-x86_64/libGLESv2\.[0-9]*\.[0-9]*\.[0-9]*\.dylib`

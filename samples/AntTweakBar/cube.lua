@@ -91,6 +91,7 @@ local function main()
 
    width, height = nil, nil
    local int1, int2 = ffi.new( "int[1]" ), ffi.new( "int[1]" )
+   local dbl1, dbl2 = ffi.new( "double[1]" ), ffi.new( "double[1]" )
    while glfw.glfwIsWindow(window) 
    and   glfw.glfwGetKey(window, glfw.GLFW_KEY_ESCAPE) ~= glfw.GLFW_PRESS 
    do
@@ -138,8 +139,8 @@ local function main()
 	       tw.TwMouseButton( b.new_state, tw.TW_MOUSE_LEFT + i - 1 )
 	    end
 	 end
-	 glfw.glfwGetScrollOffset( window, int1, int2 )
-	 mouse.wheel = mouse.wheel + int2[0]
+	 glfw.glfwGetScrollOffset( window, dbl1, dbl2 )
+	 mouse.wheel = mouse.wheel + dbl2[0]
 	 tw.TwMouseWheel( mouse.wheel )
 	 tw.TwMouseMotion( mouse.x, mouse.y )
 	 tw.TwDraw()

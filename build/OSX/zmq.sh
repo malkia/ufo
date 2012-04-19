@@ -23,8 +23,8 @@ git clean -fdx
 #exit
 
 FLAGS="-arch i386 -arch x86_64 -mmacosx-version-min=10.5"
-CXX="g++ $FLAGS"
-CC="gcc $FLAGS"
+CXX="clang $FLAGS"
+CC="clang $FLAGS"
 #make clean
 ./autogen.sh
 export OpenPGM_CFLAGS=-I../../openpgm/pgm/include
