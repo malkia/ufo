@@ -175,7 +175,7 @@ local function read_text_file(n)
    return lines
 end
 
-local source = read_text_file( ... or (arg and arg[1]) or "e:/p/ufo/ffi/OpenGL.lua" )
+local source = read_text_file( ... or (arg and arg[1]) or "ffi/OpenGL.lua" )
 
 local state = {
    lines = {},
