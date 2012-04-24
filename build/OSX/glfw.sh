@@ -7,6 +7,8 @@ git clean -fdx
 
 mkdir build
 pushd build
+# http://stackoverflow.com/questions/1440456/static-libraries-in-version-cross-compiled-program/7835983#7835983
+export MACOSX_DEPLOYMENT_TARGET=10.5
 cmake -D CMAKE_OSX_DEPLOYMENT_TARGET=10.5 -D CMAKE_OSX_ARCHITECTURES="i386;x86_64" -D BUILD_SHARED_LIBS=ON -D CMAKE_C_COMPILER=clang -D CMAKE_OSX_SYSROOT="`xcode-select -print-path`/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.6.sdk" ../
 make -j VERBOSE=1
 popd
