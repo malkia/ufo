@@ -4,6 +4,19 @@ local curves = {}
 local min, max, pi, sin, cos, pow, sqrt = math.min, math.max, math.pi, math.sin, math.cos, math.pow, math.sqrt
 local two_over_pi = 2 / pi
 
+local function punch( amplitude, value )
+   local s = 9
+   if value == 0 then
+      return 0
+   end
+   if value == 1 then
+      return 0
+   end
+   local period = 0.3
+   s = period / (2 * pi) * math.asin(0)
+   return amplitude * pow(2, -10 * value) * sin((value * 1 - s) * (2 * pi) / period)
+end
+	
 function curves.linear( from, to, value )
    return (1 - value) * from + value * to
 end
@@ -117,17 +130,15 @@ function curves.easeInExpo( from, to, value )
 end
 
 function curves.easeOutExpo( from, to, value )
-   return (from - to) * (pow(2, -10 * value) + 1) + from;
+   return (to - from) * (1 - (pow(2, -10 * value))) + from
 end
 
 function curves.easeInOutExpo( from, to, value )
    value = value + value
-   to = to - from
    if value < 1 then
-      return 0.5 * to * pow(2, 10 * (value - 1)) + from
+      return 0.5 * (to-from) * pow(2, 10 * (value - 1)) + from
    end
-   value = value - 1
-   return -0.5 * to * (pow(2, -10 * value) + 2) + from
+   return 0.5 * (to-from) * (2 - pow(2, 10 * (1 - value))) + from
 end
 
 function curves.easeInCirc( from, to, value )
@@ -158,7 +169,7 @@ function curves.easeOutBounce(from, to, value)
    if value < (1 / 2.75) then
       return to * (7.5625 * value * value) + from;
    end
-   if value < (2 / 2.75) then
+   if value < (1.5 / 2.75) then
       value = value - (1.5 / 2.75)
       return to * (7.5625 * value * value + 0.75) + from
    end
@@ -174,42 +185,19 @@ function curves.easeInOutBounce( from, to, value )
    if value < 0.5 then
       return curves.easeInBounce( 0, to-from, value + value ) * 0.5 + from
    end
-   return curves.easeOutBounce( 0, to-from, value + value - 0.5) * 0.5 + to*0.5 + from
+   return curves.easeOutBounce( 0, to-from, value + value - 0.5) * 0.5 + (to-from)*0.5 + from
 end
 
-if true then
-   local c = ".:"
-   local w, h = 64, 16
-   for k,v in pairs(curves) do
-      print()
-      print(k)
-      for y=h-1, 0, -1 do
-	 local l = {}
-	 for x=0, w-1 do
-	    local v = v(0, 1, x / w) * h
-	    l[#l+1] = v > y and 'x' or ' '
-	 end
-	 print(table.concat(l))
-      end
-   end
+function curves.easeInBack( from, to, value )
+   return (to-from) * value * value * (1.70158 * value + value - 1.70158) + from
+end
+
+function curves.easeOutBack( from, to, value )
+   value = value - 1
+   return (to-from) * (value * value * (1.70158 * value + value + 1.70158) + 1) + from
 end
 
 --[[
-
-	function curves.easeInBack(from, to, value){
-		to -= from;
-		value /= 1;
-		s = 1.70158f;
-		return to * (value) * value * ((s + 1) * value - s) + from;
-	}
-
-	function curves.easeOutBack(from, to, value){
-		s = 1.70158f;
-		to -= from;
-		value = (value / 1) - 1;
-		return to * ((value) * value * ((s + 1) * value + s) + 1) + from;
-	}
-
 	function curves.easeInOutBack(from, to, value){
 		s = 1.70158f;
 		to -= from;
@@ -313,3 +301,31 @@ end
 	
 --]]
 
+
+
+if true then
+   local c = ".:"
+   local w, h = 64, 32
+   for k,v in pairs(curves) do
+      print()
+      print(k)
+      for y=h-1, 0, -1 do
+	 local l = {}
+	 for x=0, w-1 do
+	    local v = v(0, 1, x / w) * h
+	    if v - 1 > y then
+	       l[#l+1] = '='
+	    elseif v - 0.5 > y then 
+	       l[#l+1] = "'"
+	    elseif v > y then 
+	       l[#l+1] = ':'
+	    elseif v + 0.5 > y then
+	       l[#l+1] = '.'
+	    else
+	       l[#l+1] = '-'
+	    end
+	 end
+	 print(table.concat(l))
+      end
+   end
+end
