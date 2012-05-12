@@ -1,0 +1,18 @@
+diff --git a/src/win32fixes.c b/src/win32fixes.c
+index eb30cf3..0a6c4be 100644
+--- a/src/win32fixes.c
++++ b/src/win32fixes.c
+@@ -472,9 +472,13 @@ static _locale_t clocale = NULL;
+ double wstrtod(const char *nptr, char **eptr) {
+     double d;
+     char *leptr;
++#if 0
+     if (clocale == NULL)
+         clocale = _create_locale(LC_ALL, "C");
+     d = _strtod_l(nptr, &leptr, clocale);
++#else
++    d = (strtod)(nptr, &leptr);
++#endif
+     /* if 0, check if input was inf */
+     if (d == 0 && nptr == leptr) {
+         int neg = 0;
