@@ -2,36 +2,118 @@ local ffi = require( "ffi" )
 local hr = require( "ffi/hiredis" )
 
 if ffi.os == "Windows" then
-   -- klutch
+   -- klutch - we are using MSOpenTech/bksavecow version of redis (2.4.11)
    ffi.cdef( "int w32initWinSock();" );
    assert( hr.w32initWinSock() == 1 );
 end
 
-local c = ffi.gc( hr.redisConnect( "taassetcache", 6379 ), hr.redisFree );
-print('\n CTX',c,'\n ERR',c.err,'\n ERRSTR',ffi.string(c.errstr),
-      '\n FD',c.fd,'\n FLAGS',c.flags,'\n OBUF',c.obuf,'\n READER',c.reader,'\n' )
-assert( c.err == 0, ffi.string( c.errstr ) )
+local c = {}
 
-while true do
+for i=1, 8 do
+   c[i] = ffi.gc( hr.redisConnect( "taAssetCache", 6380 + i ), hr.redisFree );
+   local c = c[i]
+--   print('\n CTX',c,'\n ERR',c.err,'\n ERRSTR',ffi.string(c.errstr),
+--	 '\n FD',c.fd,'\n FLAGS',c.flags,'\n OBUF',c.obuf,'\n READER',c.reader,'\n' )
+   assert( c.err == 0, ffi.string( c.errstr ) )
+end
+
+print()
+
+if false then
    local t1 = os.clock()
    local times = 39000
    for i=1, times do
-      local r = ffi.gc( hr.redisCommand( c, "PING" ), hr.freeReplyObject );
-      assert( r.err == 0 )
-      assert( r.err==0 and ffi.string( r.str ) == "PONG" )
+      for x = 1, 8 do
+	 local c = c[x]
+	 local r = ffi.gc(
+	    hr.redisCommand( c, "DEL k"..tostring(i) ),
+	    hr.freeReplyObject
+	 );
+	 --      print(r.str)
+	 --      assert( ffi.string( r.str ) == "OK" )
+      end
    end
    local t2 = os.clock()
-   print( ' PING', tostring(t2 - t1)..'s / '..tostring(times).. ' = ' .. string.format( "%.7f", 1000*(t2-t1) / times ) .. " ms average ping-pong time with ffi/gc/etc." )
+   print( ' DEL', tostring(t2 - t1)..'s / '..tostring(times).. ' = ' .. string.format( "%.7f", 1000*(t2-t1) / times ) .. " ms average del-key" )
+end
 
-   if true then 
-      break
+print(c[1])
+
+local r = {}
+
+for i=1, 8 do
+   r[i] = ffi.gc(
+      hr.redisCommand( c[i], "KEYS *" ),
+      hr.freeReplyObject
+   )
+   local r = r[i]
+   print(r.type, r.integer, r.len, r.elements, r.element)
+   --assert(r.type == hr.REDIS_TYPE_ARRAY, "KEYS should return an array")
+end
+
+local t1 = os.clock()
+local times = 0
+local bytes = 0
+for i=1, 8 do
+   print(i)
+   local r = r[i]
+   local c = c[i]
+   local n = r.elements
+   if r.type == hr.REDIS_REPLY_ARRAY then
+      for i=0, n-1 do
+	 local key = ffi.string( r.element[i].str )
+	 local r = ffi.gc(
+	    hr.redisCommand( c, "STRLEN " .. key ),
+	    hr.freeReplyObject
+	 )
+	 local len = tonumber(r.integer)
+	 local t1 = os.clock()
+	 local r = ffi.gc(
+	    hr.redisCommand( c, "GET " .. key ),
+	    hr.freeReplyObject
+	 )
+	 local t2 = os.clock()
+	 print( 'Read ' .. tostring(i+1) .. '/' .. tostring(n) .. ' ' ..
+		key .. ' ' .. tostring( len ) .. ' speed ' .. tostring(len / (1024*1024*(t2 - t1))) .. ' mb/s' )
+	 times = times + 1
+	 bytes = bytes + len
+      end
    end
+end
+local t2 = os.clock()
+
+print( 'Finished retrieving ' .. times .. ' speed ' .. tostring(bytes / (1024*1024*(t2 - t1))) .. ' mb/s ' .. ' total time ' .. (t2 - t1) )
+--   print( ffi.string( r.str ) )
+
+-- print( ffi.string(r.str))
+
+while false do
+   local t1 = os.clock()
+   local times = 39000
+   for i = 1, times do
+      for x = 1, 8 do
+	 local c = c[x]
+	 local r = ffi.gc(
+	    hr.redisCommand( c, "PING" ),
+	    hr.freeReplyObject
+	 )
+	 assert( ffi.string( r.str ) == "PONG" )
+      end
+   end
+   local t2 = os.clock()
+   print( ' PING', tostring(t2 - t1)..'s / '..tostring(times).. ' = ' .. string.format( "%.7f", 1000*(t2-t1) / times ) .. " ms average ping-pong" )
 
    local t1 = os.clock()
    local times = 39000
    for i=1, times do
-      local r = ffi.gc( hr.redisCommand( c, "SET k"..tostring(i).." "..tostring(i) ), hr.freeReplyObject );
-      assert( ffi.string( r.str ) == "OK" )
+      for x = 1, 8 do
+	 local c = c[x]
+	 local r = ffi.gc(
+	    hr.redisCommand( c, "SET k"..tostring(i).." "..tostring(i) ),
+	    hr.freeReplyObject
+	 );
+	 assert( ffi.string( r.str ) == "OK" )
+      end
    end
    local t2 = os.clock()
    print( ' SET', tostring(t2 - t1)..'s / '..tostring(times).. ' = ' .. string.format( "%.7f", 1000*(t2-t1) / times ) .. " ms average set-some-key" )

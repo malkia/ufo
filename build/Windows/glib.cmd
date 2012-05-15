@@ -4,11 +4,6 @@ pushd %LB_PROJECT_ROOT%
 git clean -fdx
 setlocal
 
-if "%LB_TARGET_BITS%"=="32" set CUTSYMPOS=12
-if "%LB_TARGET_BITS%"=="32" set MMX=off
-if "%LB_TARGET_BITS%"=="64" set CUTSYMPOS=11
-if "%LB_TARGET_BITS%"=="64" set MMX=off
-
 for /F "tokens=1,2,3 delims=[](), " %%i in (configure.ac) do if "%%i"=="m4_define" (
     if "%%j"=="glib_major_version" set MAJOR_VERSION=%%k
     if "%%j"=="glib_minor_version" set MINOR_VERSION=%%k
@@ -19,7 +14,6 @@ rem if "%%j"=="glib_binary_age" set BINARY_AGE=%%k
 
 set /A BINARY_AGE=100*%MINOR_VERSION% + %MICRO_VERSION%
 echo GLIB VERSION %MAJOR_VERSION%.%MINOR_VERSION%.%MICRO_VERSION% (%BINARY_AGE%)
-rem goto :EOF
 
 set NAME=%LB_PROJECT_NAME%
 
@@ -37,6 +31,9 @@ for %%i in (glibconfig.h.win32.in glib/glibconfig.h.win32.in glib/glib.rc.in gli
         > %%~dpni
 )
 
+copy config.h.win32 config.h
+copy glibconfig.h.win32 glibconfig.h
+
 echo.>dummy.c
 cl -c dummy.c
 link /lib /out:dummy.lib dummy.obj
@@ -44,13 +41,32 @@ copy dummy.lib intl.lib
 copy dummy.lib glib\pcre\pcre.lib
 copy dummy.lib build\win32\dirent\dirent.lib
 
-echo nmake -f Makefile.msc INTL=".."
-cmd.exe
-
-rem make MMX=%MMX% CC="cl -DPIXMAN_NO_TLS=1 %LB_CL_OPTS%" -f Makefile.win32 CFG=release
-rem echo EXPORTS > %NAME%.def
-rem link /DUMP /NOLOGO /LINKERMEMBER:1 release/%NAME%-1.lib | grep -E " [ 0-9A-Z]{7}[0-9A-Z] [A-Za-z_]+" | cut -b%CUTSYMPOS%- | sort | uniq >> %NAME%.def
-rem link /DEF:%NAME%.def /OUT:%NAME%.dll %LB_LINK_OPTS% release/%NAME%-1.lib
+pushd build\win32\vs10
+echo.>sources.tmp
+(for /f "usebackq tokens=3 delims=>=/ " %%i in (`findstr ClCompile gobject.vcxprojin`) do echo %%i) >> sources.tmp
+(for /f "usebackq tokens=3 delims=>=/ " %%i in (`findstr ClCompile gio.vcxprojin`) do echo %%i) >> sources.tmp
+(for /f "usebackq tokens=3 delims=>=/ " %%i in (`findstr ClCompile glib.vcxprojin`) do echo %%i) >> sources.tmp
+rem (for /f "usebackq tokens=3 delims=>=/ " %%i in (`findstr ClCompile gmodule.vcxproj`) do echo %%i) >> sources.tmp
+cl %LB_CL_OPTS% -Fe%NAME%.dll -LD^
+ -DGLIB_COMPILATION=1^
+ -DDLL_EXPORT=1^
+ -DNDEBUG=1^
+ -I..\..\..^
+ -I..\..\..\glib^
+ -DLINK_SIZE=2^
+ -DPCRE_STATIC=1^
+ -DMAX_NAME_SIZE=32^
+ -DMAX_NAME_COUNT=10000^
+ -DNEWLINE=-1^
+ -DPOSIX_MALLOC_THRESHOLD=10^
+ -DMATCH_LIMIT=10000000^
+ -DLIBDIR=""^
+ -DMATCH_LIMIT_RECURSION=10000000^
+ -DSUPPORT_UCP=1^
+ -DSUPPORT_UTF=1^
+ -DSUPPORT_UTF8=1^
+ @sources.tmp^
+ /link"%LB_LINK_OPTS% kernel32.lib"
 
 rem call %~dp0/wdk/install %NAME%.dll
 rem call %~dp0/wdk/install %NAME%.lib

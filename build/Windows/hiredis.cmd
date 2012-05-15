@@ -1,4 +1,5 @@
 @echo off
+set LB_PROJECT_REPO=redis
 call %~dp0/wdk/setup %~n0 %*
 pushd %LB_PROJECT_ROOT%\deps\hiredis
 git clean -fdx

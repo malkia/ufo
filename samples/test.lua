@@ -6,11 +6,6 @@ local glu  = require( "ffi/glu" )
 local glfw = require( "ffi/glfw" )
 local tw   = require( "ffi/AntTweakBar" )
 
-ffi.cdef[[
-void* wglGetProcAddress(const char*);
-typedef GLuint (*pglCreateShader)(GLenum);
-]]
-
 local function main()
    local desktop_width  = 0
    local desktop_height = 0
@@ -42,12 +37,16 @@ local function main()
       buttons = { {}, {}, {} },
    }
 
-   local fun = ffi.new( "pglCreateShader", gl.wglGetProcAddress( "glCreateShader" ) )
-   gl.glCreateShader = fun
-   print(fun(gl.GL_VERTEX_SHADER))
+   ffi.cdef[[
+       void* wglGetProcAddress(const char*);
+       typedef GLuint (*pglCreateShader)(GLenum);
+   ]]
+   local glCreateShader = ffi.new( "pglCreateShader", gl.wglGetProcAddress( "glCreateShader" ) )
+   print(glCreateShader(gl.GL_VERTEX_SHADER))
 --   print(ffi.C.pglCreateShader)
    
    local int1, int2 = ffi.new( "int[1]" ), ffi.new( "int[1]" )
+   local dbl1, dbl2 = ffi.new( "double[1]" ), ffi.new( "double[1]" )
    while glfw.glfwIsWindow(window) 
    and   glfw.glfwGetKey(window, glfw.GLFW_KEY_ESCAPE) ~= glfw.GLFW_PRESS 
    do
@@ -80,8 +79,8 @@ local function main()
 	       tw.TwMouseButton( b.new_state, tw.TW_MOUSE_LEFT + i - 1 )
 	    end
 	 end
-	 glfw.glfwGetScrollOffset( window, int1, int2 )
-	 mouse.wheel = mouse.wheel + int2[0]
+	 glfw.glfwGetScrollOffset( window, dbl1, dbl2 )
+	 mouse.wheel = mouse.wheel + dbl2[0]
 	 var2data[0] = mouse.wheel
 	 tw.TwMouseWheel(mouse.wheel)
 	 tw.TwMouseMotion(mouse.x, mouse.y)

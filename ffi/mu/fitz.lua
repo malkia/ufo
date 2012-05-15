@@ -368,4 +368,5 @@ ffi.cdef[[
       void             fz_run_page(              fz_document*, fz_page*, fz_device*, fz_matrix t, fz_cookie* );
       void             fz_free_page(             fz_document*, fz_page*  );
       int              fz_meta(                  fz_document*, int key, void* ptr, int size );
+      void             fz_write(                 fz_document*, char* filename, fz_write_options* );
 ]]

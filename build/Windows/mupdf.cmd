@@ -15,6 +15,7 @@ echo ..\apps\mudraw.c >> sources.tmp
 echo ..\apps\mupdfclean.c >> sources.tmp
 echo ..\apps\mupdfextract.c >> sources.tmp
 echo ..\apps\mupdfinfo.c >> sources.tmp
+echo ..\apps\mupdfposter.c >> sources.tmp
 echo ..\apps\mupdfshow.c >> sources.tmp
 echo ..\apps\pdfapp.c >> sources.tmp
 echo ..\apps\win_main.c >> sources.tmp
@@ -29,6 +30,7 @@ cl -c %LB_CL_OPTS% -Fe%NAME%.dll -LD -I..\fitz -I..\thirdparty\jbig2dec -Dvsnpri
     -I"%~dp0\include" -I"%LB_PROJECT_ROOT%\..\freetype2\include" -I"%LB_PROJECT_ROOT%\..\zlib" -I..\pdf -I..\cbz -I..\xps -I..\apps^
     @sources.tmp
 
+rem Does not work yet (but would make it from 5MB -> 1MB)   -DNOCJK=1^
 
 echo EXPORTS>%NAME%.def
 link /LIB /OUT:%NAME%_static.lib *.obj
