@@ -9,8 +9,8 @@ end
 
 local c = {}
 
-for i=1, 8 do
-   c[i] = ffi.gc( hr.redisConnect( "taAssetCache", 6380 + i ), hr.redisFree );
+for i=1, 1 do
+   c[i] = ffi.gc( hr.redisConnect( "10.150.9.9", 6380 + i ), hr.redisFree );
    local c = c[i]
 --   print('\n CTX',c,'\n ERR',c.err,'\n ERRSTR',ffi.string(c.errstr),
 --	 '\n FD',c.fd,'\n FLAGS',c.flags,'\n OBUF',c.obuf,'\n READER',c.reader,'\n' )
@@ -23,7 +23,7 @@ if false then
    local t1 = os.clock()
    local times = 39000
    for i=1, times do
-      for x = 1, 8 do
+      for x = 1, 1 do
 	 local c = c[x]
 	 local r = ffi.gc(
 	    hr.redisCommand( c, "DEL k"..tostring(i) ),
@@ -41,7 +41,7 @@ print(c[1])
 
 local r = {}
 
-for i=1, 8 do
+for i=1, 1 do
    r[i] = ffi.gc(
       hr.redisCommand( c[i], "KEYS *" ),
       hr.freeReplyObject
@@ -51,14 +51,15 @@ for i=1, 8 do
    --assert(r.type == hr.REDIS_TYPE_ARRAY, "KEYS should return an array")
 end
 
-local t1 = os.clock()
-local times = 0
-local bytes = 0
-for i=1, 8 do
-   print(i)
+local files = {
+}
+
+for i=1, 1 do
    local r = r[i]
    local c = c[i]
    local n = r.elements
+   files[i] = {}
+   local files = files[i]
    if r.type == hr.REDIS_REPLY_ARRAY then
       for i=0, n-1 do
 	 local key = ffi.string( r.element[i].str )
@@ -66,23 +67,50 @@ for i=1, 8 do
 	    hr.redisCommand( c, "STRLEN " .. key ),
 	    hr.freeReplyObject
 	 )
-	 local len = tonumber(r.integer)
-	 local t1 = os.clock()
-	 local r = ffi.gc(
-	    hr.redisCommand( c, "GET " .. key ),
-	    hr.freeReplyObject
-	 )
-	 local t2 = os.clock()
-	 print( 'Read ' .. tostring(i+1) .. '/' .. tostring(n) .. ' ' ..
-		key .. ' ' .. tostring( len ) .. ' speed ' .. tostring(len / (1024*1024*(t2 - t1))) .. ' mb/s' )
-	 times = times + 1
-	 bytes = bytes + len
+	 files[key] = tonumber(r.integer)
       end
+   end
+end
+
+print( 'files', #files, #files[1] )
+
+local t1 = os.clock()
+local times = 0
+local bytes = 0
+for i=1, 8*0+1 do
+   local s = ""
+   local max = 1
+   local more = max
+   for key,len in pairs(files[i]) do
+      if false then
+	 if more > 0 then
+	    s = s .. " " .. key
+	    more = more - 1
+	 else
+	    local r = hr.redisCommand( c[i], "MGET " .. s )
+	    --	 for i=0, r.elements-1 do
+	    --	    hr.freeReplyObject( r.element[i] )
+	    --	 end
+	    hr.freeReplyObject( r )
+	    --	 print( s )
+	    more = max
+	    s = ""
+	    --	 break
+	 end
+      else
+--	 print(key)
+	 local r = hr.redisCommand( c[i], "GET " .. key )
+	 hr.freeReplyObject( r )
+      end
+--      print( 'Read ' .. key .. ' ' .. tostring( len ) .. ' speed ' .. 
+--	     tostring(len / (1024*1024*(t2 - t1))) .. ' mb/s' )
+      bytes = bytes + len
+      times = times + 1
    end
 end
 local t2 = os.clock()
 
-print( 'Finished retrieving ' .. times .. ' speed ' .. tostring(bytes / (1024*1024*(t2 - t1))) .. ' mb/s ' .. ' total time ' .. (t2 - t1) )
+print( 'Finished retrieving ' .. times .. ' files, ' .. bytes .. ' bytes, speed ' .. tostring(bytes / (1024*1024*(t2 - t1))) .. ' mb/s, total time ' .. (t2 - t1) )
 --   print( ffi.string( r.str ) )
 
 -- print( ffi.string(r.str))

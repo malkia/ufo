@@ -6,18 +6,18 @@ struct XML_ParserStruct;
 typedef struct XML_ParserStruct *XML_Parser;
 
 enum {
-   XML_MAJOR_VERSION = 2,
-   XML_MINOR_VERSION = 0,
-   XML_MICRO_VERSION = 1
+  XML_MAJOR_VERSION = 2,
+  XML_MINOR_VERSION = 0,
+  XML_MICRO_VERSION = 1
 };
 
-typedef enum {
+typedef enum XML_Status {
   XML_STATUS_ERROR     = 0,
   XML_STATUS_OK        = 1,
   XML_STATUS_SUSPENDED = 2,
 } XML_Status;
 
-typedef enum {
+typedef enum XML_Error {
   XML_ERROR_NONE,
   XML_ERROR_NO_MEMORY,
   XML_ERROR_SYNTAX,
@@ -61,7 +61,7 @@ typedef enum {
   XML_ERROR_RESERVED_NAMESPACE_URI
 } XML_Error;
 
-typedef enum {
+typedef enum XML_Content_Type {
   XML_CTYPE_EMPTY = 1,
   XML_CTYPE_ANY,
   XML_CTYPE_MIXED,
@@ -70,21 +70,21 @@ typedef enum {
   XML_CTYPE_SEQ
 } XML_Content_Type;
 
-typedef enum {
+typedef enum XML_Content_Quant {
   XML_CQUANT_NONE,
   XML_CQUANT_OPT,
   XML_CQUANT_REP,
   XML_CQUANT_PLUS
 } XML_Content_Quant;
 
-typedef enum {
+typedef enum XML_Parsing{
   XML_INITIALIZED,
   XML_PARSING,
   XML_FINISHED,
   XML_SUSPENDED
 } XML_Parsing;
 
-typedef enum {
+typedef enum XML_FeatureEnum {
   XML_FEATURE_END,
   XML_FEATURE_UNICODE,
   XML_FEATURE_UNICODE_WCHAR_T,
