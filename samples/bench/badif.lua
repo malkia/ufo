@@ -9,7 +9,7 @@ end
 
 local function timeit(m)
    local t = os.clock()
-   test(0xFFFFFFFF,m)
+   test(0xFFFFFFF,m)
    local t = os.clock() - t
    print(string.format("%08X",m),t)
 end
