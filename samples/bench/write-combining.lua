@@ -3,7 +3,7 @@
 local ffi = require( "ffi" )
 local shl, band = bit.lshift, bit.band
 
-local ITERATIONS = 0x80000000
+local ITERATIONS = 0x8000000
 local ITEMS      = shl( 1, 24 )
 local MASK       = ITEMS - 1
 
@@ -42,18 +42,46 @@ local function runCaseTwo()
    local i = ITERATIONS - 1
    while i ~= 0 do
       local slot = band( i, MASK )
-      arrays[0][slot] = slot
-      arrays[1][slot] = slot
-      arrays[2][slot] = slot
+      arrays[3][slot] = slot
+      arrays[4][slot] = slot
+      arrays[5][slot] = slot
       i = i - 1
    end
    return nanoTime() - start
 end
 
+local function runCaseThree()
+   local start = nanoTime()
+   local i = ITERATIONS - 1
+   while i ~= 0 do
+      local slot = band( i, MASK )
+      arrays[0][slot] = slot
+      arrays[1][slot] = slot
+      i = i - 1
+   end
+   local i = ITERATIONS - 1
+   while i ~= 0 do
+      local slot = band( i, MASK )
+      arrays[2][slot] = slot
+      arrays[3][slot] = slot
+      i = i - 1
+   end
+   local i = ITERATIONS - 1
+   while i ~= 0 do
+      local slot = band( i, MASK )
+      arrays[4][slot] = slot
+      arrays[5][slot] = slot
+      i = i - 1
+   end
+   return nanoTime() - start
+end
+
+
 local function main()
    for i = 1, 3 do
       print( i .. " SingleLoop duration (s) = " .. runCaseOne() )
       print( i .. " SplitLoop  duration (s) = " .. runCaseTwo() )
+      print( i .. " Threesplit duration (s) = " .. runCaseThree() )
    end
    local result = arrays[0][1] + arrays[0][2] + arrays[0][3] + arrays[0][4] + arrays[0][5] + arrays[0][6]
    assert( result == 1 + 2 + 3 + 4 + 5 + 6 )
