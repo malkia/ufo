@@ -1,7 +1,7 @@
 LUAJIT=../../../luajit
-DEVDIR=/Developer/Platforms
-IOSVER=iPhoneOS5.0.sdk
-SIMVER=iPhoneSimulator5.0.sdk
+DEVDIR=`xcode-select -print-path`/Platforms
+IOSVER=iPhoneOS5.1.sdk
+SIMVER=iPhoneSimulator5.1.sdk
 IOSDIR=$DEVDIR/iPhoneOS.platform/Developer
 SIMDIR=$DEVDIR/iPhoneSimulator.platform/Developer
 IOSBIN=$IOSDIR/usr/bin/
