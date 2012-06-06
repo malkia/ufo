@@ -1,0 +1,33 @@
++host+target                      print "There is always host AND target"
+-host -target                     error "This should never happen"
++host                             print "There is always a host. Host is the OS on which you compile"
++target                           print "There is always a target. Target is the OS for which you want to compile. We never take advantage when host==target. We always cross compile"
+
++host.windows                     print "I'm on Windows"
++host.windows +host.osx           print "I'm on Windows or OSX. Note the space there it means 'OR'"				 
++host.osx                         print "I'm on OSX"
++host.linux                       print "I'm on Linux"
++host.osx +host.linux             print "I'm on Linux or OSX. Note the space there it means 'OR'"
+-host.windows-host.osx-host.linux print "I'm on something else than Windows, OSX or Linux. Maybe BSD? Note the concatenation, and no space - it means 'AND'"
+
++host.ios                         print "Yeah.. Wishwul thinking"
++host.ios.cydia                   print "Acutally there!"
++host.cydia                       print "Or just like this?"
++host.android                     print "More likely"
++host.webos                       print "Possible"
++host.bbx                         print "Maybe"
++host.nacl                        print "Interresting thought"
+
++host.x86                         print "Host x86 cpu"
++host.x64                         print "Host x64 cpu"
++host.arm                         print "Host ARM cpu"
+
++target.windows                   print "Compiling for Windows using Microsoft C compiler"
++target.mingw                     print "Compiling for Windows using GCC compiler (mingw)"
++target.mingw+host.windows        print "Compiling for Windows using GCC compiler (mingw) on Windows"
++target.mingw+host.osx            print "Compiling for Windows using GCC compiler (mingw) on OSX (MacPorts has mingw)"
++target.cygwin                    print "Compiling for POSIX running under Windows (cygwin)"
+
++debug print "Compiling with debug info"
++speed print "Compiling for speed"
++space print "Compiling for space"
