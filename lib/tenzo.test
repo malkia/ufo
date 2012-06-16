@@ -31,3 +31,4 @@
 +debug print "Compiling with debug info"
 +speed print "Compiling for speed"
 +space print "Compiling for space"
+

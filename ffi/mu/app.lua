@@ -1,3 +1,4 @@
+ffi.cdef[[
 typedef struct pdfapp pdfapp;
 
 enum {
@@ -48,6 +49,7 @@ typedef struct pdfapp {
 	fz_text_page *page_text;
 	fz_text_sheet *page_sheet;
 	fz_link *page_links;
+	int errored;
 
 	/* snapback history */
 	int hist[256];
@@ -102,3 +104,5 @@ void  pdfapp_oncopy(    pdfapp *app, unsigned short *ucsbuf, int ucslen);
 void  pdfapp_onresize(  pdfapp *app, int w, int h);
 void  pdfapp_invert(    pdfapp *app, fz_bbox rect);
 void  pdfapp_inverthit( pdfapp *app);
+]]
+

@@ -121,7 +121,13 @@ del "%~dp0\..\bin\cl.cmd" "%~dp0\..\bin\link.cmd" 1>nul 2>nul
 
 if "%LB_LINK_SWAPRUN%"=="" set LB_LINK_SWAPRUN=-SWAPRUN:NET,CD
 if "%LB_CL_OPTS%"==""      set LB_CL_OPTS=/nologo -MD -GF -GL -Oy -O1 -Oi -GS- -Z7 -MP -Qfast_transcendentals -Fd%LB_PROJECT_NAME%.pdb %LB_CL_ARCH_SSE2% -wd4005 -D_STL70_=1 -D_STATIC_CPPLIB=1
-if "%LB_LINK_OPTS%"==""    set LB_LINK_OPTS=-NOLOGO -LTCG -DEBUG -OPT:REF -OPT:ICF=9999 -DYNAMICBASE:NO -DLL -LTCG -MACHINE:%LB_TARGET_ARCH% %LB_LINK_SWAPRUN% -PDB:%LB_PROJECT_NAME%.pdb -NXCOMPAT:NO %LB_OBJS% ntstc_msvcrt.lib
+if "%LB_LINK_OPTS%"==""    set LB_LINK_OPTS=-NOLOGO -LTCG -DEBUG -OPT:REF -OPT:ICF=9999 -DYNAMICBASE:NO -DLL -LTCG -MACHINE:%LB_TARGET_ARCH% %LB_LINK_SWAPRUN% -PDB:%LB_PROJECT_NAME%.pdb -PDBSTRIPPED:%LB_PROJECT_NAME%_stripped.pdb -NXCOMPAT:NO %LB_OBJS% ntstc_msvcrt.lib
+
+rem luajit's msvcbuild relies on CPU
+rem 
+echo CPU: [%PROCESSOR_ARCHITECTURE%]
+if "%LB_TARGET_CPU%"=="i386"  set CPU=X86
+if "%LB_TARGET_CPU%"=="amd64" set CPU=AMD64
 
 goto :EOF
 

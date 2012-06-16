@@ -6,7 +6,7 @@ local dotkey = {}
 -- Example: local t = { one = { two = 12 } }
 --          print( dotkey.get( t, "one.two" ) ) -- prints 12
 function dotkey.get(t, key)
-   local b, s, p = string.byte, string.sub, 1
+   local b,s,p = string.byte,string.sub,1
    for i=1, key:len()+1 do
       local c = b(key, i)
       if c==nil or c==46 then
@@ -14,8 +14,10 @@ function dotkey.get(t, key)
             error( "DOTKEY: Invalid character '" .. string.char(c) .. "' (" .. c ..
 		   ") found in key '"  .. tostring(key) .. "' at position: " .. p)
          end
-	 -- Don't shortcut here. Check the whole key for errors!
-         t,p = type(t)~="table" and nil or t[s(key, p, i-1)],i+1
+	 if type(t)=="table" then
+	    t = t[s(key, p, i-1)]
+	 end
+	 p = i + 1
       end
    end
    return t
