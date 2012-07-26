@@ -1,37 +1,11 @@
-diff --git a/examples/glfw.h b/examples/glfw.h
-index e669872..4a2526f 100755
---- a/examples/glfw.h
-+++ b/examples/glfw.h
-@@ -130,8 +130,8 @@ extern "C" {
- 
-  // We are building a Win32 DLL
-  #define GLFWAPI      __declspec(dllexport)
-- #define GLFWAPIENTRY __stdcall
-- #define GLFWCALL     __stdcall
-+ #define GLFWAPIENTRY //__stdcall
-+ #define GLFWCALL     //__stdcall
- 
- #elif defined(_WIN32) && defined(GLFW_DLL)
- 
-@@ -141,8 +141,8 @@ extern "C" {
-  #else
-   #define GLFWAPI      __declspec(dllimport)
-  #endif
-- #define GLFWAPIENTRY __stdcall
-- #define GLFWCALL     __stdcall
-+ #define GLFWAPIENTRY //__stdcall
-+ #define GLFWCALL     //__stdcall
- 
- #else
- 
 diff --git a/include/AntTweakBar.h b/include/AntTweakBar.h
-index 41bb77c..b255eb1 100755
+index ca2ed24..aed08e0 100755
 --- a/include/AntTweakBar.h
 +++ b/include/AntTweakBar.h
 @@ -43,7 +43,7 @@
  // ----------------------------------------------------------------------------
  
- #if defined(_WIN32) || defined(_WIN64)
+ #if (defined(_WIN32) || defined(_WIN64)) && !defined(TW_STATIC)
 -#   define TW_CALL          __stdcall
 +#   define TW_CALL          //__stdcall
  #   define TW_CDECL_CALL    __cdecl
