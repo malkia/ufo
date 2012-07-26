@@ -11,7 +11,7 @@ local lib  = ffi_AntTweakBar_lib or libs[ ffi.os ][ ffi.arch ] or "AntTweakBar"
 local tw   = ffi.load( lib )
 
 ffi.cdef [[
-      enum { TW_VERSION = 114 }
+      enum { TW_VERSION = 115 }
 
       typedef enum ETwType {
 	 TW_TYPE_UNDEF,
@@ -61,10 +61,11 @@ ffi.cdef [[
       } TwParamValueType;
       
       typedef enum ETwGraphAPI {
-	 TW_OPENGL     = 1,
-	 TW_DIRECT3D9  = 2,
-	 TW_DIRECT3D10 = 3,
-	 TW_DIRECT3D11 = 4
+	 TW_OPENGL      = 1,
+	 TW_DIRECT3D9   = 2,
+	 TW_DIRECT3D10  = 3,
+	 TW_DIRECT3D11  = 4,
+         TW_OPENGL_CORE = 5,
       } TwGraphAPI;
       
       typedef enum ETwKeyModifier {
@@ -142,7 +143,7 @@ ffi.cdef [[
       TwBar*      TwGetTopBar(                                     );
       int         TwSetBottomBar(              const TwBar *bar    );
       TwBar*      TwGetBottomBar(                                  );
-      const char* TwGetBarName(                TwBar *bar          );
+      const char* TwGetBarName(                const TwBar *bar    );
       int         TwGetBarCount(                                   );
       TwBar*      TwGetBarByIndex(             int barIndex        );
       TwBar*      TwGetBarByName(              const char *barName );
@@ -190,6 +191,7 @@ ffi.cdef [[
       int         TwEventSpecialGLUT(          int           glutKey, int mouseX, int mouseY );
       int         TwGLUTModifiersFunc(         int (*glutGetModifiersFunc)(void) );
       int         TwEventSFML(                 const void *sfmlEvent, unsigned char sfmlMajorVersion, unsigned char sfmlMinorVersion);
+      int         TwEventX11(                  void *xevent );
 ]]
 
 if ffi.arch == "x64" then
