@@ -18,7 +18,7 @@ cl %LB_CL_OPTS% -Fe%NAME%.dll^
    -DREGAL_DECL_EXPORT^
    -DREGAL_LOG_ALL=0^
    -I..\..\..\src\boost -I..\..\..\include -LD @sources.tmp^
-   /link"%LB_LINK_OPTS% /DEF:..\..\..\src\regal\regal.def"
+   /link"%LB_LINK_OPTS% /DEF:..\..\..\src\regal\regal.def advapi32.lib gdi32.lib user32.lib"
 
 call %~dp0/wdk/install %LB_PROJECT_NAME%.dll
 call %~dp0/wdk/install %LB_PROJECT_NAME%.lib
