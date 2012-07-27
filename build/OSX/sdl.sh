@@ -2,6 +2,7 @@ set -e
 pushd ../../../sdl
 hg purge --all
 hg checkout 6248 --clean
+export SDK_PATH=`xcode-select --print-path`/Platforms/MacOSX.platform/Developer/SDKs
 sed -i .bak "s/10\.[46]/10\.5/g" build-scripts/fatbuild.sh
 build-scripts/fatbuild.sh
 popd
