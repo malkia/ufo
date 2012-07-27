@@ -159,7 +159,6 @@ ffi.cdef[[
          GLFW_KEY_RALT              = GLFW_KEY_RIGHT_ALT,
          GLFW_KEY_RSUPER            = GLFW_KEY_RIGHT_SUPER,
 
-
 	 GLFW_MOUSE_BUTTON_1        = 0,
 	 GLFW_MOUSE_BUTTON_2        = 1,
 	 GLFW_MOUSE_BUTTON_3        = 2,
@@ -357,6 +356,16 @@ ffi.cdef[[
       int         glfwExtensionSupported(       const char* extension );
       void*       glfwGetProcAddress(           const char* procname );
       void        glfwCopyContext(              GLFWwindow src, GLFWwindow dst, unsigned long mask );
+
+      void*       glfwGetWin32Window(           GLFWwindow );
+      void*       glfwGetWGLContext(            GLFWwindow );
+
+      void*       glfwGetCocoaWindow(           GLFWwindow );
+      void*       glfwGetNSGLContext(           GLFWwindow );
+
+      uint32_t*   glfwGetX11Display(            );
+      uint32_t    glfwGetX11Window(             GLFWwindow ); 
+      void*       glfwGetGLXContext(            GLFWwindow );
 ]]
 
 return glfw

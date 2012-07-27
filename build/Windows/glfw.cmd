@@ -13,10 +13,13 @@ set NAME=%LB_PROJECT_NAME%
 set FILES=^
   error.c fullscreen.c gamma.c init.c input.c joystick.c opengl.c time.c^
   win32_dllmain.c win32_fullscreen.c win32_gamma.c win32_init.c win32_input.c^
-  win32_joystick.c win32_opengl.c win32_time.c win32_window.c window.c
+  win32_joystick.c win32_opengl.c win32_time.c win32_window.c window.c win32_native.c
+
+set OPENGL=%LB_ROOT%\bin\Windows\%LB_TARGET_ARCH%\regal.lib
+set OPENGL=opengl32.lib
 
 cl %LB_CL_OPTS% -Fe%NAME%.dll -LD -D_GLFW_BUILD_DLL=1 %FILES%^
-   /link"%LB_LINK_OPTS% user32.lib opengl32.lib gdi32.lib winmm.lib"
+   /link"%LB_LINK_OPTS% user32.lib gdi32.lib winmm.lib %OPENGL%"
 
 call %~dp0/wdk/install %NAME%.dll
 call %~dp0/wdk/install %NAME%.lib
