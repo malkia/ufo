@@ -97,7 +97,7 @@ local sdks = {
       'ProductDir'
    },
    msvc11 = {
-      'HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\VisualStudio\\10.0\\Setup\\VC',
+      'HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\VisualStudio\\11.0\\Setup\\VC',
       'ProductDir'
    },
    dia8 = {
