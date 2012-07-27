@@ -1,1 +1,0 @@
-Remove in begin_code.h / close_code.h the pragma pack(push/pop,4), simply because it's not done consistently for all platforms, so fii/SDL.lua would end up with special cases that cannot be verified easy.

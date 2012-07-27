@@ -16,7 +16,7 @@ set FILES=^
   win32_joystick.c win32_opengl.c win32_time.c win32_window.c window.c win32_native.c
 
 set OPENGL=%LB_ROOT%\bin\Windows\%LB_TARGET_ARCH%\regal.lib
-set OPENGL=opengl32.lib
+rem set OPENGL=opengl32.lib
 
 cl %LB_CL_OPTS% -Fe%NAME%.dll -LD -D_GLFW_BUILD_DLL=1 %FILES%^
    /link"%LB_LINK_OPTS% user32.lib gdi32.lib winmm.lib %OPENGL%"

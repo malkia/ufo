@@ -121,7 +121,7 @@ local function main()
       gl.glColor4ubv( var_cube_color )
       DrawModel( var_wire[0] ~= 0 )
  
-      glfw.glfwGetMousePos(window, int1, int2)
+      glfw.glfwGetCursorPos(window, int1, int2)
       mouse.x, mouse.y = int1[0], int2[0]
       do -- AntTweakBar
 	 for i=1, #mouse.buttons do

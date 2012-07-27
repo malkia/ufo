@@ -161,7 +161,7 @@ local function main()
    do
       local t = glfw.glfwGetTime()
 
-      glfw.glfwGetMousePos(window, mx, my)
+      glfw.glfwGetCursorPos(window, mx, my)
       local mx, my = mx[0], my[0]
 
       glfw.glfwGetWindowSize(window, sw, sh)

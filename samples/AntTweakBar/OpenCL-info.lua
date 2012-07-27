@@ -108,7 +108,7 @@ local function main()
       gl.glMatrixMode( gl.GL_MODELVIEW )
       gl.glLoadIdentity()
  
-      glfw.glfwGetMousePos(window, int1, int2)
+      glfw.glfwGetCursorPos(window, int1, int2)
       mouse.x, mouse.y = int1[0], int2[0]
 
       do -- AntTweakBar

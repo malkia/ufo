@@ -23,7 +23,7 @@ local function update(self)
    glfw.PollEvents()
 
    -- Polling mouse
-   glfw.glfwGetMousePos(window, int1, int2)
+   glfw.glfwGetCursorPos(window, int1, int2)
    local mx, my = int1[0], int2[0]
    if self.mx ~= mx or self.my ~= my then
       self.mx, self.my = mx, my

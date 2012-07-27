@@ -217,7 +217,7 @@ local function main()
       glfw.glfwGetWindowSize(window, ww, wh)
       local ww, wh = ww[0], wh[0]
 
-      glfw.glfwGetMousePos(window, mx, my)
+      glfw.glfwGetCursorPos(window, mx, my)
       local mx, my = mx[0], my[0]
 
       glfw.glfwGetScrollOffset(window, sx, sy)

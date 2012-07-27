@@ -329,8 +329,8 @@ ffi.cdef[[
       void        glfwSetInputMode(             GLFWwindow, int  mode, int value );
       int         glfwGetKey(                   GLFWwindow, int  key );
       int         glfwGetMouseButton(           GLFWwindow, int  button );
-      void        glfwGetMousePos(              GLFWwindow, int* x, int* y );
-      void        glfwSetMousePos(              GLFWwindow, int  x, int  y );
+      void        glfwGetCursorPos(             GLFWwindow, int* x, int* y );
+      void        glfwSetCursorPos(             GLFWwindow, int  x, int  y );
       void        glfwGetScrollOffset(          GLFWwindow, double* x, double* y );
 
       void        glfwSetKeyCallback(           GLFWkeyfun         cbfun );
