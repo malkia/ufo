@@ -17,6 +17,7 @@ cl %LB_CL_OPTS% -Fe%NAME%.dll^
    -DREGAL_SYS_WGL_DECLARE_WGL^
    -DREGAL_DECL_EXPORT^
    -DREGAL_LOG_ALL=0^
+   -DREGAL_TLS_API=1^
    -I..\..\..\src\boost -I..\..\..\include -LD @sources.tmp^
    /link"%LB_LINK_OPTS% /DEF:..\..\..\src\regal\regal.def advapi32.lib gdi32.lib user32.lib"
 
