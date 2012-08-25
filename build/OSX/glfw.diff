@@ -1,13 +1,63 @@
-diff --git a/src/cocoa_window.m b/src/cocoa_window.m
-index fd57040..d00fbbf 100644
---- a/src/cocoa_window.m
-+++ b/src/cocoa_window.m
-@@ -1163,7 +1163,7 @@ void _glfwPlatformSetCursorPos(_GLFWwindow* window, int x, int y)
- {
-     if (window->mode == GLFW_FULLSCREEN)
+diff --git a/src/cocoa_joystick.m b/src/cocoa_joystick.m
+index bf567f8..e20ca97 100644
+--- a/src/cocoa_joystick.m
++++ b/src/cocoa_joystick.m
+@@ -86,7 +86,7 @@ typedef struct
+ static _glfwJoystick _glfwJoysticks[GLFW_JOYSTICK_LAST + 1];
+ 
+ 
+-void getElementsCFArrayHandler(const void* value, void* parameter);
++static void getElementsCFArrayHandler(const void* value, void* parameter);
+ 
+ 
+ //========================================================================
+@@ -610,16 +610,16 @@ int _glfwPlatformGetJoystickButtons(int joy, unsigned char* buttons,
      {
--        CGPoint globalPoint = CGMakePoint(x, y);
-+        CGPoint globalPoint = CGPointMake(x, y);
-         CGDisplayMoveCursorToPoint(CGMainDisplayID(), globalPoint);
-     }
-     else
+         _glfwJoystickElement* hat = (_glfwJoystickElement*) CFArrayGetValueAtIndex(joystick.hats, i);
+ 
+-        const int value = hat->value;
++        int value = hat->value;
+         if (value < 0 || value > 8)
+             value = 8;
+ 
+         for (j = 0;  j < 4 && button < numbuttons;  j++)
+         {
+             if (directions[value] & (1 << j))
+-                buttons[button = GLFW_PRESS;
++                buttons[button] = GLFW_PRESS;
+             else
+-                buttons[button = GLFW_RELEASE;
++                buttons[button] = GLFW_RELEASE;
+ 
+             button++;
+         }
+diff --git a/src/fullscreen.c b/src/fullscreen.c
+index 9dab1a5..4d7ed68 100644
+--- a/src/fullscreen.c
++++ b/src/fullscreen.c
+@@ -31,8 +31,9 @@
+ #include "internal.h"
+ 
+ #include <stdlib.h>
++#ifdef _MSC_VER
+ #include <malloc.h>
+-
++#endif
+ 
+ //========================================================================
+ // Lexical comparison function for GLFW video modes, used by qsort
+diff --git a/src/window.c b/src/window.c
+index 1e16974..8037689 100644
+--- a/src/window.c
++++ b/src/window.c
+@@ -32,8 +32,9 @@
+ 
+ #include <string.h>
+ #include <stdlib.h>
++#ifdef _MSC_VER
+ #include <malloc.h>
+-
++#endif
+ 
+ //========================================================================
+ // Return the maxiumum of the specified values
