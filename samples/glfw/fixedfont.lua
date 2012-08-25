@@ -63,10 +63,11 @@ local function main()
    local window_x = ( desktop_width - width ) / 2
    local window_y = ( desktop_height - height ) / 2
 
-   glfw.glfwOpenWindowHint(glfw.GLFW_WINDOW_NO_RESIZE, 1)
-   local window = glfw.glfwOpenWindow( width, height, glfw.GLFW_WINDOWED, "fixedfont", nil )
+   glfw.glfwWindowHint(glfw.GLFW_WINDOW_NO_RESIZE, 1)
+   local window = glfw.glfwCreateWindow( width, height, glfw.GLFW_WINDOWED, "fixedfont", nil )
    assert( window )
 
+   glfw.glfwMakeContextCurrent( window )
    glfw.glfwSetWindowPos( window, window_x, window_y )
    glfw.glfwSwapInterval( 0 );
 
@@ -89,14 +90,13 @@ local function main()
    local GL_POINTS = gl.GL_POINTS
    local glfwSwapBuffers = glfw.glfwSwapBuffers
    local glfwPollEvents = glfw.glfwPollEvents
-   local glfwIsWindow = glfw.glfwIsWindow
    local glfwGetKey = glfw.glfwGetKey
    local GLFW_KEY_ESCAPE = glfw.GLFW_KEY_ESCAPE
    local GLFW_PRESS = glfw.GLFW_PRESS
    
    local curr_time = glfw.glfwGetTime()
    local prev_time = glfw.glfwGetTime()
-   while glfwIsWindow(window) and glfwGetKey(window, GLFW_KEY_ESCAPE) ~= GLFW_PRESS 
+   while  glfw.glfwGetKey( window, glfw.GLFW_KEY_ESCAPE ) ~= glfw.GLFW_PRESS
    do
       prev_time, curr_time = curr_time, glfwGetTime()
       
@@ -111,7 +111,7 @@ local function main()
       glDisableClientState( GL_VERTEX_ARRAY )
       prev_vbo_index, vbo_index = vbo_index, 0 
       
-      glfwSwapBuffers();
+      glfwSwapBuffers(window);
       glfwPollEvents();
    end
    glfw.glfwTerminate();

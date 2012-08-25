@@ -1,11 +1,8 @@
-#!/usr/bin/env luajit
-
 local ffi  = require( "ffi" )
 local glfw = require( "ffi/glfw" )
 local gl   = require( "ffi/OpenGL" )
 local glu  = require( "ffi/glu" )
 local bit  = require( "bit" )
-local bor  = bit.bor
 
 local BOING_DEBUG      = false
 local RADIUS           = 70
@@ -30,11 +27,8 @@ local deg_rot_y_inc    = 2
 local ball_x           = -RADIUS
 local ball_y           = -RADIUS
 local ball_x_inc       = 1
-local ball_y_inc       = 2
+local y_ball_inc       = 2
 local draw_ball_how    = DRAW_BALL
-local t                = 0
-local t_old            = 0
-local dt               = 0
 local sin, cos, PI     = math.sin, math.cos, math.pi
 local atan2, random    = math.atan2, math.random
 
@@ -82,13 +76,7 @@ local function PerspectiveAngle( size, dist )
    return degTheta
 end
 
-
-local function init( )
-   gl.glClearColor( 0.55, 0.55, 0.55, 0 )
-   gl.glShadeModel( gl.GL_FLAT )
-end
-
-local function BounceBall( dt )
+local function BounceBall(dt)
    if ball_x > BOUNCE_WIDTH/2 + WALL_R_OFFSET then
       ball_x_inc    = -0.5 - 0.75 * random()
       deg_rot_y_inc = -deg_rot_y_inc
@@ -184,7 +172,7 @@ local function DrawBoingBallBand( long_lo, long_hi )
    colorToggle = not colorToggle
 end
 
-local function DrawBoingBall( )
+local function DrawBoingBall(dt)
    gl.glPushMatrix()
    gl.glMatrixMode( gl.GL_MODELVIEW )
    gl.glTranslatef( 0, 0, DIST_BALL )
@@ -258,17 +246,17 @@ local function DrawGrid()
    gl.glPopMatrix()
 end
 
-local function display()
-   gl.glClear( bor(gl.GL_COLOR_BUFFER_BIT, gl.GL_DEPTH_BUFFER_BIT) )
+local function display(dt)
+   gl.glClear( gl.GL_COLOR_BUFFER_BIT + gl.GL_DEPTH_BUFFER_BIT )
    gl.glPushMatrix()
    
    drawBallHow = DRAW_BALL_SHADOW
-   DrawBoingBall()
+   DrawBoingBall(dt)
    
    DrawGrid()
    
    drawBallHow = DRAW_BALL
-   DrawBoingBall()
+   DrawBoingBall(dt)
    
    gl.glPopMatrix()
    gl.glFlush()
@@ -290,30 +278,30 @@ end
 
 local function main()
    assert( glfw.glfwInit() )
-   
-   glfw.glfwOpenWindowHint( glfw.GLFW_DEPTH_BITS, 16 )
-   local window = glfw.glfwOpenWindow( 400, 400, glfw.GLFW_WINDOWED, "Boing (classic Amiga demo)", nil )
-   assert( window )
-   
-   glfw.glfwSetInputMode( window, glfw.GLFW_STICKY_KEYS, 1 )
-   glfw.glfwSwapInterval( 1 )
-   glfw.glfwSetTime( 0 )
-   
-   init()
-   
-   while glfw.glfwIsWindow(window) and glfw.glfwGetKey( window, glfw.GLFW_KEY_ESCAPE ) ~= glfw.GLFW_PRESS do
-      local width, height = ffi.new( "int[1]" ), ffi.new( "int[1]" )
-      glfw.glfwGetWindowSize(window, width, height)
-      width, height = width[0], height[0]	
-      reshape( window, width, height )
+   local window = assert(
+      ffi.gc( glfw.glfwCreateWindow( 1024, 768, glfw.GLFW_WINDOWED, "Boing (classic Amiga demo)", nil ),
+	      glfw.glfwDestroyWindow))
+   glfw.glfwMakeContextCurrent( window )
+
+   gl.glClearColor( 0.55, 0.55, 0.55, 0 )
+   gl.glShadeModel( gl.GL_FLAT )
+
+   local ot = glfw.glfwGetTime()
+   local width, height
+   local ffi_w, ffi_h = ffi.new( "int[1]" ), ffi.new( "int[1]" )
+   while glfw.glfwGetKey( window, glfw.GLFW_KEY_ESCAPE ) ~= glfw.GLFW_PRESS
+   do
+      glfw.glfwGetWindowSize(window, ffi_w, ffi_h)
+      if ffi_w[0] ~= width or ffi_h[0] ~= height then
+	 width, height = ffi_w[0], ffi_h[0]
+	 reshape(window, width, height)
+      end
       
-      t = glfw.glfwGetTime()
-      dt = t - t_old
-      t_old = t
+      local nt = glfw.glfwGetTime()
+      display(nt - ot)
+      ot = nt
       
-      display()
-      
-      glfw.glfwSwapBuffers()
+      glfw.glfwSwapBuffers(window)
       glfw.glfwPollEvents()
    end
    glfw.glfwTerminate()

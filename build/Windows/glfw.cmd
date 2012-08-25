@@ -18,7 +18,10 @@ set FILES=^
 set OPENGL=%LB_ROOT%\bin\Windows\%LB_TARGET_ARCH%\regal.lib
 rem set OPENGL=opengl32.lib
 
-cl %LB_CL_OPTS% -Fe%NAME%.dll -LD -D_GLFW_BUILD_DLL=1 %FILES%^
+cl %LB_CL_OPTS% -Fe%NAME%.dll -LD^
+   -D_GLFW_BUILD_DLL=1^
+   -Dvsnprintf=_vsnprintf^
+   %FILES%^
    /link"%LB_LINK_OPTS% user32.lib gdi32.lib winmm.lib %OPENGL%"
 
 call %~dp0/wdk/install %NAME%.dll

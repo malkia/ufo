@@ -1,5 +1,6 @@
 local ffi = require( "ffi" )
 local glfw = require( "ffi/glfw" )
+local cr = require ( "ffi/cairo" )
 assert( glfw.glfwInit() )
 
 local function detect( window)
@@ -16,8 +17,8 @@ local function detect( window)
 end
 
 local win = assert( ffi.gc(
-   glfw.glfwOpenWindow(320,200,glfw.GLFW_WINDOWED, "GLFW Window System Detection", nil),
-   glfw.glfwCloseWindow
+   glfw.glfwCreateWindow(320,200,glfw.GLFW_WINDOWED, "GLFW Window System Detection", nil),
+   glfw.glfwDestroyWindow
 ))
 
 print()
@@ -26,6 +27,15 @@ local t = detect(win)
 for k,v in pairs(t) do
    print(k,v)
 end
+
+local device
+
+if t.Win32Window ~= nil and t.WGLContext ~= nil then
+   -- Windows
+--   device = cr.cairo_wgl_device_create( t.WGLContext );
+end
+
+print( device )
 
 win = nil
 collectgarbage()

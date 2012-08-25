@@ -229,24 +229,22 @@ end
 
 local function main()
    assert( glfw.glfwInit() )
-
-   glfw.glfwOpenWindowHint( glfw.GLFW_DEPTH_BITS, 16 )
-   local window = glfw.glfwOpenWindow( 300, 300, glfw.GLFW_WINDOWED, "Gears", nil )
-   assert( window )
-
-   glfw.glfwSetInputMode( window, glfw.GLFW_KEY_REPEAT, 1 )
-   glfw.glfwSwapInterval( 1 )
+   local window = assert(
+      ffi.gc( glfw.glfwCreateWindow( 1024, 768, glfw.GLFW_WINDOWED, "Gears", nil ),
+	      glfw.glfwDestroyWindow))
+   glfw.glfwMakeContextCurrent(window)
 
    init()
 
    local sw, sh = ffi.new( "int[1]" ), ffi.new( "int[1]" )
-   while glfw.glfwIsWindow(window) do
+   while glfw.glfwGetKey( window, glfw.GLFW_KEY_ESCAPE ) ~= glfw.GLFW_PRESS
+   do
       glfw.glfwGetWindowSize(window, sw, sh)
       local sw, sh = sw[0], sh[0]
       reshape( window, sw, sh )
       draw();
       animate();
-      glfw.glfwSwapBuffers();
+      glfw.glfwSwapBuffers(window);
       glfw.glfwPollEvents();
       if pressed( window, "Z" ) then
 	 if holds( window, "LEFT_SHIFT" ) then

@@ -56,7 +56,7 @@ local function bind_font( font )
    return {
       tid = tid,
       font = font
-   }
+	  }
 end
 
 local function unbind_font( font )
@@ -72,9 +72,9 @@ local function build_text( font, lines, top, bottom )
    
    assert( 1 <= top and top <= bottom and bottom <= #lines,
 	   "top="..tostring(top).." "..
-	   "bottom="..tostring(bottom).." "..
-	"lines="..tostring(#lines)
-	)
+	      "bottom="..tostring(bottom).." "..
+	      "lines="..tostring(#lines)
+	 )
 
    local chars = 0
    for y = top, bottom do
@@ -127,40 +127,40 @@ local function build_text( font, lines, top, bottom )
       verts = v,
       w = w,
       h = h,
-   }
+	  }
 end
 
 local function draw_text( dc, x, y, selection )
-   testGL( gl.glPushClientAttrib(    gl.GL_CLIENT_ALL_ATTRIB_BITS ) )
-   testGL( gl.glPushAttrib(          gl.GL_ALL_ATTRIB_BITS ) )
+   testGL( gl.glPushClientAttrib(   gl.GL_CLIENT_ALL_ATTRIB_BITS ) )
+   testGL( gl.glPushAttrib(         gl.GL_ALL_ATTRIB_BITS ) )
    testGL( gl.glPushMatrix( ) )
-   testGL( gl.glTranslated(       x, y, 0 ) )
-   testGL( gl.glEnable(              gl.GL_BLEND ) )
-   testGL( gl.glBlendFunc(           gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA ) )
-   testGL( gl.glEnable(              gl.GL_TEXTURE_2D ) )
-   testGL( gl.glBindTexture(         gl.GL_TEXTURE_2D, dc.tid ) )
-   testGL( gl.glVertexPointer(    2, gl.GL_FLOAT, 0, dc.verts ) )
-   testGL( gl.glTexCoordPointer(  2, gl.GL_FLOAT, 0, dc.uvs ) )
-   testGL( gl.glEnableClientState(   gl.GL_VERTEX_ARRAY ) )
-   testGL( gl.glEnableClientState(   gl.GL_TEXTURE_COORD_ARRAY ) )
+   testGL( gl.glTranslated(      x, y, 0 ) )
+   testGL( gl.glEnable(             gl.GL_BLEND ) )
+   testGL( gl.glBlendFunc(          gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA ) )
+   testGL( gl.glEnable(             gl.GL_TEXTURE_2D ) )
+   testGL( gl.glBindTexture(        gl.GL_TEXTURE_2D, dc.tid ) )
+   testGL( gl.glVertexPointer(   2, gl.GL_FLOAT, 0, dc.verts ) )
+   testGL( gl.glTexCoordPointer( 2, gl.GL_FLOAT, 0, dc.uvs ) )
+   testGL( gl.glEnableClientState(  gl.GL_VERTEX_ARRAY ) )
+   testGL( gl.glEnableClientState(  gl.GL_TEXTURE_COORD_ARRAY ) )
    if selection then
       local from = selection.from * 6
       local to   = selection.to   * 6
       if 0 <= from and from <= to and to <= dc.n_verts then
          assert( 0 <= from and from <= to and to <= dc.n_verts,
                  "from="..tostring(from)..
-                 " to="..tostring(to)..
-              " n_verts="..tostring(dc.n_verts))
-         testGL( gl.glDrawArrays(       gl.GL_TRIANGLES, 0,  from ) )
-         testGL( gl.glBlendFunc(        gl.GL_ONE_MINUS_SRC_ALPHA, gl.GL_SRC_ALPHA ) )
-         testGL( gl.glDrawArrays(       gl.GL_TRIANGLES, from, to - from ) )
-         testGL( gl.glBlendFunc(        gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA ) )
-         testGL( gl.glDrawArrays(       gl.GL_TRIANGLES, to, dc.n_verts - to ) )
+		    " to="..tostring(to)..
+		    " n_verts="..tostring(dc.n_verts))
+         testGL( gl.glDrawArrays(   gl.GL_TRIANGLES, 0,  from ) )
+         testGL( gl.glBlendFunc(    gl.GL_ONE_MINUS_SRC_ALPHA, gl.GL_SRC_ALPHA ) )
+         testGL( gl.glDrawArrays(   gl.GL_TRIANGLES, from, to - from ) )
+         testGL( gl.glBlendFunc(    gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA ) )
+         testGL( gl.glDrawArrays(   gl.GL_TRIANGLES, to, dc.n_verts - to ) )
       else
-         testGL( gl.glDrawArrays(       gl.GL_TRIANGLES, 0, dc.n_verts ) )
+         testGL( gl.glDrawArrays(   gl.GL_TRIANGLES, 0, dc.n_verts ) )
       end
    else
-      testGL( gl.glDrawArrays(       gl.GL_TRIANGLES, 0, dc.n_verts ) )
+      testGL( gl.glDrawArrays(      gl.GL_TRIANGLES, 0, dc.n_verts ) )
    end
    testGL( gl.glPopMatrix() )
    testGL( gl.glPopAttrib() )
@@ -191,8 +191,9 @@ local function main()
    local desktop_width, desktop_height = desktop_mode[0].width, desktop_mode[0].height
    local width, height = desktop_width * 0.9, desktop_height * 0.9
 
-   local window = glfw.glfwOpenWindow( width, height, glfw.GLFW_WINDOWED, "Font Demo", nil )
-   assert( window, "Failed to open GLFW window" )
+   local window = assert(
+      ffi.gc( glfw.glfwCreateWindow( width, height, glfw.GLFW_WINDOWED, "Font Demo", nil ),
+	      glfw.glfwDestroyWindow))
 
    local function key_pressed(key)
       return glfw.glfwGetKey( window, glfw[ "GLFW_KEY_" .. key:upper() ] ) == glfw.GLFW_PRESS
@@ -200,6 +201,7 @@ local function main()
 
    glfw.glfwSetInputMode( window, glfw.GLFW_STICKY_KEYS, 1 )
    glfw.glfwSetWindowPos( window, (desktop_width - width)/2, (desktop_height - height)/2 )
+   glfw.glfwMakeContextCurrent( window );
    glfw.glfwSwapInterval( 0 ) -- 0=nosync 1=60fps
 
    local font2 = bind_font( fonts[4] )
@@ -213,7 +215,8 @@ local function main()
    local s2 = 100
    local dc
 
-   while glfw.glfwIsWindow(window) and glfw.glfwGetKey(window, glfw.GLFW_KEY_ESCAPE) ~= glfw.GLFW_PRESS do
+   while glfw.glfwGetKey( window, glfw.GLFW_KEY_ESCAPE ) ~= glfw.GLFW_PRESS
+   do
       glfw.glfwGetWindowSize(window, ww, wh)
       local ww, wh = ww[0], wh[0]
 
@@ -224,22 +227,22 @@ local function main()
       local sx, sy = sx[0], sy[0]
 
       if key_pressed( "UP" ) then
---       py = py + font.font.ch
---       sy = sy + 1
+	 --       py = py + font.font.ch
+	 --       sy = sy + 1
          py = py + font.font.ch
       end
 
       if key_pressed( "DOWN" ) then
---       py = py - font.font.ch
---       sy = sy - 1
+	 --       py = py - font.font.ch
+	 --       sy = sy - 1
          py = py - font.font.ch
       end
 
       testGL( gl.glViewport(0, 0, ww, wh) )
       testGL( gl.glClearColor(0.4, 0.3, 0.2 + pdy/100.0, 0) )
---      if math.abs(pdy) < 10.5 then
-	 testGL( gl.glClear(gl.GL_COLOR_BUFFER_BIT) )
-  --    end
+      --      if math.abs(pdy) < 10.5 then
+      testGL( gl.glClear(gl.GL_COLOR_BUFFER_BIT) )
+      --    end
 
       testGL( gl.glMatrixMode(gl.GL_PROJECTION) )
       testGL( gl.glLoadIdentity() )
@@ -283,7 +286,7 @@ local function main()
 	 s2 = 10
       end
 
-      glfw.glfwSwapBuffers()
+      glfw.glfwSwapBuffers(window)
       glfw.glfwPollEvents()
    end
    glfw.glfwTerminate()

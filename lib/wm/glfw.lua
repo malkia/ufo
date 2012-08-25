@@ -11,7 +11,7 @@ local function update(self)
    end
    assert(self.window)
 
-   if not glfw.glfwIsWindow(self.window) then
+   if glfw.glfwGetWindowParam(self.window, glfw.GLFW_CLOSE_REQUESTED) then
       notify(self, "exiting")
       self.window = false
       notify(self, "exited")
@@ -49,7 +49,7 @@ local function update(self)
    function()
       self.width, self.height = self.event.resize.w, self.event.resize.h
       notify(self, "resizing")
-      self.window = glfw.glfwOpenWindow(
+      self.window = glfw.glfwCreateWindow(
 	 self.width, self.height,
 	 glfw.GLFW_WINDOWED, "", nil
       )

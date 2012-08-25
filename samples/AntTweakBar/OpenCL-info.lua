@@ -27,9 +27,10 @@ local function main()
    local desktop_width, desktop_height = desktop_mode[0].width, desktop_mode[0].height
    local width, height = desktop_width * 0.8, desktop_height * 0.8
 
-   local window = glfw.glfwOpenWindow( width, height, glfw.GLFW_WINDOWED,
+   local window = glfw.glfwCreateWindow( width, height, glfw.GLFW_WINDOWED,
 				       "LuaJIT FFI demo - OpenGL, glu, glfw and AntTweakBar", nil )
    assert( window, "Failed to open GLFW window")
+   glfw.glfwMakeContextCurrent( window )
    glfw.glfwSetWindowPos( window, (desktop_width - width)/2, (desktop_height - height)/2 )
    glfw.glfwSwapInterval( 1 ) -- 60fps
  
@@ -82,8 +83,7 @@ local function main()
    
    local int1, int2 = ffi.new( "int[1]" ), ffi.new( "int[1]" )
    local dbl1, dbl2 = ffi.new( "double[1]" ), ffi.new( "double[1]" )
-   while glfw.glfwIsWindow(window) 
-   and   glfw.glfwGetKey(window, glfw.GLFW_KEY_ESCAPE) ~= glfw.GLFW_PRESS 
+   while glfw.glfwGetKey( window, glfw.GLFW_KEY_ESCAPE ) ~= glfw.GLFW_PRESS
    do
       glfw.glfwGetWindowSize(window, int1, int2)
       if width ~= int1[0] or height ~= int2[0] then
@@ -134,7 +134,7 @@ local function main()
 	 tw.TwDraw()
       end
 
-      glfw.glfwSwapBuffers()
+      glfw.glfwSwapBuffers(window)
       glfw.glfwPollEvents()
    end
 

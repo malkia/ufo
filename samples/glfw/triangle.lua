@@ -143,8 +143,9 @@ local function main()
    local px, py = 0, 0
    assert( glfw.glfwInit() )
 
-   local window = glfw.glfwOpenWindow( 1024, 768, glfw.GLFW_WINDOWED, "Spinning Triangle", nil)
+   local window = glfw.glfwCreateWindow( 1024, 768, glfw.GLFW_WINDOWED, "Spinning Triangle", nil)
    assert( window )
+   glfw.glfwMakeContextCurrent( window )
    glfw.glfwSetInputMode(window, glfw.GLFW_STICKY_KEYS, 1)
    glfw.glfwSwapInterval(1)
 
@@ -157,7 +158,7 @@ local function main()
    local mx, my = ffi.new( "int[1]" ), ffi.new( "int[1]" )
    local sw, sh = ffi.new( "int[1]" ), ffi.new( "int[1]" )
    local dx, dy
-   while glfw.glfwIsWindow(window) and glfw.glfwGetKey(window, glfw.GLFW_KEY_ESCAPE) ~= glfw.GLFW_PRESS 
+   while glfw.glfwGetKey( window, glfw.GLFW_KEY_ESCAPE ) ~= glfw.GLFW_PRESS
    do
       local t = glfw.glfwGetTime()
 
@@ -219,7 +220,7 @@ local function main()
       draw_text( build_text( font, source ), px, py ) --mx[0], py + my[0] )
       py = py - 0.05
 
-      glfw.glfwSwapBuffers()
+      glfw.glfwSwapBuffers(window)
       glfw.glfwPollEvents()
    end
    glfw.glfwTerminate()

@@ -1,7 +1,7 @@
-local ffi = require( "ffi" )
-local cr  = require( "ffi/cairo" )
-local gl  = require( "ffi/OpenGL" )
-local fw  = require( "ffi/glfw" )
+local ffi  = require( "ffi" )
+local cr   = require( "ffi/cairo" )
+local gl   = require( "ffi/OpenGL" )
+local glfw = require( "ffi/glfw" )
 
 local min, max, abs, sqrt, log, floor = math.min, math.max, math.abs, math.sqrt, math.log, math.floor
 
@@ -170,11 +170,11 @@ end
 local function main()
    local width, height
 
-   assert( fw.glfwInit() )
-   local window = fw.glfwOpenWindow( 640, 480, fw.GLFW_WINDOWED, "Spinning Triangle", nil)
+   assert( glfw.glfwInit() )
+   local window = glfw.glfwCreateWindow( 640, 480, glfw.GLFW_WINDOWED, "Spinning Triangle", nil)
    assert( window )
-   fw.glfwSetInputMode(window, fw.GLFW_STICKY_KEYS, 1);
-   fw.glfwSwapInterval(1);
+   glfw.glfwSetInputMode(window, glfw.GLFW_STICKY_KEYS, 1);
+   glfw.glfwSwapInterval(1);
    print( window )
 
    gl.glClearColor( 0, 0, 0, 0 )
@@ -186,10 +186,9 @@ local function main()
    local texture_id = ffi.new( "GLuint[1]" )
 
    local int1, int2 = ffi.new( "int[1]" ), ffi.new( "int[1]" )
-   while fw.glfwIsWindow(window) 
-   and fw.glfwGetKey(window, fw.GLFW_KEY_ESCAPE) ~= fw.GLFW_PRESS 
+   while not glfw.glfwGetWindowParam(window, glfw.GLFW_CLOSE_REQUESTED)
    do
-      fw.glfwGetWindowSize( window, int1, int2 )
+      glfw.glfwGetWindowSize( window, int1, int2 )
       if width ~= int1[0] or height ~= int2[0] then
 	 width, height = int1[0], int2[0]
 	 gl.glViewport( 0, 0, width, height )
@@ -224,7 +223,7 @@ local function main()
       gl.glEnd( )
       gl.glPopMatrix( )
    end
-   fw.glfwTerminate();
+   glfw.glfwTerminate();
 end
 
 

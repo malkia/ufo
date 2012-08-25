@@ -19,7 +19,7 @@ local function main()
    desktop_width, desktop_height = desktop_mode[0].width, desktop_mode[0].height
    local window_x, window_y = ( desktop_width - width ) / 2, ( desktop_height - height ) / 2
 
-   local window = glfw.glfwOpenWindow( width, height, glfw.GLFW_WINDOWED, "LuaJIT FFI demo - OpenGL, glu, glfw and AntTweakBar", nil )
+   local window = glfw.glfwCreateWindow( width, height, glfw.GLFW_WINDOWED, "LuaJIT FFI demo - OpenGL, glu, glfw and AntTweakBar", nil )
    assert( window, "Failed to open GLFW window")
    glfw.glfwSetWindowPos( window, window_x, window_y )
 
@@ -43,12 +43,11 @@ local function main()
    ]]
    local glCreateShader = ffi.new( "pglCreateShader", gl.wglGetProcAddress( "glCreateShader" ) )
    print(glCreateShader(gl.GL_VERTEX_SHADER))
---   print(ffi.C.pglCreateShader)
+   print(gl.glCreateShader(gl.GL_VERTEX_SHADER))
    
    local int1, int2 = ffi.new( "int[1]" ), ffi.new( "int[1]" )
    local dbl1, dbl2 = ffi.new( "double[1]" ), ffi.new( "double[1]" )
-   while glfw.glfwIsWindow(window) 
-   and   glfw.glfwGetKey(window, glfw.GLFW_KEY_ESCAPE) ~= glfw.GLFW_PRESS 
+   while not glfwGetWindowParam(window, glfw.GLFW_CLOSE_REQUESTED) 
    do
       glfw.glfwGetWindowSize(window, int1, int2)
       width, height = int1[0], int2[0]
@@ -95,4 +94,25 @@ local function main()
    glfw.glfwTerminate()
 end
 
-main()
+--main()
+
+ffi.cdef[[
+    void glBegin1();
+]]
+
+local ffi = require( "ffi" )
+local gl = require( "ffi/OpenGL" )
+
+print()
+
+-- Print error messages
+print('glBegin',  pcall(function()return ffi.cast( "void*", gl.glBegin  )end))
+print('glBegin1', pcall(function()return ffi.cast( "void*", gl.glBegin1 )end))
+print('glBegin2', pcall(function()return ffi.cast( "void*", gl.glBegin2 )end))
+
+-- Don't print anything
+print('glBegin',  xpcall(function()return ffi.cast( "void*", gl.glBegin  )end,function()end))
+print('glBegin1', xpcall(function()return ffi.cast( "void*", gl.glBegin1 )end,function()end))
+print('glBegin2', xpcall(function()return ffi.cast( "void*", gl.glBegin2 )end,function()end))
+
+
