@@ -10,6 +10,13 @@ local libs = ffi_OpenGL_libs or {
    Other   = { x86 = "libGL.so",                  x64 = "libGL.so" },
 }
 
+if ffi.os=="Windows" then
+   -- weird workaround for XP
+   -- Have to investigate more
+   -- It's something due to REGAL, but not sure...
+   ffi.load( "GLU32" )
+end
+
 local lib  = ffi_OpenGL_lib or libs[ ffi.os ][ ffi.arch ]
 
 local gl   = ffi.load( lib )
