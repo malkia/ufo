@@ -4,15 +4,15 @@ pushd %LB_PROJECT_ROOT%
 fossil clean --force
 set NAME=%LB_PROJECT_NAME%
 
+sh -c "tclsh tools/genStubs.tcl generic generic/tcl.decls generic/tclInt.decls generic/tclTomMath.decls"
+sh -c "tclsh tools/genStubs.tcl generic generic/tclOO.decls"
+sh -c "tclsh tools/fix_tommath_h.tcl libtommath/tommath.h > generic/tclTomMath.h"
+
 echo.>sources.tmp
+for %%i in (regfronts.c regc_lex.c regc_color.c regc_nfa.c regc_cvec.c regc_locale.c rege_dfa.c tclUniData.c tclLoadNone.c) do echo.>>generic\%%i.exclude
 for %%i in (libtommath\*.c) do if not exist %%i.exclude echo %%i >> sources.tmp
 for %%i in (win\tclWin*.c) do if not exist %%i.exclude echo %%i >> sources.tmp
-rem for %%i in (regc_lex.c regc_color.c regc_nfa.c regc_cvec.c regc_locale.c rege_dfa.c tclUniData.c tclPkgConfig.c tclLoadNone.c) do echo.>>generic\%%i.exclude
-for %%i in (regfronts.c regc_lex.c regc_color.c regc_nfa.c regc_cvec.c regc_locale.c rege_dfa.c tclUniData.c tclLoadNone.c) do echo.>>generic\%%i.exclude
 for %%i in (generic\*.c) do if not exist %%i.exclude echo %%i >> sources.tmp
-
-sh -c "tclsh tools/genStubs.tcl generic generic/tcl.decls generic/tclInt.decls generic/tclTomMath.decls"
-sh -c "tclsh tools/fix_tommath_h.tcl libtommath/tommath.h > generic/tclTomMath.h"
 
 echo -DCFG_RUNTIME_LIBDIR="""""">>sources.tmp
 echo -DCFG_RUNTIME_BINDIR="""""">>sources.tmp

@@ -13,7 +13,7 @@ irfield = { [0]="str.len", "func.env", "func.pc", "tab.meta", "tab.array", "tab.
 ircall = {
 [0]="lj_str_cmp",
 "lj_str_new",
-"lj_str_tonum",
+"lj_strscan_num",
 "lj_str_fromint",
 "lj_str_fromnum",
 "lj_tab_new1",
@@ -303,6 +303,8 @@ ffnames = {
 "ffi.meta.__pow",
 "ffi.meta.__unm",
 "ffi.meta.__tostring",
+"ffi.meta.__pairs",
+"ffi.meta.__ipairs",
 "ffi.clib.__index",
 "ffi.clib.__newindex",
 "ffi.clib.__gc",

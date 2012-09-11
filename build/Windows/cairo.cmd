@@ -4,7 +4,7 @@ pushd %LB_PROJECT_ROOT%
 setlocal
 
 git clean -fdx
-rem git checkout dad69ce4d5568f94621ae60ccdcc683d5bbd0efd
+rem git checkout 465319ce828f922edce46b6e7628da543b20d5e4
 
 set DEBUG_RELEASE=release
 

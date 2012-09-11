@@ -116,7 +116,7 @@ ffi.cdef[[
    typedef struct AdbInterfaceInfo {
      ADB_GUID     class_id;
      uint32_t     flags;
-     wchar_t      device_name[1];
+     wchar_t      device_name[?];
    } AdbInterfaceInfo;
 
    ADB AdbEnumInterfaces(                ADB_GUID class_id, int exclude_not_present,
@@ -166,6 +166,32 @@ ADB_USB_CLASS_ID = ffi.new(
 
 local lib = ffi.load( "bin/Windows/x86/AdbWinApi.dll" )
 
-print( lib.test1 )
+if ... then
+   return lib
+end
 
-return lib
+print( ffi.test2 )
+
+--- testing
+print()
+
+local adb = lib --require( "ffi/Windows/adb" )
+local ADB = ffi.gc( adb.AdbEnumInterfaces( ADB_USB_CLASS_ID, 1, 1, 1), adb.AdbCloseHandle )
+--print( ADB )
+local count = ffi.new( "uint32_t[1]", 1024 )
+
+local interface_info = ffi.new( "AdbInterfaceInfo", 1024 )
+local interface_size = ffi.new( "uint32_t[1]", ffi.sizeof( interface_info ))
+
+while adb.AdbNextInterface( ADB, interface_info, interface_size ) == 1 do
+   local name = {}
+   for i = 0,255 do
+      local char = interface_info.device_name[i]
+      if char == 0 then
+	 break
+      end
+      name[#name+1] = string.char(char)
+   end
+   print(table.concat(name))
+--   print(interface_info.flags)
+end

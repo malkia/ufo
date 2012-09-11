@@ -1,0 +1,220 @@
+Index: src/libGLESv2/mathutil.h
+===================================================================
+--- src/libGLESv2/mathutil.h	(revision 1276)
++++ src/libGLESv2/mathutil.h	(working copy)
+@@ -83,6 +83,9 @@
+ 
+ inline bool supportsSSE2()
+ {
++#if 1
++  return true;
++#else
+     static bool checked = false;
+     static bool supports = false;
+ 
+@@ -104,6 +107,7 @@
+     checked = true;
+ 
+     return supports;
++#endif
+ }
+ 
+ float float16ToFloat32(unsigned short h);
+Index: src/compiler/util.cpp
+===================================================================
+--- src/compiler/util.cpp	(revision 1276)
++++ src/compiler/util.cpp	(working copy)
+@@ -18,9 +18,9 @@
+ double atof_dot(const char *str)
+ {
+ #ifdef _MSC_VER
+-    _locale_t l = _create_locale(LC_NUMERIC, "C");
+-    double result = _atof_l(str, l);
+-    _free_locale(l);
++  //    _locale_t l = _create_locale(LC_NUMERIC, "C");
++    double result = atof(str);
++    //    _free_locale(l);
+     return result;
+ #else
+     double result;
+Index: src/libEGL/Surface.cpp
+===================================================================
+--- src/libEGL/Surface.cpp	(revision 1276)
++++ src/libEGL/Surface.cpp	(working copy)
+@@ -82,17 +82,24 @@
+     // to minimize the amount of queuing done by DWM between our calls to
+     // present and the actual screen.
+     if (mWindow && (getComparableOSVersion() >= versionWindowsVista)) {
+-      BOOL isComposited;
+-      HRESULT result = DwmIsCompositionEnabled(&isComposited);
+-      if (SUCCEEDED(result) && isComposited) {
+-        DWM_PRESENT_PARAMETERS presentParams;
+-        memset(&presentParams, 0, sizeof(presentParams));
+-        presentParams.cbSize = sizeof(DWM_PRESENT_PARAMETERS);
+-        presentParams.cBuffer = 2;
+-
+-        result = DwmSetPresentParameters(mWindow, &presentParams);
+-        if (FAILED(result))
+-          ERR("Unable to set present parameters: 0x%08X", result);
++      static HMODULE dwmapi = LoadLibraryA( "Dwmapi.dll" );
++      if( dwmapi ) {
++	static union{ void* p; HRESULT (WINAPI *f)( BOOL *pfEnabled)                                  ; } f_DwmIsCompositionEnabled = { GetProcAddress( dwmapi, "DwmIsCompositionEnabled" ) };
++	static union{ void* p; HRESULT (WINAPI *f)( HWND hwnd, DWM_PRESENT_PARAMETERS *pPresentParams); } f_DwmSetPresentParameters = { GetProcAddress( dwmapi, "DwmSetPresentParameters" ) };
++	if( f_DwmIsCompositionEnabled.f && f_DwmSetPresentParameters.f ) {
++	  BOOL isComposited;
++	  HRESULT result = f_DwmIsCompositionEnabled.f(&isComposited);
++	  if (SUCCEEDED(result) && isComposited) {
++	    DWM_PRESENT_PARAMETERS presentParams;
++	    memset(&presentParams, 0, sizeof(presentParams));
++	    presentParams.cbSize = sizeof(DWM_PRESENT_PARAMETERS);
++	    presentParams.cBuffer = 2;
++	    
++	    result = f_DwmSetPresentParameters.f(mWindow, &presentParams);
++	    if (FAILED(result))
++	      ERR("Unable to set present parameters: 0x%08X", result);
++	  }
++	}
+       }
+     }
+ 
+Index: src/libEGL/libEGL.vcproj
+===================================================================
+--- src/libEGL/libEGL.vcproj	(revision 1276)
++++ src/libEGL/libEGL.vcproj	(working copy)
+@@ -44,7 +44,7 @@
+ 			<Tool
+ 				Name="VCCLCompilerTool"
+ 				Optimization="0"
+-				AdditionalIncludeDirectories="$(ProjectDir)/..; $(ProjectDir)/../../include"
++				AdditionalIncludeDirectories="$(DXSDK_DIR)/Include;$(ProjectDir)/..; $(ProjectDir)/../../include"
+ 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBEGL_EXPORTS;_CRT_SECURE_NO_DEPRECATE;NOMINMAX"
+ 				MinimalRebuild="true"
+ 				BasicRuntimeChecks="3"
+@@ -69,6 +69,7 @@
+ 				Name="VCLinkerTool"
+ 				AdditionalDependencies="d3d9.lib dxguid.lib dwmapi.lib"
+ 				LinkIncremental="2"
++				AdditionalLibraryDirectories="$(DXSDK_DIR)/Lib/x86"
+ 				ModuleDefinitionFile="libEGL.def"
+ 				DelayLoadDLLs="dwmapi.dll"
+ 				GenerateDebugInformation="true"
+@@ -101,12 +102,11 @@
+ 			/>
+ 		</Configuration>
+ 		<Configuration
+-			Name="Release|Win32"
+-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+-			IntermediateDirectory="$(ConfigurationName)"
++			Name="Debug|x64"
++			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
++			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+ 			ConfigurationType="2"
+ 			CharacterSet="1"
+-			WholeProgramOptimization="1"
+ 			>
+ 			<Tool
+ 				Name="VCPreBuildEventTool"
+@@ -122,6 +122,7 @@
+ 			/>
+ 			<Tool
+ 				Name="VCMIDLTool"
++				TargetEnvironment="3"
+ 			/>
+ 			<Tool
+ 				Name="VCCLCompilerTool"
+@@ -149,16 +150,15 @@
+ 			<Tool
+ 				Name="VCLinkerTool"
+ 				AdditionalDependencies="d3d9.lib dxguid.lib dwmapi.lib"
+-				LinkIncremental="1"
++				LinkIncremental="2"
++				AdditionalLibraryDirectories="$(DXSDK_DIR)/Lib/x64"
+ 				ModuleDefinitionFile="libEGL.def"
+ 				DelayLoadDLLs="dwmapi.dll"
+ 				GenerateDebugInformation="true"
+ 				SubSystem="2"
+-				OptimizeReferences="2"
+-				EnableCOMDATFolding="2"
+ 				RandomizedBaseAddress="1"
+ 				DataExecutionPrevention="0"
+-				TargetMachine="1"
++				TargetMachine="17"
+ 			/>
+ 			<Tool
+ 				Name="VCALinkTool"
+@@ -184,11 +184,12 @@
+ 			/>
+ 		</Configuration>
+ 		<Configuration
+-			Name="Debug|x64"
+-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
+-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
++			Name="Release|Win32"
++			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
++			IntermediateDirectory="$(ConfigurationName)"
+ 			ConfigurationType="2"
+ 			CharacterSet="1"
++			WholeProgramOptimization="1"
+ 			>
+ 			<Tool
+ 				Name="VCPreBuildEventTool"
+@@ -204,16 +205,14 @@
+ 			/>
+ 			<Tool
+ 				Name="VCMIDLTool"
+-				TargetEnvironment="3"
+ 			/>
+ 			<Tool
+ 				Name="VCCLCompilerTool"
+-				Optimization="0"
+-				AdditionalIncludeDirectories="$(ProjectDir)/..; $(ProjectDir)/../../include"
+-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBEGL_EXPORTS;_CRT_SECURE_NO_DEPRECATE;NOMINMAX"
+-				MinimalRebuild="true"
+-				BasicRuntimeChecks="3"
+-				RuntimeLibrary="1"
++				Optimization="2"
++				InlineFunctionExpansion="2"
++				AdditionalIncludeDirectories="$(DXSDK_DIR)/Include;$(ProjectDir)/..; $(ProjectDir)/../../include"
++				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBEGL_EXPORTS;_CRT_SECURE_NO_DEPRECATE;NOMINMAX;_SECURE_SCL=0"
++				RuntimeLibrary="0"
+ 				UsePrecompiledHeader="0"
+ 				WarningLevel="4"
+ 				DisableSpecificWarnings="4100;4127;4189;4239;4244;4245;4512;4702"
+@@ -233,14 +232,17 @@
+ 			<Tool
+ 				Name="VCLinkerTool"
+ 				AdditionalDependencies="d3d9.lib dxguid.lib dwmapi.lib"
+-				LinkIncremental="2"
++				LinkIncremental="1"
++				AdditionalLibraryDirectories="$(DXSDK_DIR)/Lib/x86"
+ 				ModuleDefinitionFile="libEGL.def"
+-				DelayLoadDLLs="dwmapi.dll"
++				DelayLoadDLLs="dwmapi.lib"
+ 				GenerateDebugInformation="true"
+ 				SubSystem="2"
++				OptimizeReferences="2"
++				EnableCOMDATFolding="2"
+ 				RandomizedBaseAddress="1"
+ 				DataExecutionPrevention="0"
+-				TargetMachine="17"
++				TargetMachine="1"
+ 			/>
+ 			<Tool
+ 				Name="VCALinkTool"
+@@ -293,7 +295,7 @@
+ 				Name="VCCLCompilerTool"
+ 				Optimization="2"
+ 				InlineFunctionExpansion="2"
+-				AdditionalIncludeDirectories="$(ProjectDir)/..; $(ProjectDir)/../../include"
++				AdditionalIncludeDirectories="$(DXSDK_DIR)/Include;$(ProjectDir)/..; $(ProjectDir)/../../include"
+ 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBEGL_EXPORTS;_CRT_SECURE_NO_DEPRECATE;NOMINMAX;_SECURE_SCL=0"
+ 				RuntimeLibrary="0"
+ 				UsePrecompiledHeader="0"
+@@ -316,6 +318,7 @@
+ 				Name="VCLinkerTool"
+ 				AdditionalDependencies="d3d9.lib dxguid.lib dwmapi.lib"
+ 				LinkIncremental="1"
++				AdditionalLibraryDirectories="$(DXSDK_DIR)/Lib/x64"
+ 				ModuleDefinitionFile="libEGL.def"
+ 				DelayLoadDLLs="dwmapi.dll"
+ 				GenerateDebugInformation="true"

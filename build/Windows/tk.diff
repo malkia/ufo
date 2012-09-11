@@ -1,0 +1,107 @@
+Index: generic/tkMain.c
+==================================================================
+--- generic/tkMain.c
++++ generic/tkMain.c
+@@ -106,14 +106,14 @@
+      * always claim to be running on a tty. This probably isn't the right way
+      * to do it.
+      */
+ 
+ #if !defined(STATIC_BUILD)
+-	if (tclStubsPtr->reserved9 && TclpIsAtty) {
+-	    /* We are running on Cygwin */
+-	    return TclpIsAtty(fd);
+-	}
++    //	if (tclStubsPtr->reserved9 && TclpIsAtty) {
++    //	    /* We are running on Cygwin */
++    //	    return TclpIsAtty(fd);
++    //	}
+ #endif
+     handle = GetStdHandle(STD_INPUT_HANDLE + fd);
+ 	/*
+ 	 * If it's a bad or closed handle, then it's been connected to a wish
+ 	 * console window. A character file handle is a tty by definition.
+@@ -192,31 +192,31 @@
+ 	abort();
+     }
+ 
+ #if defined(__WIN32__) && !defined(__WIN64__) && !defined(UNICODE) && !defined(STATIC_BUILD)
+ 
+-    if (tclStubsPtr->reserved9) {
+-	/* We are running win32 Tk under Cygwin, so let's check
+-	 * whether the env("DISPLAY") variable or the -display
+-	 * argument is set. If so, we really want to run the
+-	 * Tk_MainEx function of libtk8.?.dll, not this one. */
+-	if (Tcl_GetVar2(interp, "env", "DISPLAY", TCL_GLOBAL_ONLY)) {
+-	loadCygwinTk:
+-	    if (TkCygwinMainEx(argc, argv, appInitProc, interp)) {
+-		/* Should never reach here. */
+-		return;
+-	    }
+-	} else {
+-	    int i;
+-
+-	    for (i = 1; i < argc; ++i) {
+-		if (!_tcscmp(argv[i], TEXT("-display"))) {
+-		    goto loadCygwinTk;
+-		}
+-	    }
+-	}
+-    }
++    //    if (tclStubsPtr->reserved9) {
++    //	/* We are running win32 Tk under Cygwin, so let's check
++    //	 * whether the env("DISPLAY") variable or the -display
++    //	 * argument is set. If so, we really want to run the
++    //	 * Tk_MainEx function of libtk8.?.dll, not this one. */
++    //	if (Tcl_GetVar2(interp, "env", "DISPLAY", TCL_GLOBAL_ONLY)) {
++    //	loadCygwinTk:
++    //	    if (TkCygwinMainEx(argc, argv, appInitProc, interp)) {
++    //		/* Should never reach here. */
++    //		return;
++    //	    }
++    //	} else {
++    //	    int i;
++    //
++    //	    for (i = 1; i < argc; ++i) {
++    //		if (!_tcscmp(argv[i], TEXT("-display"))) {
++    //		    goto loadCygwinTk;
++    //		}
++    //	    }
++    //	}
++    //}
+ #endif
+ 
+     Tcl_InitMemory(interp);
+ 
+     is.interp = interp;
+
+Index: generic/tkWindow.c
+==================================================================
+--- generic/tkWindow.c
++++ generic/tkWindow.c
+@@ -957,17 +957,17 @@
+ 	if (cmdPtr->objProc == NULL) {
+ 	    Tcl_Panic("TkCreateMainWindow: builtin command with NULL string and object procs");
+ 	}
+ 
+ #if defined(__WIN32__) && !defined(STATIC_BUILD)
+-	if ((cmdPtr->flags & WINMACONLY) && tclStubsPtr->reserved9) {
+-	    /*
+-	     * We are running on Cygwin, so don't use the win32 dialogs.
+-	     */
+-
+-	    continue;
+-	}
++	//	if ((cmdPtr->flags & WINMACONLY) && tclStubsPtr->reserved9) {
++	//  /*
++	//     * We are running on Cygwin, so don't use the win32 dialogs.
++	//     */
++	//
++	//    continue;
++	//}
+ #endif /* __WIN32__ && !STATIC_BUILD */
+ 
+ 	if (cmdPtr->flags & PASSMAINWINDOW) {
+ 	    clientData = tkwin;
+ 	} else {
+

@@ -10,8 +10,11 @@ rem git checkout c3f7543ebe08cfdadf218fa558f03a5d382d322c
 cd builds\msvc\libzmq
 set NAME=%LB_PROJECT_NAME%
 
-(for /f "usebackq tokens=1,2,3* delims==" %%i in (`findstr RelativePath lib%NAME%.vcproj`) do if /I "%%~xj"==".cpp" echo %%j) > sources.tmp
+(for /f "usebackq tokens=3 delims=>=/ " %%i in (`findstr ClCompile lib%NAME%.vcxproj`) do if /I NOT "%%~ni"=="device" echo %%i) > sources.tmp
+echo "..\..\..\src\proxy.cpp" >> sources.tmp
 echo "..\..\..\src\address.cpp" >> sources.tmp
+echo "..\..\..\src\v1_encoder.cpp" >> sources.tmp
+echo "..\..\..\src\v1_decoder.cpp" >> sources.tmp
 
 copy /y "%LB_ROOT%\bin\Windows\%LB_TARGET_ARCH%\pgm.lib" libpgm.lib"
 

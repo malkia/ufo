@@ -21,12 +21,12 @@ echo ..\apps\pdfapp.c >> sources.tmp
 echo ..\apps\win_main.c >> sources.tmp
 (for /f "usebackq tokens=1,2,3* delims==" %%i in (`findstr \thirdparty\jbig2dec libthirdparty.vcproj`) do if /I "%%~xj"==".c" echo %%j) >> sources.tmp
 (for /f "usebackq tokens=1,2,3* delims==" %%i in (`findstr \thirdparty\openjpeg libthirdparty.vcproj`) do if /I "%%~xj"==".c" echo %%j) >> sources.tmp
-(for /f "usebackq tokens=1,2,3* delims==" %%i in (`findstr \thirdparty\jpeg-8d libthirdparty.vcproj`) do if /I "%%~xj"==".c" echo %%j) >> sources.tmp
+(for /f "usebackq tokens=1,2,3* delims==" %%i in (`findstr \thirdparty\jpeg-9 libthirdparty.vcproj`) do if /I "%%~xj"==".c" echo %%j) >> sources.tmp
 (for /f "usebackq tokens=1,2,3* delims==" %%i in (`findstr RelativePath lib%NAME%.vcproj`) do if /I "%%~xj"==".c" if /I NOT "%%~nj"=="memento" echo %%j) >> sources.tmp
 
 rc ..\apps\win_res.rc
 cl -c %LB_CL_OPTS% -Fe%NAME%.dll -LD -I..\fitz -I..\thirdparty\jbig2dec -Dvsnprintf=_vsnprintf^
-   -DMUPDF_COMBINED_EXE=1 -I..\thirdparty\jpeg-8d -DOPJ_STATIC=1 -I..\scripts -I..\thirdparty\openjpeg-1.5.0\libopenjpeg^
+   -DMUPDF_COMBINED_EXE=1 -I..\thirdparty\jpeg-9 -DOPJ_STATIC=1 -I..\scripts -I..\thirdparty\openjpeg-1.5.0\libopenjpeg^
     -I"%~dp0\include" -I"%LB_PROJECT_ROOT%\..\freetype2\include" -I"%LB_PROJECT_ROOT%\..\zlib" -I..\pdf -I..\cbz -I..\xps -I..\apps^
     @sources.tmp
 

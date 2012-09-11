@@ -1,0 +1,24 @@
+diff --git a/src/win32/cairo-win32-display-surface.c b/src/win32/cairo-win32-display-surface.c
+index 5353fd5..3784918 100644
+--- a/src/win32/cairo-win32-display-surface.c
++++ b/src/win32/cairo-win32-display-surface.c
+@@ -464,7 +464,8 @@ _cairo_win32_display_surface_map_to_image (void                    *abstract_sur
+     surface = to_win32_display_surface (surface->fallback);
+ done:
+     GdiFlush();
+-    return _cairo_surface_map_to_image (&surface->image->base, extents);
++    //return _cairo_surface_map_to_image (&to_image_surface(surface->image)->base, extents);
++    return _cairo_surface_map_to_image (surface->image, extents);
+ 
+ err:
+     cairo_surface_destroy (surface->fallback);
+@@ -499,7 +500,8 @@ _cairo_win32_display_surface_unmap_image (void                    *abstract_surf
+ 	    _cairo_damage_add_rectangle (surface->fallback->damage, &r);
+     }
+ 
+-    return _cairo_surface_unmap_image (&surface->image->base, image);
++    //return _cairo_surface_unmap_image (&to_image_surface(surface->image)->base, image);
++    return _cairo_surface_unmap_image (surface->image, image);
+ }
+ 
+ static cairo_status_t

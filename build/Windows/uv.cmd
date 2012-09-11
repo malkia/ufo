@@ -7,7 +7,9 @@ git clean -fdx
 
 set NAME=%LB_PROJECT_NAME%
 
-echo src/uv-common.c>sources.tmp
+echo src/fs-poll.c>sources.tmp
+echo src/inet.c>>sources.tmp
+echo src/uv-common.c>>sources.tmp
 for %%i in (src\ares\*.c) do echo %%i >> sources.tmp
 for %%i in (src\win\*.c) do echo %%i >> sources.tmp
 

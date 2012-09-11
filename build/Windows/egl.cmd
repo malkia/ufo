@@ -9,7 +9,7 @@ set NAME=%LB_PROJECT_NAME%
 
 (for /f "usebackq tokens=1,2,3* delims==" %%i in (`findstr RelativePath lib%NAME%.vcproj`) do if /I "%%~xj"==".cpp" echo %%j) > sources.tmp
 
-cl %LB_CL_OPTS% -EHsc -Fe%NAME%.dll -LD -DWIN32=1 -DLIBEGL_EXPORTS=1 -DNDEBUG=1 -DNOMINMAX -FI_70_new -I.. -I..\..\include -I"%~dp0include" -DNOMINMAX @sources.tmp /link"%LB_LINK_OPTS% gdi32.lib user32.lib opengl32.lib"
+cl %LB_CL_OPTS% -EHsc -Fe%NAME%.dll -LD -DWIN32=1 -DLIBEGL_EXPORTS=1 -DNDEBUG=1 -DNOMINMAX -FI_70_new -I.. -I..\..\include -I"%~dp0include" -DNOMINMAX @sources.tmp /link"%LB_LINK_OPTS% gdi32.lib user32.lib opengl32.lib d3d9.lib dxguid.lib %~dp0/../../bin/%LB_TARGET_OS%/%LB_TARGET_ARCH%/glesv2.lib /DEF:libEGL.def"
 
 call %~dp0/wdk/install %LB_PROJECT_NAME%.dll
 call %~dp0/wdk/install %LB_PROJECT_NAME%.lib

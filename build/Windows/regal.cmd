@@ -11,6 +11,7 @@ set NAME=%LB_PROJECT_NAME%
 (for /f "usebackq tokens=3 delims=>=/ " %%i in (`findstr ClCompile %NAME%.vcxproj`) do echo %%i) > sources.tmp
 
 cl %LB_CL_OPTS% -Fe%NAME%.dll^
+   -D_MSC_VER=1399^
    -DWIN32=1^
    -DNDEBUG=1^
    -DREGAL_EMULATION=0^
