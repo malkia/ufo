@@ -856,23 +856,23 @@ ffi.cdef[[
    typedef struct SDL_SysWMinfo {
       SDL_version    version;
       SDL_SYSWM_TYPE subsystem;
-      union {
-	 struct {
+      union info {
+	 struct win {
             void* window; // HWND
 	 } win;
-	 struct {
+	 struct x11 {
             void* display; // Display*
             void* window;  // Window
 	 } x11;
-	 struct {
+	 struct dfb {
             void* dfb;     // IDirectFB*
             void* window;  // IDirectFBWindow*
             void* surface; // IDirectFBSurface*
 	 } dfb;
-	 struct {
+	 struct cocoa {
             void* window;  // NSWindow*
 	 } cocoa;
-	 struct  {
+	 struct uikit {
 	    void* window; // UIWindow*
 	 } uikit;
 	 int dummy;

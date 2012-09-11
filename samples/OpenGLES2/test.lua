@@ -12,7 +12,7 @@ local function InitSDL()
    sdl.SDL_GetVersion( wminfo.version )
    sdl.SDL_GetWMInfo( wminfo )
    local systems = { "win", "x11", "dfb", "cocoa", "uikit" }
-   local subsystem = wminfo.subsystem
+   local subsystem = tonumber(wminfo.subsystem)
    local wminfo = wminfo.info[systems[subsystem]]
    local window = wminfo.window
    local display = nil
