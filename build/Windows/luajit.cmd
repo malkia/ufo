@@ -31,6 +31,7 @@ call %~dp0/wdk/install lua51.pdb
 call %~dp0/wdk/install luajit.exe
 call %~dp0/wdk/install luajit.pdb
 
+goto :skip-static
 rem static version of the lua51.lib library,
 rem renamed to luajit.lib
 rem as lua51.lib already is the dll import library for lua51.dll
@@ -41,6 +42,7 @@ echo @echo off > %~dp0/bin/cl.cmd
 echo echo ....... Custom cl.cmd [%%*] >> %~dp0/bin/cl.cmd
 echo cl.exe %LB_CL_OPTS% /D_MSC_VER=1399 /DLUAJIT_ENABLE_LUA52COMPAT=1 %%* >> %~dp0/bin/cl.cmd
 call %~dp0/wdk/install lua51.lib lua51_static.lib
+:skip-static
 
 endlocal
 popd
