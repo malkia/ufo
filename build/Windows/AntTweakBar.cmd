@@ -3,6 +3,8 @@ call %~dp0/wdk/setup %~n0 %*
 pushd %LB_PROJECT_ROOT%\src
 setlocal
 
+rem http://www.antisphere.com/Wiki/tools:anttweakbar:download
+
 set NAME=%LB_PROJECT_NAME%
 
 mkdir release%LB_TARGET_BITS% 1>nul 2>nul
@@ -16,7 +18,7 @@ mkdir release%LB_TARGET_BITS% 1>nul 2>nul
 cl -LD -Fe%NAME%.dll %LB_CL_OPTS% -I"%DXSDK_DIR%/Include" -DTW_EXPORTS=1 -I../include^
    LoadOGL.cpp LoadOGLCore.cpp TwBar.cpp TwColors.cpp TwEventSFML.cpp TwFonts.cpp TwMgr.cpp^
    TwOpenGL.cpp TwOpenGLCore.cpp TwDirect3D9.cpp TwDirect3D10.cpp TwDirect3D11.cpp^
-   TwEventSDL.c TwEventSDL12.c TwEventSDL13.c^
+   TwEventSDL.c TwEventSDL12.c TwEventSDL13.c TwEventGLFW.c TwEventGLUT.c TwEventWin.c^
    /link"%LB_LINK_OPTS% user32.lib gdi32.lib kernel32.lib"
 
 call %~dp0/wdk/install %NAME%.dll

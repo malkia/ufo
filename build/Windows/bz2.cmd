@@ -5,6 +5,9 @@ pushd %LB_PROJECT_ROOT%
 git clean -fdx
 setlocal
 
+rem http://www.bzip.org/1.0.6/bzip2-1.0.6.tar.gz
+rem then "git init" ...
+
 set NAME=%LB_PROJECT_NAME%
 
 nmake lib -f makefile.msc CC="cl %LB_CL_OPTS%" AR="link /LIB" LD="link %LB_LINK_OPTS%"

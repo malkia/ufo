@@ -12,14 +12,14 @@ del *.obj 1>nul 2>nul
 echo.>sources.tmp
 rem echo.>sources_c.tmp
 
-(for /f "usebackq tokens=1,2,3* delims==" %%i in (`findstr RelativePath ..\compiler\translator_common.vcproj`) do if /I "%%~xj"==".cpp" echo ..\compiler\\%%j) >> sources.tmp
-(for /f "usebackq tokens=1,2,3* delims==" %%i in (`findstr RelativePath ..\compiler\translator_common.vcproj`) do if /I "%%~xj"==".c" echo ..\compiler\\%%j) >> sources.tmp
-(for /f "usebackq tokens=1,2,3* delims==" %%i in (`findstr RelativePath ..\compiler\translator_hlsl.vcproj`) do if /I "%%~xj"==".cpp" echo ..\compiler\\%%j) >> sources.tmp
-(for /f "usebackq tokens=1,2,3* delims==" %%i in (`findstr RelativePath ..\compiler\translator_hlsl.vcproj`) do if /I "%%~xj"==".c" echo ..\compiler\\%%j) >> sources.tmp
-(for /f "usebackq tokens=1,2,3* delims==" %%i in (`findstr RelativePath ..\compiler\preprocessor\new\preprocessor.vcproj`) do if /I "%%~xj"==".cpp" if /I NOT "%%~nj"=="ExpressionParser" echo #include ^"%%~nxj^") > ..\compiler\preprocessor\new\pp_all.cpp
+(for /f "usebackq tokens=3 delims=>=/ " %%i in (`findstr ClCompile ..\compiler\translator_common.vcxproj`) do if /I "%%~xi"==".cpp" echo ..\compiler\\%%i) >> sources.tmp
+(for /f "usebackq tokens=3 delims=>=/ " %%i in (`findstr ClCompile ..\compiler\translator_common.vcxproj`) do if /I "%%~xi"==".c" echo ..\compiler\\%%i) >> sources.tmp
+(for /f "usebackq tokens=3 delims=>=/ " %%i in (`findstr ClCompile ..\compiler\translator_hlsl.vcxproj`) do if /I "%%~xi"==".cpp" echo ..\compiler\\%%i) >> sources.tmp
+(for /f "usebackq tokens=3 delims=>=/ " %%i in (`findstr ClCompile ..\compiler\translator_hlsl.vcxproj`) do if /I "%%~xi"==".c" echo ..\compiler\\%%i) >> sources.tmp
+(for /f "usebackq tokens=3 delims=>=/ " %%i in (`findstr ClCompile ..\compiler\preprocessor\new\preprocessor.vcxproj`) do if /I "%%~xi"==".cpp" if /I NOT "%%~ni"=="ExpressionParser" echo #include ^"%%~nxi^") > ..\compiler\preprocessor\new\pp_all.cpp
 echo ..\compiler\preprocessor\new\ExpressionParser.cpp >> sources.tmp
 echo ..\compiler\preprocessor\new\pp_all.cpp >> sources.tmp
-(for /f "usebackq tokens=1,2,3* delims==" %%i in (`findstr RelativePath %NAME%.vcproj`) do if /I "%%~xj"==".cpp" echo %%j) >> sources.tmp
+(for /f "usebackq tokens=3 delims=>=/ " %%i in (`findstr ClCompile %NAME%.vcxproj`) do if /I "%%~xi"==".cpp" echo %%i) >> sources.tmp
 
 set LB_CL_OPTS=%LB_CL_OPTS% -DANGLE_USE_NEW_PREPROCESSOR=1 -Dvsnprintf=_vsnprintf -DWIN32=1 -DLIBGLESV2_EXPORTS=1 -DNDEBUG=1 -DNOMINMAX  -I.. -I..\..\include -I"%~dp0include"  -I"%DXSDK_DIR%\include"
 

@@ -3,6 +3,9 @@ call %~dp0/wdk/setup %~n0 %*
 pushd %LB_PROJECT_ROOT%
 setlocal
 
+rem svn co http://svn.apache.org/repos/asf/apr/apr/trunk/ apr
+rem patch -p0 < apr.diff
+
 set NAME=%LB_PROJECT_NAME%
 
 (for /f "usebackq tokens=1,2,3* delims==" %%i in (`findstr /B SOURCE= libapr.dsp`) do if /I "%%~xj"==".c" if /I NOT "%%~nj"=="apr_app" echo %%j) > sources.tmp

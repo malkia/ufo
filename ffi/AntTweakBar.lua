@@ -13,7 +13,7 @@ local tw   = ffi.load( lib )
 ffi.cdef [[
       enum { TW_VERSION = 115 }
 
-      typedef enum ETwType {
+      typedef enum TwType {
 	 TW_TYPE_UNDEF,
 	 TW_TYPE_BOOLCPP,
 	 TW_TYPE_BOOL8,
@@ -41,26 +41,26 @@ ffi.cdef [[
 	 TW_TYPE_CSSTRING_LEN256 = 0x30000000 + 256,
       } TwType;
 
-      typedef struct CTwEnumVal  {
-	 int           Value;
-	 const char *  Label;
+      typedef struct TwEnumVal  {
+	 int         Value;
+	 const char* Label;
       } TwEnumVal;
 
-      typedef struct CTwStructMember  {
-	 const char *  Name;
-	 TwType        Type;
-	 size_t        Offset;
-	 const char *  DefString;
+      typedef struct TwStructMember  {
+	 const char* Name;
+	 TwType      Type;
+	 size_t      Offset;
+	 const char* DefString;
       } TwStructMember;
       
-      typedef enum ETwParamValueType {
+      typedef enum TwParamValueType {
 	 TW_PARAM_INT32,
 	 TW_PARAM_FLOAT,
 	 TW_PARAM_DOUBLE,
 	 TW_PARAM_CSTRING // Null-terminated array of char (ie, c-string)
       } TwParamValueType;
       
-      typedef enum ETwGraphAPI {
+      typedef enum TwGraphAPI {
 	 TW_OPENGL      = 1,
 	 TW_DIRECT3D9   = 2,
 	 TW_DIRECT3D10  = 3,
@@ -68,7 +68,7 @@ ffi.cdef [[
          TW_OPENGL_CORE = 5,
       } TwGraphAPI;
       
-      typedef enum ETwKeyModifier {
+      typedef enum TwKeyModifier {
 	 TW_KMOD_NONE  = 0x0000,   // same codes as SDL keysym.mod
 	 TW_KMOD_SHIFT = 0x0003,
 	 TW_KMOD_CTRL  = 0x00c0,
@@ -76,7 +76,7 @@ ffi.cdef [[
 	 TW_KMOD_META  = 0x0c00
       } TwKeyModifier;
        
-      typedef enum EKeySpecial {
+      typedef enum TwKeySpecial {
 	 TW_KEY_BACKSPACE  = '\b',
 	 TW_KEY_TAB        = '\t',
 	 TW_KEY_CLEAR      = 0x0c,
@@ -112,12 +112,12 @@ ffi.cdef [[
 	 TW_KEY_LAST
       } TwKeySpecial;
 
-      typedef enum ETwMouseAction {
+      typedef enum TwMouseAction {
 	 TW_MOUSE_RELEASED,
 	 TW_MOUSE_PRESSED  
       } TwMouseAction;
       
-      typedef enum ETwMouseButtonID {
+      typedef enum TwMouseButtonID {
 	 TW_MOUSE_LEFT   = 1,
 	 TW_MOUSE_MIDDLE = 2,
 	 TW_MOUSE_RIGHT  = 3 
@@ -134,7 +134,7 @@ ffi.cdef [[
       typedef void (*TwGLUTkeyboardfun)      ( unsigned char glutKey, int mouseX, int mouseY );
       typedef void (*TwGLUTspecialfun)       ( int glutKey, int mouseX, int mouseY );
       
-      typedef struct CTwBar TwBar;
+      typedef struct TwBar TwBar;
 
       TwBar*      TwNewBar(                    const char *barName );
       int         TwDeleteBar(                 TwBar *bar          );
@@ -148,11 +148,11 @@ ffi.cdef [[
       TwBar*      TwGetBarByIndex(             int barIndex        );
       TwBar*      TwGetBarByName(              const char *barName );
       int         TwRefreshBar(                TwBar *bar          );
-      int         TwAddVarRW(                  TwBar *bar, const char *name, TwType type, void *var, const char *def );
-      int         TwAddVarRO(                  TwBar *bar, const char *name, TwType type, const void *var, const char *def );
-      int         TwAddVarCB(                  TwBar *bar, const char *name, TwType type, TwSetVarCallback setCallback, TwGetVarCallback getCallback, void *clientData, const char *def );
-      int         TwAddButton(                 TwBar *bar, const char *name, TwButtonCallback callback, void *clientData, const char *def );
-      int         TwAddSeparator(              TwBar *bar, const char *name, const char *def );
+      int         TwAddVarRW(                  TwBar *bar, const char *name, TwType type,        void *var,                                     const char *def );
+      int         TwAddVarRO(                  TwBar *bar, const char *name, TwType type,  const void *var,                                     const char *def );
+      int         TwAddVarCB(                  TwBar *bar, const char *name, TwType type, TwSetVarCallback, TwGetVarCallback, void *clientData, const char *def );
+      int         TwAddButton(                 TwBar *bar, const char *name,              TwButtonCallback,                   void *clientData, const char *def );
+      int         TwAddSeparator(              TwBar *bar, const char *name,                                                                    const char *def );
       int         TwRemoveVar(                 TwBar *bar, const char *name );
       int         TwRemoveAllVars(             TwBar *bar );
       int         TwDefine(                    const char *def );
@@ -192,12 +192,7 @@ ffi.cdef [[
       int         TwGLUTModifiersFunc(         int (*glutGetModifiersFunc)(void) );
       int         TwEventSFML(                 const void *sfmlEvent, unsigned char sfmlMajorVersion, unsigned char sfmlMinorVersion);
       int         TwEventX11(                  void *xevent );
+      int         TwEventWin(                  void *wnd, unsigned int msg, size_t wParam, size_t lParam );
 ]]
-
-if ffi.arch == "x64" then
-   ffi.cdef( "int TwEventWin(void *wnd, unsigned int msg, unsigned __int64 wParam, __int64 lParam)" )
-else
-   ffi.cdef( "int TwEventWin(void *wnd, unsigned int msg, unsigned int wParam, int lParam);" )
-end
 
 return tw

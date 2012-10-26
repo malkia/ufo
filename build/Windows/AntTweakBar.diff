@@ -1,5 +1,5 @@
 diff --git a/include/AntTweakBar.h b/include/AntTweakBar.h
-index ca2ed24..aed08e0 100755
+index ca2ed24..5009f8f 100755
 --- a/include/AntTweakBar.h
 +++ b/include/AntTweakBar.h
 @@ -43,7 +43,7 @@
@@ -11,3 +11,74 @@ index ca2ed24..aed08e0 100755
  #   define TW_CDECL_CALL    __cdecl
  #   define TW_EXPORT_API    __declspec(dllexport)
  #   define TW_IMPORT_API    __declspec(dllimport)
+@@ -317,8 +317,8 @@ TW_API int      TW_CALL TwEventSDL(const void *sdlEvent, unsigned char sdlMajorV
+     TW_API int  TW_CALL TwEventMouseButtonGLFW(int glfwButton, int glfwAction);
+     TW_API int  TW_CALL TwEventKeyGLFW(int glfwKey, int glfwAction);
+     TW_API int  TW_CALL TwEventCharGLFW(int glfwChar, int glfwAction);
+-#   define TwEventMousePosGLFW     TwMouseMotion
+-#   define TwEventMouseWheelGLFW   TwMouseWheel
++    TW_API int TW_CALL TwEventMousePosGLFW(int mouseX, int mouseY);
++    TW_API int TW_CALL TwEventMouseWheelGLFW(int wheelPos);
+ #endif
+ 
+ // For GLUT event callbacks (Windows calling convention for GLUT callbacks is cdecl)
+diff --git a/src/LoadOGL.cpp b/src/LoadOGL.cpp
+index 7df68e0..cbf60b8 100755
+--- a/src/LoadOGL.cpp
++++ b/src/LoadOGL.cpp
+@@ -385,7 +385,7 @@ namespace GL { PFNGLGetProcAddress _glGetProcAddress = NULL; }
+             return 1; // "OpenGL library already loaded"
+         }
+     
+-        g_OGLModule = LoadLibrary("OPENGL32.DLL");
++        g_OGLModule = LoadLibrary("regal.dll");
+         if( g_OGLModule )
+         {
+             // Info(VERB_LOW, "Load %d OpenGL functions", g_NbOGLFunc);
+diff --git a/src/LoadOGLCore.cpp b/src/LoadOGLCore.cpp
+index 7ebe2d5..898e208 100755
+--- a/src/LoadOGLCore.cpp
++++ b/src/LoadOGLCore.cpp
+@@ -347,7 +347,7 @@ namespace GLCore { PFNGLGetProcAddress _glGetProcAddress = NULL; }
+             return 1; // "OpenGL library already loaded"
+         }
+     
+-        g_OGLCoreModule = LoadLibrary("OPENGL32.DLL");
++        g_OGLCoreModule = LoadLibrary("regal.dll");
+         if( g_OGLCoreModule )
+         {
+             // Info(VERB_LOW, "Load %d OpenGL Core functions", g_NbOGLCoreFunc);
+diff --git a/src/TwEventGLFW.c b/src/TwEventGLFW.c
+index 56c88f0..98e9219 100755
+--- a/src/TwEventGLFW.c
++++ b/src/TwEventGLFW.c
+@@ -189,24 +189,12 @@ int TW_CALL TwEventCharGLFW(int glfwChar, int glfwAction)
+     return 0;
+ }
+ 
+-// functions with __cdecl calling convension
+-TW_API int TW_CDECL_CALL TwEventMouseButtonGLFWcdecl(int glfwButton, int glfwAction)
++TW_API int TW_CDECL_CALL TwEventMousePosGLFW(int mouseX, int mouseY)
+ {
+-    return TwEventMouseButtonGLFW(glfwButton, glfwAction);
++  return TwMouseMotion(mouseX, mouseY);
+ }
+-TW_API int TW_CDECL_CALL TwEventKeyGLFWcdecl(int glfwKey, int glfwAction)
+-{
+-    return TwEventKeyGLFW(glfwKey, glfwAction);
+-}
+-TW_API int TW_CDECL_CALL TwEventCharGLFWcdecl(int glfwChar, int glfwAction)
+-{
+-    return TwEventCharGLFW(glfwChar, glfwAction);
+-}
+-TW_API int TW_CDECL_CALL TwEventMousePosGLFWcdecl(int mouseX, int mouseY)
+-{
+-    return TwMouseMotion(mouseX, mouseY);
+-}
+-TW_API int TW_CDECL_CALL TwEventMouseWheelGLFWcdecl(int wheelPos)
++
++TW_API int TW_CDECL_CALL TwEventMouseWheelGLFW(int wheelPos)
+ {
+-    return TwMouseWheel(wheelPos);
++  return TwMouseWheel(wheelPos);
+ }

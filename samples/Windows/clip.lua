@@ -1,5 +1,5 @@
 -- pbpaste (Mac OS X) program for Windows
--- to run: luajit winclip.lua
+-- to run: luajit clip.lua
 -- it should print the clipboard (textual content)
 local ffi = require( "ffi" )
 

@@ -7,9 +7,6 @@ set NAME=%LB_PROJECT_NAME%
 pushd %LB_PROJECT_ROOT%\src\interfaces\lib%NAME%
 git clean -fdx
 
-if "%LB_TARGET_BITS%"=="32" set CUTSYMPOS=12
-if "%LB_TARGET_BITS%"=="64" set CUTSYMPOS=11
-
 echo.>sources.tmp
 
 set CPP=^

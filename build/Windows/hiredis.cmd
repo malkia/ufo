@@ -4,6 +4,10 @@ call %~dp0/wdk/setup %~n0 %*
 pushd %LB_PROJECT_ROOT%\deps\hiredis
 git clean -fdx
 
+rem git://github.com/MSOpenTech/redis.git
+rem origin/bksavecow
+rem patch -p1 < redis.diff
+
 set NAME=%LB_PROJECT_NAME%
 set FILES=async.c dict.c hiredis.c net.c sds.c ..\..\src\win32fixes.c
 
