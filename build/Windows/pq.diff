@@ -1,0 +1,13 @@
+diff --git a/src/port/dirmod.c b/src/port/dirmod.c
+index 514424f..1680cc1 100644
+--- a/src/port/dirmod.c
++++ b/src/port/dirmod.c
+@@ -640,7 +640,7 @@ pgwin32_safestat(const char *path, struct stat * buf)
+ 	int			r;
+ 	WIN32_FILE_ATTRIBUTE_DATA attr;
+ 
+-	r = stat(path, buf);
++	r = _stat(path, (struct _stat*)buf);
+ 	if (r < 0)
+ 		return r;
+ 
