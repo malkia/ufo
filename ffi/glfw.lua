@@ -368,6 +368,6 @@ ffi.cdef[[
    uint32_t*   glfwGetX11Display(            );
    uint32_t    glfwGetX11Window(             GLFWwindow ); 
    void*       glfwGetGLXContext(            GLFWwindow );
-   ]]
+]]
 
-   return glfw
+return glfw

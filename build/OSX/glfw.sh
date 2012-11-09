@@ -9,7 +9,7 @@ cd build
 
 # http://stackoverflow.com/questions/1440456/static-libraries-in-version-cross-compiled-program/7835983#7835983
 export MACOSX_DEPLOYMENT_TARGET=10.5
-cmake -D CMAKE_OSX_ARCHITECTURES="i386;x86_64" -D BUILD_SHARED_LIBS=ON -D CMAKE_C_COMPILER=clang ../
+cmake -D GLFW_NATIVE_API=1 -D CMAKE_OSX_ARCHITECTURES="i386;x86_64" -D BUILD_SHARED_LIBS=ON -D CMAKE_C_COMPILER=clang ../
 make -j VERBOSE=1
 
 git log -1 >> src/libglfw.3.0.dylib

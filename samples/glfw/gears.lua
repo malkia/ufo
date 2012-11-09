@@ -174,8 +174,8 @@ end
 
 local function reshape( window, width, height )
    local h     = height / width
-   local znear = 5
-   local zfar  = 30
+   local znear = 0.001
+   local zfar  = 300
    local xmax  = znear * 0.5
    gl.glViewport( 0, 0, width, height )
    gl.glMatrixMode( gl.GL_PROJECTION )
@@ -223,45 +223,52 @@ local function pressed( window, key )
    return glfw.glfwGetKey( window, glfw["GLFW_KEY_" .. key:upper()] ) == glfw.GLFW_PRESS
 end
 
-local function holds( window, key )
-   return glfw.glfwGetKey( window, glfw["GLFW_KEY_" .. key:upper()] ) == glfw.GLFW_PRESS
-end
-
 local function main()
    assert( glfw.glfwInit() )
+   glfw.glfwWindowHint( glfw.GLFW_DEPTH_BITS, 16 );
    local window = assert(
       ffi.gc( glfw.glfwCreateWindow( 1024, 768, glfw.GLFW_WINDOWED, "Gears", nil ),
 	      glfw.glfwDestroyWindow))
    glfw.glfwMakeContextCurrent(window)
+   glfw.glfwSwapInterval(0)
 
    init()
 
-   local sw, sh = ffi.new( "int[1]" ), ffi.new( "int[1]" )
+   local ffi_w, ffi_h = ffi.new( "int[1]" ), ffi.new( "int[1]" )
+   local width, height
+
    while glfw.glfwGetKey( window, glfw.GLFW_KEY_ESCAPE ) ~= glfw.GLFW_PRESS
    do
-      glfw.glfwGetWindowSize(window, sw, sh)
-      local sw, sh = sw[0], sh[0]
-      reshape( window, sw, sh )
+      -- Resize 
+      glfw.glfwGetWindowSize(window, ffi_w, ffi_h)
+      if width ~= ffi_w[0] or height ~= ffi_h[0] then
+	 width, height = ffi_w[0], ffi_h[0]
+	 reshape( window, width, height )
+      end
+
       draw();
       animate();
+
       glfw.glfwSwapBuffers(window);
       glfw.glfwPollEvents();
-      if pressed( window, "Z" ) then
-	 if holds( window, "LEFT_SHIFT" ) then
-	    view_rotz = view_rotz - 5
-	 else
-	    view_rotz = view_rotz + 5
-	 end
-      elseif pressed( window, "ESCAPE" )then
-	 break
-      elseif pressed( window, "UP" ) then
-	 view_rotx = view_rotx + 5
-      elseif pressed( window, "DOWN" ) then
-	 view_rotx = view_rotx - 5
-      elseif pressed( window, "LEFT" ) then
-	 view_roty = view_roty + 5
-      elseif pressed( window, "RIGHT" ) then
-	 view_roty = view_roty - 5
+
+      if pressed( window, "Z" ) and pressed( window, "LEFT_SHIFT" ) then
+	 view_rotz = view_rotz - 2
+      end
+      if pressed( window, "Z" ) and not pressed( window, "LEFT_SHIFT" ) then
+	 view_rotz = view_rotz + 2
+      end
+      if pressed( window, "UP" ) then
+	 view_rotx = view_rotx + 2
+      end
+      if pressed( window, "DOWN" ) then
+	 view_rotx = view_rotx - 2
+      end
+      if pressed( window, "LEFT" ) then
+	 view_roty = view_roty + 2
+      end
+      if pressed( window, "RIGHT" ) then
+	 view_roty = view_roty - 2
       end
    end
    
@@ -269,5 +276,4 @@ local function main()
 end    
 
 main()
-
 
