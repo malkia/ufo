@@ -214,12 +214,21 @@ ffi.cdef[[
      GLFW_STEREO                = 0x0002100C,
      GLFW_WINDOW_NO_RESIZE      = 0x0002100D,
      GLFW_FSAA_SAMPLES          = 0x0002100E,
-     GLFW_OPENGL_VERSION_MAJOR  = 0x0002100F,
-     GLFW_OPENGL_VERSION_MINOR  = 0x00021010,
-     GLFW_OPENGL_FORWARD_COMPAT = 0x00021011,
-     GLFW_OPENGL_DEBUG_CONTEXT  = 0x00021012,
-     GLFW_OPENGL_PROFILE        = 0x00021013,
-     GLFW_OPENGL_ROBUSTNESS     = 0x00021014,
+
+     GLFW_CLIENT_API            = 0x00022000,
+     GLFW_OPENGL_VERSION_MAJOR  = 0x00022001,
+     GLFW_OPENGL_VERSION_MINOR  = 0x00022002,
+     GLFW_OPENGL_FORWARD_COMPAT = 0x00022003,
+     GLFW_OPENGL_DEBUG_CONTEXT  = 0x00022004,
+     GLFW_OPENGL_PROFILE        = 0x00022005,
+     GLFW_OPENGL_ROBUSTNESS     = 0x00022006,
+     GLFW_RESIZABLE             = 0x00022007,
+     GLFW_VISIBLE               = 0x00022008,
+     GLFW_POSITION_X            = 0x00022009,
+     GLFW_POSITION_Y            = 0x0002200A,
+
+     GLFW_OPENGL_API            = 0x00000001,
+     GLFW_OPENGL_ES_API         = 0x00000002,
 
      GLFW_OPENGL_NO_ROBUSTNESS         = 0x00000000,
      GLFW_OPENGL_NO_RESET_NOTIFICATION = 0x00000001,
@@ -228,13 +237,11 @@ ffi.cdef[[
      GLFW_OPENGL_NO_PROFILE     = 0x00000000,
      GLFW_OPENGL_CORE_PROFILE   = 0x00000001,
      GLFW_OPENGL_COMPAT_PROFILE = 0x00000002,
-     GLFW_OPENGL_ES2_PROFILE    = 0x00000004,
 
      GLFW_CURSOR_MODE           = 0x00030001,
      GLFW_STICKY_KEYS           = 0x00030002,
      GLFW_STICKY_MOUSE_BUTTONS  = 0x00030003,
-     GLFW_SYSTEM_KEYS           = 0x00030004,
-     GLFW_KEY_REPEAT            = 0x00030005,
+     GLFW_KEY_REPEAT            = 0x00030004,
 
      GLFW_CURSOR_NORMAL         = 0x00040001, 
      GLFW_CURSOR_HIDDEN         = 0x00040002,
@@ -275,6 +282,7 @@ ffi.cdef[[
 
    typedef struct GLFWwindow* GLFWwindow;
 
+   typedef void  (* GLFWglproc)(           );
    typedef void  (* GLFWerrorfun)(         int, const char* );
    typedef void  (* GLFWwindowsizefun)(    GLFWwindow, int, int );
    typedef int   (* GLFWwindowclosefun)(   GLFWwindow);
@@ -288,10 +296,10 @@ ffi.cdef[[
    typedef void  (* GLFWkeyfun)(           GLFWwindow, int, int );
    typedef void  (* GLFWcharfun)(          GLFWwindow, int );
 
-   int         glfwInit(void);
-   void        glfwTerminate(void);
-   void        glfwGetVersion(int* major, int* minor, int* rev);
-   const char* glfwGetVersionString(void);
+   int         glfwInit(                     );
+   void        glfwTerminate(                );
+   void        glfwGetVersion(               int* major, int* minor, int* rev);
+   const char* glfwGetVersionString(         );
 
    int         glfwGetError(                 );
    const char* glfwErrorString(              int error );
@@ -304,16 +312,17 @@ ffi.cdef[[
    void        glfwGetGammaRamp(             GLFWgammaramp* );
    void        glfwSetGammaRamp(       const GLFWgammaramp* );
 
+   void        glfwDefaultWindowHints(       );
    void        glfwWindowHint(               int target, int hint);
    GLFWwindow  glfwCreateWindow(             int width,  int height, int mode, const char* title, GLFWwindow share );
    void        glfwDestroyWindow(            GLFWwindow  );
    void        glfwSetWindowTitle(           GLFWwindow, const char* title );
    void        glfwGetWindowSize(            GLFWwindow, int* w, int* h );
    void        glfwSetWindowSize(            GLFWwindow, int  w, int  h );
-   void        glfwGetWindowPos(             GLFWwindow, int* x, int* y );
-   void        glfwSetWindowPos(             GLFWwindow, int  x, int  y );
    void        glfwIconifyWindow(            GLFWwindow  );
    void        glfwRestoreWindow(            GLFWwindow  );
+   void        glfwShowWindow(               GLFWwindow  );
+   void        glfwHideWindow(               GLFWwindow  );
    int         glfwGetWindowParam(           GLFWwindow, int    param   );
    void        glfwSetWindowUserPointer(     GLFWwindow, void*  pointer );
    void*       glfwGetWindowUserPointer(     GLFWwindow  );
@@ -333,16 +342,15 @@ ffi.cdef[[
    void        glfwGetCursorPos(             GLFWwindow, int* x, int* y );
    void        glfwSetCursorPos(             GLFWwindow, int  x, int  y );
    void        glfwGetScrollOffset(          GLFWwindow, double* x, double* y );
-
-   void        glfwSetKeyCallback(           GLFWkeyfun         cbfun );
-   void        glfwSetCharCallback(          GLFWcharfun        cbfun );
-   void        glfwSetMouseButtonCallback(   GLFWmousebuttonfun cbfun );
-   void        glfwSetCursorPosCallback(     GLFWcursorposfun   cbfun );
-   void        glfwSetCursorEnterCallback(   GLFWcursorenterfun cbfun );
-   void        glfwSetScrollCallback(        GLFWscrollfun      cbfun );
+   void        glfwSetKeyCallback(           GLFWwindow, GLFWkeyfun         );
+   void        glfwSetCharCallback(          GLFWwindow, GLFWcharfun        );
+   void        glfwSetMouseButtonCallback(   GLFWwindow, GLFWmousebuttonfun );
+   void        glfwSetCursorPosCallback(     GLFWwindow, GLFWcursorposfun   );
+   void        glfwSetCursorEnterCallback(   GLFWwindow, GLFWcursorenterfun );
+   void        glfwSetScrollCallback(        GLFWwindow, GLFWscrollfun      );
 
    int         glfwGetJoystickParam(         int joy, int param );
-   int         glfwGetJoystickPos(           int joy, float* pos, int numaxes );
+   int         glfwGetJoystickAxes(          int joy, float* axes, int numaxes );
    int         glfwGetJoystickButtons(       int joy, unsigned char* buttons, int numbuttons );
 
    void        glfwSetClipboardString(       GLFWwindow, const char* );

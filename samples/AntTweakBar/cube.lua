@@ -59,9 +59,10 @@ local function main()
    local desktop_width, desktop_height = desktop_mode[0].width, desktop_mode[0].height
    local width, height = desktop_width * 0.8, desktop_height * 0.8
 
+   glfw.glfwWindowHint( glfw.GLFW_POSITION_X, (desktop_width  - width)/2  )
+   glfw.glfwWindowHint( glfw.GLFW_POSITION_Y, (desktop_height - height)/2 )
    local window = glfw.glfwCreateWindow( width, height, glfw.GLFW_WINDOWED, "AntTweakBar with GLFW and OpenGL", nil )
    assert( window, "Failed to open GLFW window")
-   glfw.glfwSetWindowPos( window, (desktop_width - width)/2, (desktop_height - height)/2 )
    glfw.glfwMakeContextCurrent( window )
  
    local mouse = { 

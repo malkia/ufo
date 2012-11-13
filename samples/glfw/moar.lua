@@ -191,6 +191,8 @@ local function main()
    local desktop_width, desktop_height = desktop_mode[0].width, desktop_mode[0].height
    local width, height = desktop_width * 0.9, desktop_height * 0.9
 
+   glfw.glfwWindowHint( glfw.GLFW_POSITION_X, (desktop_width  - width)/2  )
+   glfw.glfwWindowHint( glfw.GLFW_POSITION_Y, (desktop_height - height)/2 )
    local window = assert(
       ffi.gc( glfw.glfwCreateWindow( width, height, glfw.GLFW_WINDOWED, "Font Demo", nil ),
 	      glfw.glfwDestroyWindow))
@@ -200,7 +202,6 @@ local function main()
    end
 
    glfw.glfwSetInputMode( window, glfw.GLFW_STICKY_KEYS, 1 )
-   glfw.glfwSetWindowPos( window, (desktop_width - width)/2, (desktop_height - height)/2 )
    glfw.glfwMakeContextCurrent( window );
    glfw.glfwSwapInterval( 0 ) -- 0=nosync 1=60fps
 

@@ -541,9 +541,9 @@ enum {
   CL_AFFINITY_DOMAIN_L4_CACHE_EXT             = 0x4,
   CL_AFFINITY_DOMAIN_NUMA_EXT                 = 0x10,
   CL_AFFINITY_DOMAIN_NEXT_FISSIONABLE_EXT     = 0x100,
-  CL_PROPERTIES_LIST_END_EXT                  = 0UL,
-  CL_PARTITION_BY_COUNTS_LIST_END_EXT         = 0UL,
-  CL_PARTITION_BY_NAMES_LIST_END_EXT          = -1UL,
+  CL_PROPERTIES_LIST_END_EXT                  = 0,
+  CL_PARTITION_BY_COUNTS_LIST_END_EXT         = 0,
+  CL_PARTITION_BY_NAMES_LIST_END_EXT          = -1,
 };
 
 typedef struct _cl_counter_amd* cl_counter_amd;

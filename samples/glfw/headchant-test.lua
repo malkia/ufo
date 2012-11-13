@@ -22,11 +22,11 @@ local window = assert( ffi.gc(
 ))
 
 glfw.glfwSetInputMode( window, glfw.GLFW_STICKY_KEYS, 1 )
---glfw.glfwSetWindowPos( window, (desktop_width - width)/2, (desktop_height - height)/2 )
 glfw.glfwMakeContextCurrent( window );
 glfw.glfwSwapInterval( 0 ) -- 0=nosync 1=60fps
 
 glfw.glfwSetCharCallback(
+   window, -- newer glfw api requires window handle!
    ffi.cast(
       "GLFWcharfun", 
       function(w,c,a) 
@@ -36,7 +36,7 @@ glfw.glfwSetCharCallback(
 ))
 
 while glfw.glfwGetKey( window, glfw.GLFW_KEY_ESCAPE ) ~= glfw.GLFW_PRESS do
---    gl.glClear( gl.GL_COLOR_BUFFER_BIT )
+--   gl.glClear( gl.GL_COLOR_BUFFER_BIT )
     glfw.glfwSwapBuffers(window)
     glfw.glfwPollEvents() 
  end
