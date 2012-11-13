@@ -12,7 +12,7 @@ set NAME=%LB_PROJECT_NAME%
 
 set FILES=^
   fullscreen.c gamma.c init.c input.c joystick.c opengl.c time.c^
-  win32_fullscreen.c win32_gamma.c win32_init.c win32_input.c^
+  win32_fullscreen.c win32_gamma.c win32_init.c^
   win32_joystick.c win32_opengl.c win32_time.c win32_window.c window.c win32_native.c
 
 set OPENGL=%LB_ROOT%\bin\Windows\%LB_TARGET_ARCH%\regal.lib
