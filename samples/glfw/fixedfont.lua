@@ -1,6 +1,6 @@
 local ffi  = require( "ffi" )
-local gl   = require( "ffi/OpenGL" ) 
 local glfw = require( "ffi/glfw" )
+local gl   = require( "ffi/OpenGL" ) 
 
 local font = require( "lib/fonts/pearl8x8" )
 local font = ffi.new( "uint8_t[?]", #font, font )

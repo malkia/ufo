@@ -1,4 +1,5 @@
 local ffi = require( "ffi" )
+local gl = require( "ffi/OpenGL" ) -- This is required on Windows to work with REGAL
 local glfw = require( "ffi/glfw" )
 local cr = require ( "ffi/cairo" )
 assert( glfw.glfwInit() )
@@ -29,14 +30,13 @@ glfw.glfwSetCharCallback(
    window, -- newer glfw api requires window handle!
    ffi.cast(
       "GLFWcharfun", 
-      function(w,c,a) 
+      function(w,c) 
 	 print(w)
 	 print(c)
       end
 ))
 
 while glfw.glfwGetKey( window, glfw.GLFW_KEY_ESCAPE ) ~= glfw.GLFW_PRESS do
---   gl.glClear( gl.GL_COLOR_BUFFER_BIT )
     glfw.glfwSwapBuffers(window)
     glfw.glfwPollEvents() 
  end
