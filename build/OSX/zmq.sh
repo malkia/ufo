@@ -23,13 +23,16 @@ git clean -fdx
 #exit
 
 FLAGS="-arch i386 -arch x86_64 -mmacosx-version-min=10.5"
-CXX="clang $FLAGS"
+CXX="clang++ $FLAGS"
 CC="clang $FLAGS"
+CPP="clang -E"
+CXXCPP="clang++ -E"
+
 #make clean
 ./autogen.sh
 export OpenPGM_CFLAGS=-I../../openpgm/pgm/include
 export OpenPGM_LIBS="-L../../openpgm/pgm/ -lpgm"
-./configure CXX="$CXX" CC="$CC" CPP=/usr/bin/cpp CXXCPP=/usr/bin/cpp --with-system-pgm
+./configure CXX="$CXX" CC="$CC" CPP="$CPP" CXXCPP="$CXXCPP" --with-system-pgm
 make -j V=1
 
 git log -1 >> src/.libs/libzmq.3.dylib
