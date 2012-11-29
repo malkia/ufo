@@ -1,5 +1,3 @@
-#!/usr/bin/env luajit 
-
 local ffi  = require( "ffi" )
 local gl   = require( "ffi/OpenGL" )
 local glu  = require( "ffi/glu" )
@@ -53,6 +51,7 @@ end
 
 local function main()
    assert( glfw.glfwInit(), "Failed to initialize GLFW" )
+   assert( tw.TwInit(tw.TW_OPENGL, nil), "Failed to initialize AntTweakBar" )
 
    local desktop_mode = ffi.new( "GLFWvidmode[1]" )
    glfw.glfwGetDesktopMode( desktop_mode )
@@ -61,16 +60,11 @@ local function main()
 
    glfw.glfwWindowHint( glfw.GLFW_POSITION_X, (desktop_width  - width)/2  )
    glfw.glfwWindowHint( glfw.GLFW_POSITION_Y, (desktop_height - height)/2 )
-   local window = glfw.glfwCreateWindow( width, height, glfw.GLFW_WINDOWED, "AntTweakBar with GLFW and OpenGL", nil )
-   assert( window, "Failed to open GLFW window")
-   glfw.glfwMakeContextCurrent( window )
- 
-   local mouse = { 
-      x = 0, y = 0, wheel = 0,
-      buttons = { {}, {}, {} },
-   }
+   local window = assert( glfw.glfwCreateWindow( width, height, glfw.GLFW_WINDOWED, "AntTweakBar with GLFW and OpenGL", nil ), "Failed to open GLFW window")
+   require( "lib/glfw-atw" )( glfw, tw, ffi, window )
 
-   tw.TwInit( tw.TW_OPENGL, nil )
+   glfw.glfwMakeContextCurrent( window )
+   glfw.glfwSwapInterval(0)
 
    local var_speed      = ffi.new( "double[1]", 0.3 )
    local var_wire       = ffi.new( "int32_t[1]" )
@@ -79,23 +73,33 @@ local function main()
    local var_bg_color   = ffi.new( "float[3]", 0.1, 0.2, 0.4 )
    local var_cube_color = ffi.new( "uint8_t[4]", 255, 0, 0, 128 )
 
+   local bar = tw.TwNewBar("TweakBar")
    local RW = tw.TwAddVarRW
    local RO = tw.TwAddVarRO
 
-   local bar = tw.TwNewBar("TweakBar")
    tw.TwDefine("GLOBAL help='This example shows how to integrate AntTweakBar with GLFW and OpenGL.'")
-   RW( bar, "speed",     tw.TW_TYPE_DOUBLE,  var_speed,      "label='Rot speed' min=0 max=2 step=0.01 keyIncr=s keyDecr=S help='Rotation speed (turns/second)'" )
-   RW( bar, "wire",      tw.TW_TYPE_BOOL32,  var_wire,       "label='Wireframe mode' key=w help='Toggle wireframe display mode.'" )
-   RO( bar, "time",      tw.TW_TYPE_DOUBLE,  var_time,       "label='Time' precision=1 help='Time (in seconds).'")
-   RO( bar, "turn",      tw.TW_TYPE_DOUBLE,  var_turn,       "label='Turn' precision=1 help='Turn'")
-   RW( bar, "bgColor",   tw.TW_TYPE_COLOR3F, var_bg_color,   "label='Background color'")
-   RW( bar, "cubeColor", tw.TW_TYPE_COLOR32, var_cube_color, "label='Cube color' alpha help='Color and transparency of the cube.'")
+
+   RW( bar, "speed",     tw.TW_TYPE_DOUBLE,  var_speed,
+       "label='Rot speed' min=0 max=2 step=0.01 keyIncr=s keyDecr=S help='Rotation speed (turns/second)'" )
+
+   RW( bar, "wire",      tw.TW_TYPE_BOOL32,  var_wire,
+       "label='Wireframe mode' key=w help='Toggle wireframe display mode.'" )
+
+   RW( bar, "time",      tw.TW_TYPE_DOUBLE,  var_time,
+       "label='Time' precision=1 help='Time (in seconds).'")
+
+   RW( bar, "turn",      tw.TW_TYPE_DOUBLE,  var_turn,
+       "label='Turn' precision=1 help='Turn'")
+
+   RW( bar, "bgColor",   tw.TW_TYPE_COLOR3F, var_bg_color,
+       "label='Background color'")
+
+   RW( bar, "cubeColor", tw.TW_TYPE_COLOR32, var_cube_color,
+       "label='Cube color' alpha help='Color and transparency of the cube.'")
 
    width, height = nil, nil
    local int1, int2 = ffi.new( "int[1]" ), ffi.new( "int[1]" )
-   local dbl1, dbl2 = ffi.new( "double[1]" ), ffi.new( "double[1]" )
-   while glfw.glfwGetKey( window, glfw.GLFW_KEY_ESCAPE ) ~= glfw.GLFW_PRESS
-   do
+   while glfw.glfwGetKey( window, glfw.GLFW_KEY_ESCAPE ) ~= glfw.GLFW_PRESS do
       glfw.glfwGetWindowSize(window, int1, int2)
       if width ~= int1[0] or height ~= int2[0] then
          width, height = int1[0], int2[0]
@@ -121,32 +125,8 @@ local function main()
       
       gl.glColor4ubv( var_cube_color )
       DrawModel( var_wire[0] ~= 0 )
+      tw.TwDraw()
  
-      glfw.glfwGetCursorPos(window, int1, int2)
-      mouse.x, mouse.y = int1[0], int2[0]
-      do -- AntTweakBar
-	 for i=1, #mouse.buttons do
-	    local should_update
-	    local b = mouse.buttons[i]
-	    b.new_state = glfw.glfwGetMouseButton( window, glfw.GLFW_MOUSE_BUTTON_LEFT + i - 1 )
-	    if b.old_state ~= b.new_state then
-	       b.old_state = b.new_state
-	       b.last_time = os.clock()
-	       should_update = true
-	    elseif b.new_state == glfw.GLFW_PRESS then
-	       should_update = (os.clock() - b.last_time > 0.25)
-	    end
-	    if should_update then
-	       tw.TwMouseButton( b.new_state, tw.TW_MOUSE_LEFT + i - 1 )
-	    end
-	 end
-	 glfw.glfwGetScrollOffset( window, dbl1, dbl2 )
-	 mouse.wheel = mouse.wheel + dbl2[0]
-	 tw.TwMouseWheel( mouse.wheel )
-	 tw.TwMouseMotion( mouse.x, mouse.y )
-	 tw.TwDraw()
-      end
-
       glfw.glfwSwapBuffers(window)
       glfw.glfwPollEvents()
    end
