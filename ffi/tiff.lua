@@ -81,8 +81,8 @@ ffi.cdef [[
   typedef struct TIFFField TIFFField;
   typedef struct TIFFFieldArray TIFFFieldArray;
 
-  typedef void (*TIFFTileContigRoutine)(   TIFFRGBAImage*, uint32*, uint32_t, uint32_t, uint32_t, uint32_t, int32_t, int32_t, unsigned char* );
-  typedef void (*TIFFTileSeparateRoutine)( TIFFRGBAImage*, uint32*, uint32_t, uint32_t, uint32_t, uint32_t, int32_t, int32_t, unsigned char*, unsigned char*, unsigned char*, unsigned char* );
+  typedef void (*TIFFTileContigRoutine)(   TIFFRGBAImage*, uint32_t*, uint32_t, uint32_t, uint32_t, uint32_t, int32_t, int32_t, unsigned char* );
+  typedef void (*TIFFTileSeparateRoutine)( TIFFRGBAImage*, uint32_t*, uint32_t, uint32_t, uint32_t, uint32_t, int32_t, int32_t, unsigned char*, unsigned char*, unsigned char*, unsigned char* );
   
   struct TIFFRGBAImage {
     TIFF*            tif;
@@ -99,7 +99,7 @@ ffi.cdef [[
     uint16_t*        redcmap;
     uint16_t*        greencmap;
     uint16_t*        bluecmap;
-    int    (* get )( TIFFRGBAImage*, uint32*, uint32_t, uint32_t );
+    int    (* get )( TIFFRGBAImage*, uint32_t*, uint32_t, uint32_t );
     union {
       void (* any )( TIFFRGBAImage* );
       TIFFTileContigRoutine   contig;
@@ -134,7 +134,7 @@ ffi.cdef [[
   typedef void     (* TIFFExtendProc )(      TIFF*  );
   typedef int      (* TIFFVSetMethod )(      TIFF*, uint32_t, va_list );
   typedef int      (* TIFFVGetMethod )(      TIFF*, uint32_t, va_list );
-  typedef void     (* TIFFPrintMethod )(     TIFF*, FILE*, long );
+  typedef void     (* TIFFPrintMethod )(     TIFF*, void* /* FILE* */, long );
 
   typedef struct TIFFTagMethods {
     TIFFVSetMethod vsetfield; /* tag set routine */
@@ -240,7 +240,7 @@ ffi.cdef [[
   int                  TIFFWriteCustomDirectory(  TIFF *, uint64_t *);
   int                  TIFFCheckpointDirectory(   TIFF *);
   int                  TIFFRewriteDirectory(      TIFF *);
-  void                 TIFFPrintDirectory(        TIFF*, FILE*, long);
+  void                 TIFFPrintDirectory(        TIFF*, void* /* FILE* */, long);
   int                  TIFFReadScanline(          TIFF*, void* buf, uint32_t row, uint16_t sample);
   int                  TIFFWriteScanline(         TIFF*, void* buf, uint32_t row, uint16_t sample);
   int                  TIFFReadRGBAImage(         TIFF*, uint32_t, uint32_t, uint32_t*, int);
@@ -270,7 +270,7 @@ ffi.cdef [[
   uint32_t             TIFFNumberOfTiles(         TIFF*);
   ssize_t              TIFFReadTile(              TIFF*, void* buf, uint32_t x, uint32_t y, uint32_t z, uint16_t s);  
   ssize_t              TIFFWriteTile(             TIFF*, void* buf, uint32_t x, uint32_t y, uint32_t z, uint16_t s);
-  uint32_t             TIFFComputeStrip(          TIFF*, uint32_t, uint16);
+  uint32_t             TIFFComputeStrip(          TIFF*, uint32_t, uint16_t);
   uint32_t             TIFFNumberOfStrips(        TIFF*);
   ssize_t              TIFFReadEncodedStrip(      TIFF*, uint32_t strip, void* buf, ssize_t size);
   ssize_t              TIFFReadRawStrip(          TIFF*, uint32_t strip, void* buf, ssize_t size);  
@@ -302,4 +302,4 @@ ffi.cdef [[
   void                 TIFFYCbCrtoRGB(            TIFFYCbCrToRGB *, uint32_t, int32_t, int32_t, uint32_t *, uint32_t *, uint32_t *);
 ]]
 
-return ffi.load( "tiff" )
+return ffi.load( "/opt/local/lib/libtiff.dylib" )
