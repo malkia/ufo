@@ -302,4 +302,5 @@ ffi.cdef [[
   void                 TIFFYCbCrtoRGB(            TIFFYCbCrToRGB *, uint32_t, int32_t, int32_t, uint32_t *, uint32_t *, uint32_t *);
 ]]
 
-return ffi.load( "/opt/local/lib/libtiff.dylib" )
+return ffi.load( "tiff" ) 
+
