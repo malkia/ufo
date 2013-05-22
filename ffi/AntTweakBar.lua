@@ -11,7 +11,7 @@ local lib  = ffi_AntTweakBar_lib or libs[ ffi.os ][ ffi.arch ] or "AntTweakBar"
 local tw   = ffi.load( lib )
 
 ffi.cdef [[
-      enum { TW_VERSION = 115 }
+      enum { TW_VERSION = 116 };
 
       typedef enum TwType {
 	 TW_TYPE_UNDEF,
