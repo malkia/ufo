@@ -1,7 +1,7 @@
 ----------------------------------------------------------------------------
 -- LuaJIT x86/x64 disassembler module.
 --
--- Copyright (C) 2005-2012 Mike Pall. All rights reserved.
+-- Copyright (C) 2005-2013 Mike Pall. All rights reserved.
 -- Released under the MIT license. See Copyright Notice in luajit.h
 ----------------------------------------------------------------------------
 -- This is a helper module used by the LuaJIT machine code dumper module.
@@ -28,6 +28,8 @@ local type = type
 local sub, byte, format = string.sub, string.byte, string.format
 local match, gmatch, gsub = string.match, string.gmatch, string.gsub
 local lower, rep = string.lower, string.rep
+local bit = require("bit")
+local tohex = bit.tohex
 
 -- Map for 1st opcode byte in 32 bit mode. Ugly? Well ... read on.
 local map_opc1_32 = {
@@ -532,7 +534,7 @@ local function putpat(ctx, name, pat)
 	local lo = imm % 0x1000000
 	x = format("0x%02x%06x", (imm-lo) / 0x1000000, lo)
       else
-	x = format("0x%08x", imm)
+	x = "0x"..tohex(imm)
       end
     elseif p == "R" then
       local r = byte(code, pos-1, pos-1)%8
