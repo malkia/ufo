@@ -326,11 +326,11 @@ ffi.cdef[[
    int         glfwGetWindowParam(           GLFWwindow, int    param   );
    void        glfwSetWindowUserPointer(     GLFWwindow, void*  pointer );
    void*       glfwGetWindowUserPointer(     GLFWwindow  );
-   void        glfwSetWindowSizeCallback(    GLFWwindowsizefun    cbfun );
-   void        glfwSetWindowCloseCallback(   GLFWwindowclosefun   cbfun );
-   void        glfwSetWindowRefreshCallback( GLFWwindowrefreshfun cbfun );
-   void        glfwSetWindowFocusCallback(   GLFWwindowfocusfun   cbfun );
-   void        glfwSetWindowIconifyCallback( GLFWwindowiconifyfun cbfun );
+   void        glfwSetWindowSizeCallback(    GLFWwindow, GLFWwindowsizefun    cbfun );
+   void        glfwSetWindowCloseCallback(   GLFWwindow, GLFWwindowclosefun   cbfun );
+   void        glfwSetWindowRefreshCallback( GLFWwindow, GLFWwindowrefreshfun cbfun );
+   void        glfwSetWindowFocusCallback(   GLFWwindow, GLFWwindowfocusfun   cbfun );
+   void        glfwSetWindowIconifyCallback( GLFWwindow, GLFWwindowiconifyfun cbfun );
 
    void        glfwPollEvents(               );
    void        glfwWaitEvents(               );
